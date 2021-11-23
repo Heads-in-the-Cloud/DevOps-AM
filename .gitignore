@@ -17,3 +17,4 @@ target/
 *.ipr
 
 .env
+/kubernetes/secret.yaml

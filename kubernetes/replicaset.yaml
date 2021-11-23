@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: api-users-rs
+  labels:
+    app: app-rs
+spec:
+  template:
+    metadata:
+      name: api-users-pod
+      labels:
+        role: api-users-role
+    spec:
+      containers:
+        - name: api-users
+          image: amattsonsm/users-api
+          ports:
+            - name: access
+              containerPort: 8443
+              protocol: TCP
+          env:
+            - name: spring.datasource.url
+              value: "jdbc:mysql://10.0.0.102/utopia?useSSL=false&allowPublicKeyRetrieval=true"
+            - name: spring.datasource.username
+              value: "api"
+            - name: spring.datasource.password
+              value: "passwurd"
+  replicas: 2
+  selector:
+    matchLabels:
+      role: api-users-role
