@@ -1,0 +1,35 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/backend-protocol: https
+spec:
+  rules:
+  - http:
+      paths:
+        #####################
+        # USERS API SERVICE #
+        #####################
+        - path: /login
+          pathType: Prefix
+          backend:
+            service:
+              name: api-users-service
+              port:
+                number: 8443
+        - path: /api/v1/users
+          pathType: Prefix
+          backend:
+            service:
+              name: api-users-service
+              port:
+                number: 8443
+        - path: /api/v1/roles
+          pathType: Prefix
+          backend:
+            service:
+              name: api-users-service
+              port:
+                number: 8443
+

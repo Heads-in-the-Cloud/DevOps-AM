@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-bookings-deploy
+  labels:
+    app: api-bookings-app
+spec:
+  selector:
+    matchLabels:
+      app: api-bookings-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: api-bookings-app
+    spec:
+      containers:
+        - name: api-bookings-app
+          image: amattsonsm/bookings-api:latest
+          ports:
+            - containerPort: 8443
+          env:
+            - name: DB_URL_SPRING
+              valueFrom:
+                secretKeyRef:
+                  key: DB_URL_SPRING
+                  name: utopia-secret
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: utopia-secret
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: DB_USERNAME
+                  name: utopia-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-bookings-service
+  labels:
+    app: api-bookings-app
+spec:
+  ports:
+    - protocol: TCP
+      port: 8082
+      name: http
+  selector:
+    app: api-bookings-app
