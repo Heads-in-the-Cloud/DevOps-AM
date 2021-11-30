@@ -6,6 +6,9 @@ spec:
   rules:
     - http:
         paths:
+          #######################
+          # FLIGHTS API SERVICE #
+          #######################
           - path: /api/v1/airports
             pathType: Prefix
             backend:
@@ -65,3 +68,20 @@ spec:
                 name: api-bookings-service
                 port:
                   number: 8082
+          #####################
+          # USERS API SERVICE #
+          #####################
+          - path: /api/v1/users
+            pathType: Prefix
+            backend:
+              service:
+                name: api-users-service
+                port:
+                  number: 8083
+          - path: /api/v1/roles
+            pathType: Prefix
+            backend:
+              service:
+                name: api-users-service
+                port:
+                  number: 8083

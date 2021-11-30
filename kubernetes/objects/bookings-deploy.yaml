@@ -18,7 +18,7 @@ spec:
         - name: api-bookings-app
           image: amattsonsm/bookings-api:latest
           ports:
-            - containerPort: 8443
+            - containerPort: 8082
           env:
             - name: DB_URL_SPRING
               valueFrom:

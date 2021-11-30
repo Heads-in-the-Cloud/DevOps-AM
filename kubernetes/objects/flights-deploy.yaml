@@ -18,7 +18,7 @@ spec:
         - name: api-flights-app
           image: amattsonsm/flights-api:latest
           ports:
-            - containerPort: 8443
+            - containerPort: 8081
           env:
             - name: DB_URL_SPRING
               valueFrom:

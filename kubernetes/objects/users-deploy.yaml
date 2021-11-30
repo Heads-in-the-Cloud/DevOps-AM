@@ -18,12 +18,12 @@ spec:
         - name: api-users-app
           image: amattsonsm/users-api:latest
           ports:
-            - containerPort: 8443
+            - containerPort: 8083
           env:
-            - name: DB_URL
+            - name: DB_URL_SPRING
               valueFrom:
                 secretKeyRef:
-                  key: DB_URL
+                  key: DB_URL_SPRING
                   name: utopia-secret
             - name: DB_PASSWORD
               valueFrom:
@@ -45,7 +45,7 @@ metadata:
 spec:
   ports:
     - protocol: TCP
-      port: 8443
+      port: 8083
       name: http
   selector:
     app: api-users-app
