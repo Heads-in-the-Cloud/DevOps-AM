@@ -13,7 +13,7 @@ services:
     hostname: users-api
     container_name: users-api
     ports:
-      - 8443:8443
+      - 8083:8083
     env_file:
       - .env
   bookings:
@@ -22,5 +22,13 @@ services:
     container_name: bookings-api
     ports:
       - 8082:8082
+    env_file:
+      - .env
+  auth:
+    image: amattsonsm/auth-api
+    hostname: auth-api
+    container_name: auth-api
+    ports:
+      - 8443:8443
     env_file:
       - .env
