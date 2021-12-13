@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-auth-deploy
+  labels:
+    app: api-auth-app
+spec:
+  selector:
+    matchLabels:
+      app: api-auth-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: api-auth-app
+    spec:
+      containers:
+        - name: api-auth-app
+          image: amattsonsm/auth-api:latest
+          ports:
+            - containerPort: 8443
+          env:
+            - name: DB_URL_SPRING
+              valueFrom:
+                secretKeyRef:
+                  key: DB_URL_SPRING
+                  name: utopia-secret
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: utopia-secret
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: DB_USERNAME
+                  name: utopia-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-auth-service
+  labels:
+    app: api-auth-app
+spec:
+  ports:
+    - protocol: TCP
+      port: 8443
+      name: https
+  selector:
+    app: api-auth-app

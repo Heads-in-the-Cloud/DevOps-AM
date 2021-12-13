@@ -1,0 +1,87 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress-http
+spec:
+  rules:
+    - http:
+        paths:
+          #######################
+          # FLIGHTS API SERVICE #
+          #######################
+          - path: /api/v1/airports
+            pathType: Prefix
+            backend:
+              service:
+                name: api-flights-service
+                port:
+                  number: 8081
+          - path: /api/v1/routes
+            pathType: Prefix
+            backend:
+              service:
+                name: api-flights-service
+                port:
+                  number: 8081
+          - path: /api/v1/airplanes
+            pathType: Prefix
+            backend:
+              service:
+                name: api-flights-service
+                port:
+                  number: 8081
+          - path: /api/v1/airplaneTypes
+            pathType: Prefix
+            backend:
+              service:
+                name: api-flights-service
+                port:
+                  number: 8081
+          - path: /api/v1/flights
+            pathType: Prefix
+            backend:
+              service:
+                name: api-flights-service
+                port:
+                  number: 8081
+          ########################
+          # BOOKINGS API SERVICE #
+          ########################
+          - path: /api/v1/bookings
+            pathType: Prefix
+            backend:
+              service:
+                name: api-bookings-service
+                port:
+                  number: 8082
+          - path: /api/v1/passengers
+            pathType: Prefix
+            backend:
+              service:
+                name: api-bookings-service
+                port:
+                  number: 8082
+          - path: /api/v1/payments
+            pathType: Prefix
+            backend:
+              service:
+                name: api-bookings-service
+                port:
+                  number: 8082
+          #####################
+          # USERS API SERVICE #
+          #####################
+          - path: /api/v1/users
+            pathType: Prefix
+            backend:
+              service:
+                name: api-users-service
+                port:
+                  number: 8083
+          - path: /api/v1/roles
+            pathType: Prefix
+            backend:
+              service:
+                name: api-users-service
+                port:
+                  number: 8083

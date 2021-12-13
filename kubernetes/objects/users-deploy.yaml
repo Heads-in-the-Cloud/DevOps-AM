@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-users-deploy
+  labels:
+    app: api-users-app
+spec:
+  selector:
+    matchLabels:
+      app: api-users-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: api-users-app
+    spec:
+      containers:
+        - name: api-users-app
+          image: amattsonsm/users-api:latest
+          ports:
+            - containerPort: 8083
+          env:
+            - name: DB_URL_SPRING
+              valueFrom:
+                secretKeyRef:
+                  key: DB_URL_SPRING
+                  name: utopia-secret
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PASSWORD
+                  name: utopia-secret
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  key: DB_USERNAME
+                  name: utopia-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-users-service
+  labels:
+    app: api-users-app
+spec:
+  ports:
+    - protocol: TCP
+      port: 8083
+      name: http
+  selector:
+    app: api-users-app
