@@ -17,7 +17,7 @@ ON AWS: create cluster, use role and vpc
 USE CLUSTER:
 aws eks update-kubeconfig \
   --region us-west-2 \
-  --name AM-eks-cluster-2
+  --name AM-eks-cluster
 kubectl get svc
 
 CREATE NODE ROLE (with policies):

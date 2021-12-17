@@ -29,3 +29,6 @@ kubectl apply -f secret.yaml
 
 # load objects
 cd objects && kubectl apply -f .
+
+# print eks endpoint
+kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}'
