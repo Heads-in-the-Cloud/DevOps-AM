@@ -9,7 +9,7 @@ kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main
 kubectl wait --namespace ingress-nginx \
   --for=condition=ready pod \
   --selector=app.kubernetes.io/component=controller \
-  --timeout=90s
+  --timeout=180s
 kubectl delete -A ValidatingWebhookConfiguration ingress-nginx-admission
 
 # create and move to new namespace

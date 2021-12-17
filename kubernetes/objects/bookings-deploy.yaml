@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: api-bookings-app
-          image: amattsonsm/bookings-api:latest
+          image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-bookings-api:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8082
           env:

@@ -1,0 +1,37 @@
+CREATE VPC:
+aws cloudformation create-stack \
+  --region us-west-2 \
+  --stack-name AM-eks-vpc \
+  --template-url https://amazon-eks.s3.us-west-2.amazonaws.com/cloudformation/2020-10-29/amazon-eks-vpc-private-subnets.yaml
+
+CREATE CLUSTER ROLE (with policies):
+aws iam create-role \
+  --role-name AM-eks-cluster-role \
+  --assume-role-policy-document file://"cluster-role-trust-policy.json"
+aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy \
+  --role-name AM-eks-cluster-role
+
+ON AWS: create cluster, use role and vpc
+
+USE CLUSTER:
+aws eks update-kubeconfig \
+  --region us-west-2 \
+  --name AM-eks-cluster-2
+kubectl get svc
+
+CREATE NODE ROLE (with policies):
+aws iam create-role \
+  --role-name AM-eks-node-role \
+  --assume-role-policy-document file://"node-role-trust-policy.json"
+aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy \
+  --role-name AM-eks-node-role
+aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly \
+  --role-name AM-eks-node-role
+aws iam attach-role-policy \
+  --policy-arn arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy \
+  --role-name AM-eks-node-role
+
+ON AWS: add node group (cluster>configuration>compute>add node group) with name/IAM

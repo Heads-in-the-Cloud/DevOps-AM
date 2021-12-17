@@ -1,5 +1,8 @@
 version: "3.8"
 services:
+  ###########
+  # FLIGHTS #
+  ###########
   flights:
     image: amattsonsm/flights-api
     hostname: flights-api
@@ -8,6 +11,14 @@ services:
       - 8081:8081
     env_file:
       - .env
+    # resources
+    mem_limit: 512m
+    mem_reservation: 128M
+    cpus: 0.5
+
+  #########
+  # USERS #
+  #########
   users:
     image: amattsonsm/users-api
     hostname: users-api
@@ -16,6 +27,14 @@ services:
       - 8083:8083
     env_file:
       - .env
+    # resources
+    mem_limit: 512m
+    mem_reservation: 128M
+    cpus: 0.5
+
+  ############
+  # BOOKINGS #
+  ############
   bookings:
     image: amattsonsm/bookings-api
     hostname: bookings-api
@@ -24,6 +43,14 @@ services:
       - 8082:8082
     env_file:
       - .env
+    # resources
+    mem_limit: 512m
+    mem_reservation: 128M
+    cpus: 0.5
+
+  ########
+  # AUTH #
+  ########
   auth:
     image: amattsonsm/auth-api
     hostname: auth-api
@@ -32,3 +59,7 @@ services:
       - 8443:8443
     env_file:
       - .env
+    # resources
+    mem_limit: 512m
+    mem_reservation: 128M
+    cpus: 0.5
