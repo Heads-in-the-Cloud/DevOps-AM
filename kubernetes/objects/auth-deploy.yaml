@@ -16,7 +16,8 @@ spec:
     spec:
       containers:
         - name: api-auth-app
-          image: amattsonsm/auth-api:latest
+          image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-auth-api:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8443
           env:
