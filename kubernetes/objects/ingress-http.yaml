@@ -2,10 +2,23 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: api-ingress-http
+  annotations:
+    kubernetes.io/ingress.class: nginx
 spec:
   rules:
-    - http:
+    - host: "*.elb.amazonaws.com"
+      http:
         paths:
+          ####################
+          # AUTH API SERVICE #
+          ####################
+          - path: /login
+            pathType: Prefix
+            backend:
+              service:
+                name: api-auth-service
+                port:
+                  number: 8443
           #######################
           # FLIGHTS API SERVICE #
           #######################
