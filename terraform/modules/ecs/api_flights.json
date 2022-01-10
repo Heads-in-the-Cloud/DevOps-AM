@@ -1,0 +1,16 @@
+[
+  {
+    "name": 2,
+    "image": "${var.flights-repo}",
+    "cpu": "${var.cpu}",
+    "memory": "${var.memory}",
+    "essential": true,
+    "portMappings": [
+      {
+        "containerPort": 8081,
+        "hostPort": 8081
+      }
+    ],
+    "environment": "${var.environment}"
+  }
+]
