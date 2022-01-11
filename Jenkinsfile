@@ -4,7 +4,7 @@ pipeline {
     environment {
         commit = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
         aws_region = 'us-west-2'
-        apply = true
+        apply = false
         terraform_directory = "terraform"
     }
 
@@ -32,6 +32,7 @@ pipeline {
                     if (env.apply == true) {
                         echo 'Applying Terraform objects'
                         dir("${terraform_directory}") {
+                            sh 'terraform refresh'
                             sh 'terraform apply -auto-approve plans/plan-${commit}'
                         }
                     } else {
