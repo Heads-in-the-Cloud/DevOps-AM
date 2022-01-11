@@ -22,7 +22,7 @@ resource "aws_ecs_task_definition" "api_flights" {
       image = var.flights-repo
       memory = var.memory
       cpu = var.cpu
-      essential = false
+      essential = true
       portMappings = [
         {
           containerPort = 8081
@@ -50,9 +50,22 @@ resource "aws_ecs_service" "flights_service" {
   network_configuration {
     security_groups = [ aws_security_group.ecs_api_security.id ]
     subnets = var.service_subnets
-    assign_public_ip = true
+    assign_public_ip = false
   }
+//  load_balancer {
+//    container_name = local.flights_name
+//    container_port = 8081
+//    target_group_arn = ""
+//  }
 }
+
+//resource "aws_lb_target_group" "flights_direct" {
+//  name = "AM-ecs-flights-target"
+//  port = 8081
+//  protocol = "TCP"
+//  target_type = "ip"
+//  vpc_id = var.vpc_id
+//}
 
 resource "aws_security_group" "ecs_api_security" {
   name = "AM-allow-apis"

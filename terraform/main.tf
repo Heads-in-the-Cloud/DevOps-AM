@@ -55,7 +55,7 @@ module "ecs" {
   source          = "./modules/ecs"
   task_arn        = "arn:aws:iam::026390315914:role/AM-ecs-task-execution-secrets-role"
   vpc_id          = module.network.db_vpc
-  service_subnets = [module.network.all_subnets[2], module.network.all_subnets[3]]
+  service_subnets = [module.network.all_subnets[0], module.network.all_subnets[1]]
   flights-repo    = "${data.aws_ecr_repository.ecr-flights.repository_url}:latest"
   users-repo      = "${data.aws_ecr_repository.ecr-users.repository_url}:latest"
   bookings-repo   = "${data.aws_ecr_repository.ecr-bookings.repository_url}:latest"
