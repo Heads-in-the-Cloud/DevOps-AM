@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# switch context to EKS before running:
+#   aws eks --region us-west-2 update-kubeconfig --name <NAME>
 (
   # create basic ingress framework
   cd init
