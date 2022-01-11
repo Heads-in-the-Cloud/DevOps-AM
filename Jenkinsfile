@@ -17,7 +17,7 @@ pipeline {
         stage('AWS') {
             steps {
                 echo 'logging in via AWS client'
-                sh 'aws ecr get-login-password --region ${aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repo}.dkr.ecr.${aws_region}.amazonaws.com'
+                // sh 'aws ecr get-login-password --region ${aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repo}.dkr.ecr.${aws_region}.amazonaws.com'
             }
         }
         stage('Apply') {
