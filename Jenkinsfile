@@ -4,6 +4,8 @@ pipeline {
     environment {
         commit = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
         aws_region = 'us-west-2'
+        apply = false
+        terraform_directory = "terraform"
     }
 
     stages {
@@ -14,20 +16,28 @@ pipeline {
                 sh 'pwd'
             }
         }
-        stage('AWS') {
+        stage('Terraform Plan') {
             steps {
-                echo 'logging in via AWS client'
-                // sh 'aws ecr get-login-password --region ${aws_region} | docker login --username AWS --password-stdin ${aws_ecr_repo}.dkr.ecr.${aws_region}.amazonaws.com'
-            }
-        }
-        stage('Apply') {
-            steps {
-                echo 'Applying Terraform config'
-                dir("terraform") {
+                echo 'Planning terraform infrastructure'
+                dir("${terraform_directory}") {
                     sh 'mkdir -p plans'
                     sh 'terraform init'
                     sh 'terraform plan -out plans/plan-${commit}'
-                    sh 'terraform apply -auto-approve plans/plan-${commit}'
+                }
+            }
+        }
+        stage('Terraform Apply') {
+            steps {
+                script {
+                    if (env.apply == true) {
+                        echo 'Applying Terraform objects'
+                        dir("${terraform_directory}") {
+                            sh 'terraform refresh'
+                            sh 'terraform apply -auto-approve plans/plan-${commit}'
+                        }
+                    } else {
+                        echo 'Skipping Terraform Apply'
+                    }
                 }
             }
         }
