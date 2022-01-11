@@ -1,4 +1,18 @@
 
+#####################
+# Network Variables #
+#####################
+
+variable "vpc_id" {
+  type = string
+  default = ""
+}
+
+variable "service_subnets" {
+  type = list(string)
+  default = []
+}
+
 #################
 # ECS Variables #
 #################
@@ -50,4 +64,15 @@ variable "auth-repo" {
 variable "environment" {
   type = list(map(string))
   default = []
+}
+
+##################
+# Defined Locals #
+##################
+
+locals {
+  flights_name = "AM-task-flights"
+  bookings_name = "AM-task-bookings"
+  users_name = "AM-task-users"
+  auth_name = "AM-task-auth"
 }

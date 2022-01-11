@@ -20,7 +20,7 @@ variable "db_instance_class" {
 
 variable "db_name" {
   type = string
-  default = "amUtopiaDB"
+  default = "utopia"
 }
 
 variable "db_username" {
@@ -68,5 +68,5 @@ variable "bastion_instance_type" {
 
 variable "bastion_ssh_keyname" {
   type = string
-  default = "GroupKey"
+  default = "bastion_key"
 }

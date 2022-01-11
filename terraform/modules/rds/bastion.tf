@@ -4,14 +4,17 @@ resource "aws_instance" "bastion" {
   ami                         = var.ami_id
   instance_type               = var.bastion_instance_type
   associate_public_ip_address = true
-  key_name                    = var.bastion_ssh_keyname
+  subnet_id                   = var.public_subnet_id
+  key_name                    = aws_key_pair.bastion_key.key_name
+  vpc_security_group_ids      = [aws_security_group.bastion_security.id]
+  iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
   tags = { Name               = "am-bastion" }
 
   // startup script
   user_data                   = templatefile("${path.root}/modules/rds/bastion_init.sh", {
     DB_ENDPOINT   = aws_db_instance.rds.address
-    DB_USER       = var.db_username
-    DB_PASS       = var.db_password
+    DB_USERNAME   = var.db_username
+    DB_PASSWORD   = var.db_password
     DB_NAME       = var.db_name
   })
 }
@@ -36,7 +39,7 @@ resource "aws_security_group" "bastion_security" {
   }
 
   tags = {
-    Name = "am-bastion-security"
+    Name = "am-bastion-securitygroup"
   }
 }
 
