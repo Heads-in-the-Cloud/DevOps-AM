@@ -24,6 +24,7 @@ pipeline {
             steps {
                 echo 'Applying Terraform config'
                 sh 'mkdir -p plans'
+                sh 'terraform init'
                 sh 'terraform plan -out plans/plan-${commit}'
                 sh 'terraform apply -auto-approve plans/plan-${commit}'
             }
