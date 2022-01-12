@@ -13,6 +13,11 @@ variable "service_subnets" {
   default = []
 }
 
+variable "r53_zone_id" {
+  type = string
+  default = ""
+}
+
 #################
 # ECS Variables #
 #################
@@ -66,13 +71,16 @@ variable "environment" {
   default = []
 }
 
+variable "desired-container-count" {
+  type = number
+  default = 1
+}
+
 ##################
 # Defined Locals #
 ##################
 
 locals {
-  flights_name = "AM-task-flights"
-  bookings_name = "AM-task-bookings"
-  users_name = "AM-task-users"
-  auth_name = "AM-task-auth"
+  indexes = {"flights": 8081, "users": 8083, "bookings": 8082, "auth": 8443}
+  repos = {"flights": var.flights-repo, "users": var.users-repo, "bookings": var.bookings-repo, "auth": var.auth-repo}
 }
