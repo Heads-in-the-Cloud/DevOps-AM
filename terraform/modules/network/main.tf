@@ -54,9 +54,9 @@ resource "aws_subnet" "public_subnet_2" {
   }
 }
 
-################
-# Subnet Group #
-################
+##########################
+# Subnet Group (Private) #
+##########################
 resource "aws_db_subnet_group" "subnet_group_private" {
   name = "subnet_group_private"
   subnet_ids = [aws_subnet.private_subnet_1.id, aws_subnet.private_subnet_2.id]
@@ -68,7 +68,6 @@ resource "aws_db_subnet_group" "subnet_group_private" {
 ####################
 # Internet Gateway #
 ####################
-
 resource "aws_internet_gateway" "vpc_gateway" {
   vpc_id = aws_vpc.am-vpc-db.id
   tags = {
@@ -76,6 +75,9 @@ resource "aws_internet_gateway" "vpc_gateway" {
   }
 }
 
+###############
+# Route Table #
+###############
 resource "aws_route_table" "vpc_routetable" {
   vpc_id = aws_vpc.am-vpc-db.id
   route {

@@ -23,6 +23,7 @@ locals {
   db_creds = jsondecode(
     data.aws_secretsmanager_secret_version.secrets.secret_string
   )
+  zone_id = "Z02774322V8FI017JONWO"
 }
 
 module "network" {
@@ -45,7 +46,7 @@ module "utopia-db" {
   db_engine_version     = "8.0.23"
   subnet_group_id       = module.network.subnet_group_id
   public_subnet_id      = module.network.all_subnets[2]
-  vpc_id                = module.network.db_vpc
+  vpc_id                = module.network.utopia_vpc
   db_username           = local.db_creds.DB_USERNAME
   db_password           = local.db_creds.DB_PASSWORD
   ami_id                = "ami-00f7e5c52c0f43726"
@@ -53,16 +54,22 @@ module "utopia-db" {
 
 module "ecs" {
   source          = "./modules/ecs"
+  r53_zone_id     = local.zone_id
   task_arn        = "arn:aws:iam::026390315914:role/AM-ecs-task-execution-secrets-role"
-  vpc_id          = module.network.db_vpc
-  service_subnets = [module.network.all_subnets[0], module.network.all_subnets[1]]
+  vpc_id          = module.network.utopia_vpc
+  memory          = 2048
+  cpu             = 1024
+  service_subnets = [module.network.all_subnets[2], module.network.all_subnets[3]]
   flights-repo    = "${data.aws_ecr_repository.ecr-flights.repository_url}:latest"
   users-repo      = "${data.aws_ecr_repository.ecr-users.repository_url}:latest"
   bookings-repo   = "${data.aws_ecr_repository.ecr-bookings.repository_url}:latest"
   auth-repo       = "${data.aws_ecr_repository.ecr-auth.repository_url}:latest"
   environment     = [
-    { name: "DB_URL_SPRING", value: "jdbc:mysql://${module.utopia-db.db_address}/utopia?useSSL=false&allowPublicKeyRetrieval=true"},
+    { name: "DB_TYPE", value: "mysql" },
+    { name: "DB_ADDRESS", value: module.utopia-db.db_address },
+    { name: "DB_NAME", value: "utopia" },
+    { name: "DB_PORT", value: "3306" },
     { name: "DB_USERNAME", value: local.db_creds.DB_USERNAME },
-    { name: "DB_PASSWORD", value: local.db_creds.DB_PASSWORD }
-  ]
+    { name: "DB_PASSWORD", value: local.db_creds.DB_PASSWORD }]
+  desired-container-count = 1
 }

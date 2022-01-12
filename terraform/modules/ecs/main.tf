@@ -1,71 +1,34 @@
 
+#################
+# ECS Resources #
+#################
+
+// cluster
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "am_ecs_cluster"
 }
 
-resource "aws_ecs_task_definition" "api_flights" {
-  // general
-  family = local.flights_name
-  requires_compatibilities = ["FARGATE"]
-
-  // variable
-  task_role_arn = var.task_arn
-  execution_role_arn = var.task_arn
-  network_mode = var.net_mode
-  memory = var.memory
-  cpu = var.cpu
-
-  // containers
-  container_definitions = jsonencode([
-    {
-      name = local.flights_name
-      image = var.flights-repo
-      memory = var.memory
-      cpu = var.cpu
-      essential = true
-      portMappings = [
-        {
-          containerPort = 8081
-          hostPort = 8081
-        }]
-      environment = var.environment
-      logConfiguration = {
-        logDriver = "awslogs"
-        options = {
-          awslogs-group = "/ecs/AM-ecs-apis"
-          awslogs-region = "us-west-2"
-          awslogs-stream-prefix = "ecs"
-        }
-      }
-    }
-  ])
+// load balancer
+resource "aws_alb" "utopia_alb" {
+  name = "AM-alb-utopia"
+  internal = false
+  load_balancer_type = "application"
+  security_groups = [ aws_security_group.ecs_api_security.id ]
+  subnets = var.service_subnets
 }
 
-resource "aws_ecs_service" "flights_service" {
-  name = "AM-flights-service"
-  cluster = aws_ecs_cluster.ecs_cluster.id
-  task_definition = aws_ecs_task_definition.api_flights.arn
-  desired_count = 1
-  launch_type = "FARGATE"
-  network_configuration {
-    security_groups = [ aws_security_group.ecs_api_security.id ]
-    subnets = var.service_subnets
-    assign_public_ip = false
-  }
-//  load_balancer {
-//    container_name = local.flights_name
-//    container_port = 8081
-//    target_group_arn = ""
-//  }
+// route 53
+resource "aws_route53_record" "utopia_record" {
+  zone_id = var.r53_zone_id
+  name = "am-utopia.hitwc.link"
+  type = "CNAME"
+  ttl = "20"
+  records = [aws_alb.utopia_alb.dns_name]
 }
 
-//resource "aws_lb_target_group" "flights_direct" {
-//  name = "AM-ecs-flights-target"
-//  port = 8081
-//  protocol = "TCP"
-//  target_type = "ip"
-//  vpc_id = var.vpc_id
-//}
+############
+# Security #
+############
 
 resource "aws_security_group" "ecs_api_security" {
   name = "AM-allow-apis"

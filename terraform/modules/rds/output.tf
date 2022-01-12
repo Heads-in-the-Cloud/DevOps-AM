@@ -5,7 +5,7 @@
 
 // subnet group for database use
 output "db_address" {
-  value = aws_db_instance.rds.endpoint
+  value = element(split(":", aws_db_instance.rds.endpoint), 0)
 }
 
 output "bastion_public_id" {
