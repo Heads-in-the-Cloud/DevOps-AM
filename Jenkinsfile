@@ -22,7 +22,7 @@ pipeline {
                 dir("${terraform_directory}") {
                     sh 'mkdir -p plans'
                     sh 'terraform init'
-                    sh 'terraform plan -out plans/plan-${commit}'
+                    sh 'terraform plan -out plans/plan-${commit}.tf -no-color > plans/plan-${commit}.txt'
                 }
             }
         }
@@ -33,7 +33,7 @@ pipeline {
                         echo 'Applying Terraform objects'
                         dir("${terraform_directory}") {
                             sh 'terraform refresh'
-                            sh 'terraform apply -auto-approve plans/plan-${commit}'
+                            sh 'terraform apply -auto-approve plans/plan-${commit}.tf'
                         }
                     } else {
                         echo 'Skipping Terraform Apply'

@@ -11,7 +11,7 @@ resource "aws_instance" "bastion" {
   tags = { Name               = "AM-bastion" }
 
   // startup script
-  user_data                   = templatefile("${path.root}/modules/rds/bastion_init.sh", {
+  user_data                   = templatefile("${path.module}/bastion_init.sh", {
     DB_ENDPOINT   = aws_db_instance.rds.address
     DB_USERNAME   = var.db_username
     DB_PASSWORD   = var.db_password

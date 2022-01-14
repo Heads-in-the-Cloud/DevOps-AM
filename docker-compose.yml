@@ -4,7 +4,7 @@ services:
   # FLIGHTS #
   ###########
   flights:
-    image: amattsonsm/flights-api
+    image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-flights-api
     hostname: flights-api
     container_name: flights-api
     ports:
@@ -12,15 +12,15 @@ services:
     env_file:
       - .env
     # resources
-    mem_limit: 512m
+    mem_limit: 1024m
     mem_reservation: 128M
-    cpus: 0.5
+    cpus: 1
 
   #########
   # USERS #
   #########
   users:
-    image: amattsonsm/users-api
+    image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-users-api
     hostname: users-api
     container_name: users-api
     ports:
@@ -28,15 +28,15 @@ services:
     env_file:
       - .env
     # resources
-    mem_limit: 512m
+    mem_limit: 1024m
     mem_reservation: 128M
-    cpus: 0.5
+    cpus: 1
 
   ############
   # BOOKINGS #
   ############
   bookings:
-    image: amattsonsm/bookings-api
+    image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-bookings-api
     hostname: bookings-api
     container_name: bookings-api
     ports:
@@ -44,15 +44,15 @@ services:
     env_file:
       - .env
     # resources
-    mem_limit: 512m
+    mem_limit: 1024m
     mem_reservation: 128M
-    cpus: 0.5
+    cpus: 1
 
   ########
   # AUTH #
   ########
   auth:
-    image: amattsonsm/auth-api
+    image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-auth-api
     hostname: auth-api
     container_name: auth-api
     ports:
@@ -60,6 +60,6 @@ services:
     env_file:
       - .env
     # resources
-    mem_limit: 512m
+    mem_limit: 1024m
     mem_reservation: 128M
-    cpus: 0.5
+    cpus: 1
