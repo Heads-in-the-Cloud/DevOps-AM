@@ -1,5 +1,7 @@
 version: "3.8"
 x-aws-vpc: "${AWS_VPC_ID}"
+x-aws-loadbalancer: "${AWS_ALB_ID}"
+x-aws-cluster: "${AWS_ECS_CLUSTER}"
 services:
   ###########
   # FLIGHTS #
