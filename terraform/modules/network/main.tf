@@ -39,6 +39,7 @@ resource "aws_subnet" "public_subnet_1" {
   cidr_block = var.vpc_subnet_1_public_cidr
   availability_zone = var.zone_1
   map_public_ip_on_launch = true
+
   tags = {
     Name = "am-subnet-public-1"
   }

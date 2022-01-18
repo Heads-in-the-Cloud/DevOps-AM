@@ -8,6 +8,14 @@ resource "aws_ecs_cluster" "ecs_cluster" {
   name = "am_ecs_cluster"
 }
 
+resource "aws_lb" "utopia_nwb" {
+  name = "AM-nwb-utopia"
+  internal = false
+  load_balancer_type = "network"
+  security_groups = [aws_security_group.ecs_api_security.id]
+  subnets = var.service_subnets
+}
+
 // load balancer
 resource "aws_alb" "utopia_alb" {
   name = "AM-alb-utopia"

@@ -1,6 +1,6 @@
 
 output "ALB_ID" {
-  value = aws_alb.utopia_alb.id
+  value = aws_lb.utopia_nwb.id
 }
 
 output "ECS_CLUSTER" {
