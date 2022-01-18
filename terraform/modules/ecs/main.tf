@@ -3,24 +3,11 @@
 # ECS Resources #
 #################
 
-// cluster
-resource "aws_ecs_cluster" "ecs_cluster" {
-  name = "am_ecs_cluster"
-}
-
+// load balancing
 resource "aws_lb" "utopia_nwb" {
   name = "AM-nwb-utopia"
   internal = false
   load_balancer_type = "network"
-  subnets = var.service_subnets
-}
-
-// load balancer
-resource "aws_alb" "utopia_alb" {
-  name = "AM-alb-utopia"
-  internal = false
-  load_balancer_type = "application"
-  security_groups = [ aws_security_group.ecs_api_security.id ]
   subnets = var.service_subnets
 }
 
@@ -30,7 +17,7 @@ resource "aws_route53_record" "utopia_record" {
   name = "am-utopia.hitwc.link"
   type = "CNAME"
   ttl = "20"
-  records = [aws_alb.utopia_alb.dns_name]
+  records = [aws_lb.utopia_nwb.dns_name]
 }
 
 ############
