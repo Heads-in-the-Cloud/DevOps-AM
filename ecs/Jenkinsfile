@@ -21,11 +21,9 @@ pipeline {
         stage('Push ECS') {
             steps {
                 echo 'Configuring ECS'
-                sh 'ls'
                 dir("ecs") {
-                    sh 'ls'
                     sh 'docker context use am_aws_ecs'
-                    sh 'docker-compose up'
+                    sh 'docker compose up --no-color'
                 }
             }
         }
