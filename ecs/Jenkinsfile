@@ -3,8 +3,6 @@ pipeline {
     environment {
         AWS_RDS_USERNAME = credentials('AM_DB_USERNAME')
         AWS_RDS_PASSWORD = credentials('AM_DB_PASSWORD')
-        AWS_ACCESS_KEY_ID = credentials('AM_AWS_ACCESS')
-        AWS_SECRET_ACCESS_KEY = credentials('AM_AWS_SECRET')
     }
     stages {
         stage('Load Environment') {
@@ -14,6 +12,8 @@ pipeline {
                     def outputs = readProperties file: '/var/lib/jenkins-worker-node/AM-resources/env.tf'
                     env.AWS_VPC_ID = outputs.AWS_VPC_ID
                     env.AWS_RDS_ENDPOINT = outputs.AWS_RDS_ENDPOINT
+                    env.AWS_ALB_ID = outputs.AWS_ALB_ID
+                    env.AWS_ECS_CLUSTER = outputs.AWS_ECS_CLUSTER
                 }
                 sh 'echo Environment loaded: VPC = ${AWS_VPC_ID} ----- RDS = ${AWS_RDS_ENDPOINT}'
             }

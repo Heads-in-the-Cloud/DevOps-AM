@@ -2,7 +2,7 @@
 ###############
 # ALB Hookups #
 ###############
-
+/**
 resource "aws_lb_target_group" "flights_direct" {
   for_each = local.indexes
   name = "AM-ecs-${each.value}-target"
