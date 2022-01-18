@@ -33,7 +33,7 @@ pipeline {
         stage('Terraform Apply') {
             steps {
                 script {
-                    if (env.apply == true) {
+                    if (${apply} == true) {
                         echo 'Applying Terraform objects'
                         dir("${terraform_directory}") {
                             sh 'terraform refresh'
@@ -49,7 +49,7 @@ pipeline {
         stage('Terraform Output') {
             steps {
                 script {
-                    if (env.apply == true) {
+                    if (${apply} == true) {
                         echo 'Exporting outputs as variables'
                         dir("${terraform_directory}") {
                             sh 'terraform output | tr -d \'\\\"\\ \' > ${resource_directory}/env.tf'
