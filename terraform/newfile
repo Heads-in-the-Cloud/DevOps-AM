@@ -1,0 +1,3 @@
+AWS_VPC_ID=vpc-05949b7ebec429485
+name=subnet_group_private
+vpc_id=vpc-05949b7ebec429485

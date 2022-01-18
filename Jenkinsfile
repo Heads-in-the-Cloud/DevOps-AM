@@ -4,11 +4,13 @@ pipeline {
     environment {
         commit = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
         aws_region = 'us-west-2'
-        apply = false
+        apply = true
         terraform_directory = "terraform"
+        resource_directory = "/var/lib/jenkins-worker-node/AM-resources"
     }
 
     stages {
+
         stage('System information') {
             steps {
                 echo 'Debug info:'
@@ -16,6 +18,7 @@ pipeline {
                 sh 'pwd'
             }
         }
+
         stage('Terraform Plan') {
             steps {
                 echo 'Planning terraform infrastructure'
@@ -26,11 +29,7 @@ pipeline {
                 }
             }
         }
-        stage('Terraform Output') {
-            steps {
-                sh 'terraform output | tr -d \'\\\"\\ \''
-            }
-        }
+
         stage('Terraform Apply') {
             steps {
                 script {
@@ -46,5 +45,20 @@ pipeline {
                 }
             }
         }
+
+        stage('Terraform Output') {
+            steps {
+                script {
+                    if (env.apply == true) {
+                        echo 'Exporting outputs as variables'
+                        dir("${terraform_directory}") {
+                            sh 'terraform output | tr -d \'\\\"\\ \' > ${resource_directory}/env.tf'
+                        }
+                    }
+                }
+            }
+        }
+
+        //end
     }
 }
