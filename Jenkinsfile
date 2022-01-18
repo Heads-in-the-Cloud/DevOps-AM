@@ -9,7 +9,7 @@ pipeline {
     }
 
     parameters {
-        booleanParam(name: "APPLY", defaultValue: true)
+        booleanParam(name: "APPLY", defaultValue: false)
     }
 
     stages {
