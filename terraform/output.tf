@@ -10,7 +10,3 @@ output "AWS_RDS_ENDPOINT" {
 output "AWS_ALB_ID" {
   value = module.ecs.ALB_ID
 }
-
-output "AWS_ECS_CLUSTER" {
-  value = module.ecs.ECS_CLUSTER
-}
