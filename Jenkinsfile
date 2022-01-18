@@ -38,7 +38,6 @@ pipeline {
             steps {
                 echo 'Applying Terraform objects'
                 dir("${terraform_directory}") {
-                    sh 'terraform refresh'
                     sh 'terraform apply -auto-approve plans/plan-${commit}.tf'
                 }
             }
@@ -49,6 +48,7 @@ pipeline {
             steps {
                 echo 'Exporting outputs as variables'
                 dir("${terraform_directory}") {
+                    sh 'terraform refresh'
                     sh 'terraform output | tr -d \'\\\"\\ \' > ${resource_directory}/env.tf'
                 }
             }
