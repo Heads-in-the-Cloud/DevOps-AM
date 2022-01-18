@@ -34,8 +34,8 @@ pipeline {
         }
 
         stage('Terraform Apply') {
+            when { expression { params.APPLY } }
             steps {
-                when { expression { params.APPLY } }
                 echo 'Applying Terraform objects'
                 dir("${terraform_directory}") {
                     sh 'terraform refresh'
@@ -45,8 +45,8 @@ pipeline {
         }
 
         stage('Terraform Output') {
+            when { expression { params.APPLY } }
             steps {
-                when { expression { params.APPLY } }
                 echo 'Exporting outputs as variables'
                 dir("${terraform_directory}") {
                     sh 'terraform output | tr -d \'\\\"\\ \' > ${resource_directory}/env.tf'
