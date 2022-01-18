@@ -4,7 +4,7 @@ output "AWS_VPC_ID" {
 }
 
 output "AWS_RDS_ENDPOINT" {
-  value = nonsensitive(module.utopia-db.db_address)
+  value = module.utopia-db.db_address
 }
 
 output "AWS_RDS_USERNAME" {
