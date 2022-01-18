@@ -13,7 +13,6 @@ pipeline {
                     env.AWS_VPC_ID = outputs.AWS_VPC_ID
                     env.AWS_RDS_ENDPOINT = outputs.AWS_RDS_ENDPOINT
                     env.AWS_ALB_ID = outputs.AWS_ALB_ID
-                    env.AWS_ECS_CLUSTER = outputs.AWS_ECS_CLUSTER
                 }
                 sh 'echo Environment loaded: VPC = ${AWS_VPC_ID} ----- RDS = ${AWS_RDS_ENDPOINT}'
             }
