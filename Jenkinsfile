@@ -27,7 +27,7 @@ pipeline {
                 echo 'Planning terraform infrastructure'
                 dir("${terraform_directory}") {
                     sh 'mkdir -p plans'
-                    sh 'terraform init'
+                    sh 'terraform init -no-color'
                     sh 'terraform plan -out plans/plan-${commit}.tf -no-color > plans/plan-${commit}.txt'
                 }
             }
@@ -38,7 +38,7 @@ pipeline {
             steps {
                 echo 'Applying Terraform objects'
                 dir("${terraform_directory}") {
-                    sh 'terraform apply -auto-approve plans/plan-${commit}.tf'
+                    sh 'terraform apply -no-color -auto-approve plans/plan-${commit}.tf'
                 }
             }
         }
