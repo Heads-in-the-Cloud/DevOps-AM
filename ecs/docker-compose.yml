@@ -1,0 +1,58 @@
+version: "3.8"
+x-aws-vpc: 'vpc-05949b7ebec429485'
+services:
+  ###########
+  # FLIGHTS #
+  ###########
+  flights:
+    image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-flights-api
+    ports:
+      - 8081:8081
+    env_file:
+      - .env
+    # resources
+    mem_limit: 2048m
+    mem_reservation: 128M
+    cpus: 1
+
+  #########
+  # USERS #
+  #########
+  users:
+    image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-users-api
+    ports:
+      - 8083:8083
+    env_file:
+      - .env
+    # resources
+    mem_limit: 2048m
+    mem_reservation: 128M
+    cpus: 1
+
+  ############
+  # BOOKINGS #
+  ############
+  bookings:
+    image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-bookings-api
+    ports:
+      - 8082:8082
+    env_file:
+      - .env
+    # resources
+    mem_limit: 2048m
+    mem_reservation: 128M
+    cpus: 1
+
+  ########
+  # AUTH #
+  ########
+  auth:
+    image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-auth-api
+    ports:
+      - 8443:8443
+    env_file:
+      - .env
+    # resources
+    mem_limit: 2048m
+    mem_reservation: 128M
+    cpus: 1
