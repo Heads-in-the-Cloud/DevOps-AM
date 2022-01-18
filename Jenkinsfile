@@ -49,7 +49,7 @@ pipeline {
                 echo 'Exporting outputs as variables'
                 dir("${terraform_directory}") {
                     sh 'terraform refresh'
-                    sh 'terraform output | tr -d \'\\\"\\ \' > ${resource_directory}/env.tf'
+                    sh 'terraform output | tr -d \'\\ \' > ${resource_directory}/env.tf'
                 }
             }
         }
