@@ -28,7 +28,7 @@ pipeline {
         }
         stage('Terraform Output') {
             steps {
-                sh 'terraform output | tr -d \'\\\"\\ '
+                sh 'terraform output | tr -d \'\\\"\\ \''
             }
         }
         stage('Terraform Apply') {
