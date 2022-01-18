@@ -4,9 +4,12 @@ pipeline {
     environment {
         commit = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
         aws_region = 'us-west-2'
-        apply = true
         terraform_directory = "terraform"
         resource_directory = "/var/lib/jenkins-worker-node/AM-resources"
+    }
+
+    parameters {
+        booleanParam(name: "APPLY", defaultValue: true)
     }
 
     stages {
@@ -32,29 +35,21 @@ pipeline {
 
         stage('Terraform Apply') {
             steps {
-                script {
-                    if (${apply} == true) {
-                        echo 'Applying Terraform objects'
-                        dir("${terraform_directory}") {
-                            sh 'terraform refresh'
-                            sh 'terraform apply -auto-approve plans/plan-${commit}.tf'
-                        }
-                    } else {
-                        echo 'Skipping Terraform Apply'
-                    }
+                when { expression { params.APPLY } }
+                echo 'Applying Terraform objects'
+                dir("${terraform_directory}") {
+                    sh 'terraform refresh'
+                    sh 'terraform apply -auto-approve plans/plan-${commit}.tf'
                 }
             }
         }
 
         stage('Terraform Output') {
             steps {
-                script {
-                    if (${apply} == true) {
-                        echo 'Exporting outputs as variables'
-                        dir("${terraform_directory}") {
-                            sh 'terraform output | tr -d \'\\\"\\ \' > ${resource_directory}/env.tf'
-                        }
-                    }
+                when { expression { params.APPLY } }
+                echo 'Exporting outputs as variables'
+                dir("${terraform_directory}") {
+                    sh 'terraform output | tr -d \'\\\"\\ \' > ${resource_directory}/env.tf'
                 }
             }
         }
