@@ -3,6 +3,7 @@ pipeline {
     environment {
         AWS_RDS_USERNAME = credentials('AM_DB_USERNAME')
         AWS_RDS_PASSWORD = credentials('AM_DB_PASSWORD')
+        ECS_CONTEXT_NAME = "am_aws"
     }
     stages {
         stage('Load Environment') {
@@ -20,8 +21,8 @@ pipeline {
         stage('Push ECS') {
             steps {
                 echo 'Configuring ECS'
-                dir("ecs") {
-                    sh 'docker context use am_aws_ecs'
+                dir("am-ecs") {
+                    sh 'docker context use ${ECS_CONTEXT_NAME}'
                     sh 'docker compose up --no-color'
                 }
             }
