@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         commit = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
-        aws_region = 'us-west-2'
+        aws_region = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
         terraform_directory = "terraform"
         resource_directory = "/var/lib/jenkins-worker-node/AM-resources"
     }
@@ -46,10 +46,24 @@ pipeline {
         stage('Terraform Output') {
             when { expression { params.APPLY } }
             steps {
-                echo 'Exporting outputs as variables'
+                echo 'Exporting outputs as secrets'
                 dir("${terraform_directory}") {
                     sh 'terraform refresh'
                     sh 'terraform output | tr -d \'\\\"\\ \' > ${resource_directory}/env.tf'
+                }
+                script {
+                    withCredentials([
+                        string (credentialsId: 'dev/AM/utopia-secrets',
+                        variable: 'DB_CREDS')
+                    ]) {
+                        def creds = readJSON text: DB_CREDS
+                        def outputs = readProperties file: '${resource_directory}/env.tf'
+                        creds.AWS_VPC_ID = outputs.AWS_VPC_ID
+                        creds.AWS_RDS_ENDPOINT = outputs.AWS_RDS_ENDPOINT
+                        creds.AWS_ALB_ID = outputs.AWS_ALB_ID
+                        def secretString = "${jsonObj}".replace('[', '{').replace(']', '}')
+                        sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:us-west-2:026390315914:secret:dev/AM/utopia-secrets-NE4x9z' --secret-string '${secretString}'"
+                    }
                 }
             }
         }

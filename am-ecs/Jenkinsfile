@@ -1,23 +1,28 @@
 pipeline {
     agent {label 'aws-ready'}
     environment {
-        AWS_RDS_USERNAME = credentials('AM_DB_USERNAME')
-        AWS_RDS_PASSWORD = credentials('AM_DB_PASSWORD')
         ECS_CONTEXT_NAME = "am_aws"
-        AWS_ACCOUNT_ID = "026390315914"
-        AWS_REGION_ID = "us-west-2"
+        AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
+        AWS_REGION_ID = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
     }
     stages {
         stage('Load Environment') {
             steps {
                 echo 'Loading Environment'
                 script {
-                    def outputs = readProperties file: '/var/lib/jenkins-worker-node/AM-resources/env.tf'
-                    env.AWS_VPC_ID = outputs.AWS_VPC_ID
-                    env.AWS_RDS_ENDPOINT = outputs.AWS_RDS_ENDPOINT
-                    env.AWS_ALB_ID = outputs.AWS_ALB_ID
+                    withCredentials([
+                        string(credentialsId: 'dev/AM/utopia-secrets',
+                        variable: 'DB_CREDS')
+                    ]) {
+                        // def outputs = readProperties file: '/var/lib/jenkins-worker-node/AM-resources/env.tf'
+                        def jsonObj = readJSON text: DB_CREDS
+                        env.AWS_RDS_USERNAME  = jsonObj.DB_USERNAME
+                        env.AWS_RDS_PASSWORD  = jsonObj.DB_PASSWORD
+                        env.AWS_VPC_ID        = jsonObj.AWS_VPC_ID
+                        env.AWS_RDS_ENDPOINT  = jsonObj.AWS_RDS_ENDPOINT
+                        env.AWS_ALB_ID        = jsonObj.AWS_ALB_ID
+                    }
                 }
-                sh 'echo Environment loaded: VPC = ${AWS_VPC_ID} ----- RDS = ${AWS_RDS_ENDPOINT}'
             }
         }
         stage('Push ECS') {
