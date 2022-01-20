@@ -48,11 +48,19 @@ pipeline {
                         string (credentialsId: 'dev/AM/utopia-secrets',
                         variable: 'DB_CREDS')
                     ]) {
+                        // json objects
                         def creds = readJSON text: DB_CREDS
                         def outputs = readProperties file: env.resource_directory + '/env.tf'
-                        creds.AWS_VPC_ID = outputs.AWS_VPC_ID
-                        creds.AWS_RDS_ENDPOINT = outputs.AWS_RDS_ENDPOINT
-                        creds.AWS_ALB_ID = outputs.AWS_ALB_ID
+
+                        // secret keys
+                        creds.AWS_VPC_ID          = outputs.AWS_VPC_ID
+                        creds.AWS_RDS_ENDPOINT    = outputs.AWS_RDS_ENDPOINT
+                        creds.AWS_ALB_ID          = outputs.AWS_ALB_ID
+                        creds.SUBNET_ECS_1        = outputs.SUBNET_ECS_1
+                        creds.SUBNET_ECS_2        = outputs.SUBNET_ECS_2
+                        creds.ECS_SECURITY_GROUP  = outputs.ECS_SECURITY_GROUP
+
+                        // rewrite secret
                         String jsonOut = writeJSON returnText: true, json: creds
                         sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:us-west-2:026390315914:secret:dev/AM/utopia-secrets-NE4x9z' --secret-string '${jsonOut}'"
                     }
