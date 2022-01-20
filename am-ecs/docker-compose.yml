@@ -1,4 +1,4 @@
-version: "3.8"
+version: "2.4"
 x-aws-vpc: "${AWS_VPC_ID}"
 x-aws-loadbalancer: "${AWS_ALB_ID}"
 services:
@@ -16,7 +16,8 @@ services:
       - DB_NAME=utopia
       - DB_TYPE=mysql
       - DB_PORT=3306
-
+    mem_limit: 2048m
+    mem_reservation: 256M
 
   #########
   # USERS #
