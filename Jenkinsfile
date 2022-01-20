@@ -14,14 +14,6 @@ pipeline {
 
     stages {
 
-        stage('System information') {
-            steps {
-                echo 'Debug info:'
-                sh 'ls'
-                sh 'pwd'
-            }
-        }
-
         stage('Terraform Plan') {
             steps {
                 echo 'Planning terraform infrastructure'
@@ -56,11 +48,16 @@ pipeline {
                         string (credentialsId: 'dev/AM/utopia-secrets',
                         variable: 'DB_CREDS')
                     ]) {
+                        // json objects
                         def creds = readJSON text: DB_CREDS
                         def outputs = readProperties file: env.resource_directory + '/env.tf'
-                        creds.AWS_VPC_ID = outputs.AWS_VPC_ID
-                        creds.AWS_RDS_ENDPOINT = outputs.AWS_RDS_ENDPOINT
-                        creds.AWS_ALB_ID = outputs.AWS_ALB_ID
+
+                        // secret keys
+                        creds.AWS_VPC_ID          = outputs.AWS_VPC_ID
+                        creds.AWS_RDS_ENDPOINT    = outputs.AWS_RDS_ENDPOINT
+                        creds.AWS_ALB_ID          = outputs.AWS_ALB_ID
+
+                        // rewrite secret
                         String jsonOut = writeJSON returnText: true, json: creds
                         sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:us-west-2:026390315914:secret:dev/AM/utopia-secrets-NE4x9z' --secret-string '${jsonOut}'"
                     }

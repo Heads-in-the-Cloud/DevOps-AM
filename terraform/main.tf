@@ -59,7 +59,7 @@ module "ecs" {
   vpc_id          = module.network.utopia_vpc
   memory          = 2048
   cpu             = 1024
-  service_subnets = [module.network.all_subnets[2], module.network.all_subnets[3]]
+  service_subnets = [module.network.all_subnets[2]]
   flights-repo    = "${data.aws_ecr_repository.ecr-flights.repository_url}:latest"
   users-repo      = "${data.aws_ecr_repository.ecr-users.repository_url}:latest"
   bookings-repo   = "${data.aws_ecr_repository.ecr-bookings.repository_url}:latest"
