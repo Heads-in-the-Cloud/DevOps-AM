@@ -14,14 +14,6 @@ pipeline {
 
     stages {
 
-        stage('System information') {
-            steps {
-                echo 'Debug info:'
-                sh 'ls'
-                sh 'pwd'
-            }
-        }
-
         stage('Terraform Plan') {
             steps {
                 echo 'Planning terraform infrastructure'

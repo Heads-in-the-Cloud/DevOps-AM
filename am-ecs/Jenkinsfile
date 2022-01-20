@@ -16,11 +16,14 @@ pipeline {
                     ]) {
                         // def outputs = readProperties file: '/var/lib/jenkins-worker-node/AM-resources/env.tf'
                         def jsonObj = readJSON text: DB_CREDS
-                        env.AWS_RDS_USERNAME  = jsonObj.DB_USERNAME
-                        env.AWS_RDS_PASSWORD  = jsonObj.DB_PASSWORD
-                        env.AWS_VPC_ID        = jsonObj.AWS_VPC_ID
-                        env.AWS_RDS_ENDPOINT  = jsonObj.AWS_RDS_ENDPOINT
-                        env.AWS_ALB_ID        = jsonObj.AWS_ALB_ID
+                        env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
+                        env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
+                        env.AWS_VPC_ID          = jsonObj.AWS_VPC_ID
+                        env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
+                        env.AWS_ALB_ID          = jsonObj.AWS_ALB_ID
+                        env.SUBNET_ECS_1        = jsonObj.SUBNET_ECS_1
+                        env.SUBNET_ECS_2        = jsonObj.SUBNET_ECS_2
+                        env.ECS_SECURITY_GROUP  = jsonObj.ECS_SECURITY_GROUP
                     }
                 }
             }

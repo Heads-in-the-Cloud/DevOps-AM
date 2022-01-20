@@ -1,4 +1,26 @@
 version: 1
 task_definition:
-  ecs_network_mode: awsvpc
-  task_role_arn:
+  ecs_network_mode: "awsvpc"
+  task_role_arn: "arn:aws:iam::026390315914:role/AM-ecs-task-execution-secrets-role"
+  task_execution_role: "arn:aws:iam::026390315914:role/AM-ecs-task-execution-secrets-role"
+  task_size:
+    cpu_limit: "1024"
+    mem_limit: "2048"
+  services:
+    flights:
+      essential: true
+#      healthcheck:
+#        test: ["CMD", "curl -f http://localhost"]
+#        interval: string
+#        timeout: string
+#        retries: integer
+#        start_period: string
+run_params:
+  network_configuration:
+    awsvpc_configuration:
+      subnets:
+        - ${SUBNET_ECS_1}
+        - ${SUBNET_ECS_2}
+      security_groups:
+        - ${ECS_SECURITY_GROUP}
+      assign_public_ip: ENABLED
