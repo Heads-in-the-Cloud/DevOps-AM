@@ -39,6 +39,14 @@ services:
       - DB_NAME=utopia
       - DB_TYPE=mysql
       - DB_PORT=3306
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.50'
+          memory: 256M
 
   ############
   # BOOKINGS #
