@@ -1,6 +1,4 @@
 version: "3.9"
-x-aws-vpc: "${AWS_VPC_ID}"
-x-aws-loadbalancer: "${AWS_ALB_ID}"
 services:
   ###########
   # FLIGHTS #
@@ -62,6 +60,14 @@ services:
       - DB_NAME=utopia
       - DB_TYPE=mysql
       - DB_PORT=3306
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.50'
+          memory: 256M
 
   ########
   # AUTH #
@@ -77,3 +83,11 @@ services:
       - DB_NAME=utopia
       - DB_TYPE=mysql
       - DB_PORT=3306
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1024M
+        reservations:
+          cpus: '0.50'
+          memory: 256M
