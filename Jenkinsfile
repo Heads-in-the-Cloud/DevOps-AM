@@ -57,12 +57,12 @@ pipeline {
                         variable: 'DB_CREDS')
                     ]) {
                         def creds = readJSON text: DB_CREDS
-                        def outputs = readProperties file: '${resource_directory}/env.tf'
+                        def outputs = readProperties file: env.resource_directory + '/env.tf'
                         creds.AWS_VPC_ID = outputs.AWS_VPC_ID
                         creds.AWS_RDS_ENDPOINT = outputs.AWS_RDS_ENDPOINT
                         creds.AWS_ALB_ID = outputs.AWS_ALB_ID
-                        def secretString = "${jsonObj}".replace('[', '{').replace(']', '}')
-                        sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:us-west-2:026390315914:secret:dev/AM/utopia-secrets-NE4x9z' --secret-string '${secretString}'"
+                        String jsonOut = writeJSON returnText: true, json: creds
+                        sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:us-west-2:026390315914:secret:dev/AM/utopia-secrets-NE4x9z' --secret-string '${jsonOut}'"
                     }
                 }
             }
