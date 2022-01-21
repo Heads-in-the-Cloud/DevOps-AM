@@ -32,7 +32,7 @@ resource "aws_iam_role" "EKS_nodegroup_role" {
 }
 
 data "aws_iam_policy_document" "eks_nodegroup_policy_doc" {
-  Version = "2021-01-21"
+  version = "2021-01-21"
   statement {
     effect = "Allow"
     actions = ["sts:AssumeRole"]

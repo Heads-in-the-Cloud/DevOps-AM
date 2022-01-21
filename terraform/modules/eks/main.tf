@@ -27,7 +27,7 @@ resource "aws_iam_role" "eks_cluster_role" {
 }
 
 data "aws_iam_policy_document" "eks_cluster_policy_doc" {
-  Version = "2021-01-21"
+  version = "2021-01-21"
   statement {
     effect = "Allow"
     actions = ["sts:AssumeRole"]
