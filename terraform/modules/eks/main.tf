@@ -9,6 +9,9 @@ resource "aws_eks_cluster" "eks_cluster" {
 
   vpc_config {
     subnet_ids = var.eks_subnets
+    security_group_ids = [aws_security_group.eks_api_access.id]
+    endpoint_private_access = true
+    endpoint_public_access = true
   }
 
   depends_on = [
@@ -46,4 +49,62 @@ resource "aws_iam_role_policy_attachment" "EKS_cluster_policy" {
 resource "aws_iam_role_policy_attachment" "EKS_vpc_policy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController"
   role       = aws_iam_role.eks_cluster_role.name
+}
+
+resource "aws_security_group" "eks_api_access" {
+  name = "AM-eks-allow-traffic"
+  description = "Open HTTP and HTTPS connections"
+  vpc_id = var.vpc_id
+
+  # SSH
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # HTTP
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # HTTPS
+  ingress {
+    from_port   = 443
+    to_port     = 443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # General API ports
+  ingress {
+    from_port   = 8080
+    to_port     = 8083
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # Auth API port
+  ingress {
+    from_port   = 8443
+    to_port     = 8443
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # outgoing coverage
+  egress {
+    from_port     = 0
+    to_port       = 0
+    protocol      = "-1"
+    cidr_blocks   = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "AM-allow-apis"
+  }
 }
