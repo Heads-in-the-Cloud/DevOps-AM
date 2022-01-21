@@ -6,7 +6,7 @@
 resource "aws_eks_node_group" "eks_nodes" {
   cluster_name = aws_eks_cluster.eks_cluster.name
   node_group_name = "AM-EKS-nodegroup"
-  node_role_arn = ""
+  node_role_arn = aws_iam_role.EKS_nodegroup_role.arn
   subnet_ids = var.eks_subnets
 
   scaling_config {

@@ -1,5 +1,5 @@
 
 variable "eks_subnets" {
-  value = list(string)
+  type = list(string)
   default = []
 }

@@ -5,7 +5,7 @@
 
 resource "aws_eks_cluster" "eks_cluster" {
   name = "AM-eks-cluster"
-  role_arn = ''
+  role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
     subnet_ids = var.eks_subnets
