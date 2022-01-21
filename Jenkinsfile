@@ -56,9 +56,6 @@ pipeline {
                         creds.AWS_VPC_ID          = outputs.AWS_VPC_ID
                         creds.AWS_RDS_ENDPOINT    = outputs.AWS_RDS_ENDPOINT
                         creds.AWS_ALB_ID          = outputs.AWS_ALB_ID
-                        creds.SUBNET_ECS_1        = outputs.SUBNET_ECS_1
-                        creds.SUBNET_ECS_2        = outputs.SUBNET_ECS_2
-                        creds.ECS_SECURITY_GROUP  = outputs.ECS_SECURITY_GROUP
 
                         // rewrite secret
                         String jsonOut = writeJSON returnText: true, json: creds
