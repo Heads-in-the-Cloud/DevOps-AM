@@ -5,8 +5,14 @@ pipeline {
         AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
         AWS_REGION_ID = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
     }
+
+    parameters {
+        booleanParam(name: "DESTROY", defaultValue: false)
+    }
+
     stages {
         stage('Load Environment') {
+            when { expression { !params.DESTROY } }
             steps {
                 echo 'Loading Environment'
                 script {
@@ -25,13 +31,26 @@ pipeline {
                 }
             }
         }
+
         stage('Push ECS') {
+            when { expression { !params.DESTROY } }
             steps {
                 echo 'Configuring ECS'
                 dir("am-ecs") {
                     sh 'docker context use ${ECS_CONTEXT_NAME}'
                     sh 'aws ecr get-login-password --region ${AWS_REGION_ID} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com'
                     sh 'docker compose up --no-color'
+                }
+            }
+        }
+
+        stage('Destroy ECS') {
+            when { expression { params.DESTROY } }
+            steps {
+                echo 'Destroying ECS'
+                dir('am-ecs') {
+                    sh 'docker context use ${ECS_CONTEXT_NAME}'
+                    sh 'docker compose down'
                 }
             }
         }
