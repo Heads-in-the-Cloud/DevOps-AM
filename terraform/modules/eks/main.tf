@@ -51,6 +51,10 @@ resource "aws_iam_role_policy_attachment" "EKS_vpc_policy" {
   role       = aws_iam_role.eks_cluster_role.name
 }
 
+############
+# Security #
+############
+
 resource "aws_security_group" "eks_api_access" {
   name = "AM-eks-allow-traffic"
   description = "Open HTTP and HTTPS connections"
