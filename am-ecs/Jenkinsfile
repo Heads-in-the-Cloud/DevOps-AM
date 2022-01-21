@@ -50,7 +50,7 @@ pipeline {
                 echo 'Destroying ECS'
                 dir('am-ecs') {
                     sh 'docker context use ${ECS_CONTEXT_NAME}'
-                    sh 'docker compose down --no-color'
+                    sh 'docker compose down'
                 }
             }
         }
