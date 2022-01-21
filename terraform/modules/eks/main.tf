@@ -32,7 +32,7 @@ data "aws_iam_policy_document" "eks_cluster_policy_doc" {
     effect = "Allow"
     actions = ["sts:AssumeRole"]
     principals {
-      identifiers = ["ec2.amazonaws.com"]
+      identifiers = ["eks.amazonaws.com"]
       type = "Service"
     }
   }
