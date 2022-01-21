@@ -55,21 +55,13 @@ module "utopia-db" {
 module "ecs" {
   source          = "./modules/ecs"
   r53_zone_id     = local.zone_id
-  task_arn        = "arn:aws:iam::026390315914:role/AM-ecs-task-execution-secrets-role"
   vpc_id          = module.network.utopia_vpc
-  memory          = 2048
-  cpu             = 1024
   service_subnets = [module.network.all_subnets[2]]
-  flights-repo    = "${data.aws_ecr_repository.ecr-flights.repository_url}:latest"
-  users-repo      = "${data.aws_ecr_repository.ecr-users.repository_url}:latest"
-  bookings-repo   = "${data.aws_ecr_repository.ecr-bookings.repository_url}:latest"
-  auth-repo       = "${data.aws_ecr_repository.ecr-auth.repository_url}:latest"
-  environment     = [
-    { name: "DB_TYPE", value: "mysql" },
-    { name: "DB_ADDRESS", value: module.utopia-db.db_address },
-    { name: "DB_NAME", value: "utopia" },
-    { name: "DB_PORT", value: "3306" },
-    { name: "DB_USERNAME", value: local.db_creds.DB_USERNAME },
-    { name: "DB_PASSWORD", value: local.db_creds.DB_PASSWORD }]
-  desired-container-count = 1
+}
+
+module "eks" {
+  source              = "./modules/eks"
+  eks_public_subnets  = [module.network.all_subnets[2], module.network.all_subnets[3]]
+  eks_subnets         = module.network.all_subnets
+  vpc_id              = module.network.utopia_vpc
 }
