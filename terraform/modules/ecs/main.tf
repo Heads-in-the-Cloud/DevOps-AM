@@ -14,7 +14,7 @@ resource "aws_lb" "utopia_nwb" {
 // route 53
 resource "aws_route53_record" "utopia_record" {
   zone_id = var.r53_zone_id
-  name = "am-utopia.hitwc.link"
+  name = "am-ecs-utopia.hitwc.link"
   type = "CNAME"
   ttl = "20"
   records = [aws_lb.utopia_nwb.dns_name]
@@ -25,7 +25,7 @@ resource "aws_route53_record" "utopia_record" {
 ############
 
 resource "aws_security_group" "ecs_api_security" {
-  name = "AM-allow-apis"
+  name = "AM-ecs-allow-apis"
   description = "Open SSH and all API ports"
   vpc_id = var.vpc_id
 

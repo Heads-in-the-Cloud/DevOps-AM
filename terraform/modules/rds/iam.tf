@@ -1,16 +1,18 @@
 
 resource "aws_iam_instance_profile" "bastion_profile" {
-  name = "am-bastion-iam-profile"
+  name = "AM-bastion-profile"
   role = aws_iam_role.bastion_iam_role.name
 }
 
 resource "aws_iam_role" "bastion_iam_role" {
-  name = "am-s3-readonly"
+  name = "AM-bastion-s3-access-role"
   assume_role_policy = data.aws_iam_policy_document.bastion_policy_doc.json
 }
 
 data "aws_iam_policy_document" "bastion_policy_doc" {
+  version = "2012-10-17"
   statement {
+    effect = "Allow"
     actions = ["sts:AssumeRole"]
     principals {
       identifiers = ["ec2.amazonaws.com"]

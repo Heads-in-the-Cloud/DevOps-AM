@@ -18,8 +18,8 @@ resource "aws_db_instance" "rds" {
 
 // RDS Security Group
 resource "aws_security_group" "db_security" {
-  name          = "am-security-db"
-  description   = "Allow all public traffic"
+  name          = "AM-rds-security"
+  description   = "Allow all SSH and SQL traffic"
   vpc_id        = var.vpc_id
 
   ingress {
@@ -44,6 +44,6 @@ resource "aws_security_group" "db_security" {
   }
 
   tags = {
-    Name = "am-security-db"
+    Name = "AM-rds-security"
   }
 }
