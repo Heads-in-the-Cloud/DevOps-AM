@@ -27,7 +27,16 @@
 # create and move to new namespace
 kubectl create ns apis-ns
 kubens apis-ns
-kubectl apply -f secret.yaml
+# kubectl apply -f secret.yaml
+
+# special secret insertion
+kubectl create secret generic utopia-secret \
+  --from-literal=DB_NAME=utopia \
+  --from-literal=DB_PORT="3306" \
+  --from-literal=DB_TYPE=mysql \
+  --from-literal=DB_ADDRESS="${AWS_RDS_PASSWORD}" \
+  --from-literal=DB_USERNAME="${AWS_RDS_USERNAME}" \
+  --from-literal=DB_PASSWORD="${AWS_RDS_ENDPOINT}"
 
 # load objects
 cd objects && kubectl apply -f .
