@@ -1,5 +1,10 @@
 pipeline {
-    agent { label 'aws-ready' }
+    agent {
+        node {
+            label 'aws-ready'
+            customWorkspace '${AM_RESOURCE_DIRECTORY}/terraform'
+        }
+    }
 
     environment {
         COMMIT_HASH = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
