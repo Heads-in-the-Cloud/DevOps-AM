@@ -4,6 +4,9 @@ pipeline {
         AWS_REGION_ID = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
         SECRET_ID = 'dev/AM/utopia-secrets'
         EKS_CLUSTER_NAME = 'AM-eks-cluster'
+        HOSTED_ZONE_ID = 'Z02774322V8FI017JONWO'
+        RECORD_NAME = 'am-eks.hitwc.link'
+
     }
 
     stages {
