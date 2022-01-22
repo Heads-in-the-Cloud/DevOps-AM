@@ -42,7 +42,7 @@ pipeline {
                 echo 'Running Kubernetes Initialization'
                 dir('kubernetes') {
                   sh 'chmod +x eks-init.sh'
-                  sh 'eks-init.sh'
+                  sh './eks-init.sh'
                 }
             }
         }
