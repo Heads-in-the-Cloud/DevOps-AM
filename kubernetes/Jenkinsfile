@@ -1,5 +1,10 @@
 pipeline {
-    agent {label 'aws-ready'}
+    agent {
+        node {
+            label 'aws-ready'
+            customWorkspace '/var/lib/jenkins-worker-node/AM-resources/kubernetes-resources'
+        }
+    }
     environment {
         AWS_REGION_ID = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
         AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
@@ -34,6 +39,20 @@ pipeline {
                 sh 'docker context use default'
                 sh 'aws eks --region ${AWS_REGION_ID} update-kubeconfig --name ${EKS_CLUSTER_NAME}'
                 sh 'aws ecr get-login-password --region ${AWS_REGION_ID} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com'
+            }
+        }
+
+        stage('Load Images') {
+            steps {
+                echo "Loading latest image hashes"
+                dir("${AM_RESOURCES_DIRECTORY}") {
+                    script {
+                        env.USERS_API_LATEST = sh(script:'jq -Mr \'.users\' images.json', returnStdout: true)
+                        env.BOOKINGS_API_LATEST = sh(script:'jq -Mr \'.bookings\' images.json', returnStdout: true)
+                        env.FLIGHTS_API_LATEST = sh(script:'jq -Mr \'.flights\' images.json', returnStdout: true)
+                        env.AUTH_API_LATEST = sh(script:'jq -Mr \'.auth\' images.json', returnStdout: true)
+                    }
+                }
             }
         }
 

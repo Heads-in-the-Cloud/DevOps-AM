@@ -1,5 +1,10 @@
 pipeline {
-    agent { label 'aws-ready' }
+    agent {
+        node {
+            label 'aws-ready'
+            customWorkspace '/var/lib/jenkins-worker-node/AM-resources/terraform-resources'
+        }
+    }
 
     environment {
         COMMIT_HASH = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
@@ -7,7 +12,6 @@ pipeline {
         AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
         SECRET_ID = "dev/AM/utopia-secrets"
         SECRET_ID_PUSH = "dev/AM/utopia-secrets-NE4x9z"
-        OUTPUTS_FILEPATH = "${AM_RESOURCE_DIRECTORY}/env.tf"
     }
 
     parameters {
@@ -19,7 +23,7 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 echo 'Planning terraform infrastructure'
-                dir("${AM_TERRAFORM_DIRECTORY}") {
+                dir("terraform") {
                     sh 'mkdir -p plans'
                     sh 'terraform init -no-color'
                     sh 'terraform plan -out plans/plan-${COMMIT_HASH}.tf -no-color > plans/plan-${COMMIT_HASH}.txt'
@@ -31,7 +35,7 @@ pipeline {
             when { expression { params.APPLY } }
             steps {
                 echo 'Applying Terraform objects'
-                dir("${AM_TERRAFORM_DIRECTORY}") {
+                dir("terraform") {
                     sh 'terraform apply -no-color -auto-approve plans/plan-${COMMIT_HASH}.tf'
                 }
             }
@@ -41,9 +45,9 @@ pipeline {
             when { expression { params.APPLY } }
             steps {
                 echo 'Exporting outputs as secrets'
-                dir("${AM_TERRAFORM_DIRECTORY}") {
+                dir("terraform") {
                     sh 'terraform refresh'
-                    sh 'terraform output | tr -d \'\\\"\\ \' > ${OUTPUTS_FILEPATH}'
+                    sh 'terraform output | tr -d \'\\\"\\ \' > env.tf'
                 }
             }
         }
@@ -59,7 +63,7 @@ pipeline {
                     ]) {
                         // json objects
                         def creds = readJSON text: DB_CREDS
-                        def outputs = readProperties file: env.OUTPUTS_FILEPATH
+                        def outputs = readProperties file: 'terraform/env.tf'
 
                         // secret keys
                         creds.AWS_VPC_ID          = outputs.AWS_VPC_ID
@@ -71,6 +75,14 @@ pipeline {
                         sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:${AWS_REGION_ID}:${AWS_ACCOUNT_ID}:secret:${SECRET_ID_PUSH}' --secret-string '${jsonOut}'"
                     }
                 }
+            }
+        }
+
+        stage('Cleanup') {
+            when { expression { params.APPLY } }
+            steps {
+                echo 'Removing temp files'
+                sh 'rm -f terraform/env.tf'
             }
         }
 
