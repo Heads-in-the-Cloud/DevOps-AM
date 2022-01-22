@@ -37,6 +37,8 @@ kubectl create secret generic utopia-secret \
   --from-literal=DB_ADDRESS="${AWS_RDS_PASSWORD}" \
   --from-literal=DB_USERNAME="${AWS_RDS_USERNAME}" \
   --from-literal=DB_PASSWORD="${AWS_RDS_ENDPOINT}"
+echo "${AWS_RDS_PASSWORD}"
+echo "${AWS_RDS_ENDPOINT}"
 
 # load objects
 cd objects && kubectl apply -f .
