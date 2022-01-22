@@ -2,7 +2,7 @@ pipeline {
     agent {
         node {
             label 'aws-ready'
-            customWorkspace '${AM_RESOURCE_DIRECTORY}/terraform'
+            customWorkspace '/' + env.AM_RESOURCE_DIRECTORY + '/terraform'
         }
     }
 
@@ -24,11 +24,9 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 echo 'Planning terraform infrastructure'
-                dir("${AM_TERRAFORM_DIRECTORY}") {
-                    sh 'mkdir -p plans'
-                    sh 'terraform init -no-color'
-                    sh 'terraform plan -out plans/plan-${COMMIT_HASH}.tf -no-color > plans/plan-${COMMIT_HASH}.txt'
-                }
+                sh 'mkdir -p plans'
+                sh 'terraform init -no-color'
+                sh 'terraform plan -out plans/plan-${COMMIT_HASH}.tf -no-color > plans/plan-${COMMIT_HASH}.txt'
             }
         }
 
@@ -36,9 +34,7 @@ pipeline {
             when { expression { params.APPLY } }
             steps {
                 echo 'Applying Terraform objects'
-                dir("${AM_TERRAFORM_DIRECTORY}") {
-                    sh 'terraform apply -no-color -auto-approve plans/plan-${COMMIT_HASH}.tf'
-                }
+                sh 'terraform apply -no-color -auto-approve plans/plan-${COMMIT_HASH}.tf'
             }
         }
 
