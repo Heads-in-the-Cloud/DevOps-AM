@@ -33,7 +33,7 @@ kubectl apply -f secret.yaml
 cd objects && kubectl apply -f .
 
 # grab load balancer endpoint
-NEW_RECORD=kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}'
+NEW_RECORD=$(kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}')
 
 # hook up Route53
 aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" \
