@@ -1,7 +1,6 @@
 pipeline {
     agent {label 'aws-ready'}
     environment {
-        AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
         AWS_REGION_ID = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
         SECRET_ID = 'dev/AM/utopia-secrets'
         EKS_CLUSTER_NAME = 'AM-eks-cluster'
@@ -9,7 +8,6 @@ pipeline {
 
     stages {
         stage('Load Environment') {
-            when { expression { !params.DESTROY } }
             steps {
                 echo 'Loading Environment'
                 script {
@@ -26,7 +24,7 @@ pipeline {
             }
         }
 
-        stage('Push ECS') {
+        stage('Prepare Tools') {
             steps {
                 echo 'Preparing EKS materials'
                 sh 'docker context use default'
@@ -35,7 +33,7 @@ pipeline {
             }
         }
 
-        stage('Destroy ECS') {
+        stage('Push EKS') {
             steps {
                 echo 'Running Kubernetes Initialization'
                 sh 'kubernetes/eks-init.sh'
