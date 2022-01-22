@@ -34,6 +34,7 @@ resource "aws_route53_record" "eks_record" {
   name = "am-eks.hitwc.link"
   type = "CNAME"
   ttl = "60"
+  records = ["placeholder.text"]
 }
 
 #############
