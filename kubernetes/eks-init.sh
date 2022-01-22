@@ -42,11 +42,12 @@ kubectl create secret generic utopia-secret \
 cd objects && kubectl apply -f .
 
 # grab load balancer endpoint
-NEW_RECORD=$(kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}')
+LB_ADDRESS=$(kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}')
 
 # hook up Route53
 aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" \
-  --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$RECORD_NAME"'","Type":"CNAME","TTL":60,"ResourceRecords":[{"Value":"'"$NEW_RECORD"'"}]}}]}'
+  --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$RECORD_NAME"'","Type":"CNAME","TTL":60,"ResourceRecords":[{"Value":"'"$LB_ADDRESS"'"}]}}]}'
 
 # exit
+echo "Balancer Address: '$LB_ADDRESS'"
 echo "Endpoint reachable at: '$RECORD_NAME'"

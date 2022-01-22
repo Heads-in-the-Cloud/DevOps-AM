@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: api-flights-app
-          image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-flights-api:latest
+          image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-flights-api:$FLIGHTS_API_LATEST
           imagePullPolicy: Always
           resources:
             limits:

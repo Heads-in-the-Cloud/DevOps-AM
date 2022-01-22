@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: api-users-app
-          image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-users-api:latest
+          image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-users-api:$USERS_API_LATEST
           imagePullPolicy: Always
           resources:
             limits:
