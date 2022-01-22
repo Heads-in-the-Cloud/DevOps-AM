@@ -2,10 +2,10 @@ pipeline {
     agent { label 'aws-ready' }
 
     environment {
-        commit = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
-        aws_region = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
-        terraform_directory = "terraform"
-        resource_directory = "/var/lib/jenkins-worker-node/AM-resources"
+        COMMIT_HASH = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
+        AWS_REGION_ID = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
+        AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
+        SECRET_ID = "dev/AM/utopia-secrets-NE4x9z"
     }
 
     parameters {
@@ -17,10 +17,10 @@ pipeline {
         stage('Terraform Plan') {
             steps {
                 echo 'Planning terraform infrastructure'
-                dir("${terraform_directory}") {
+                dir("${AM_TERRAFORM_DIRECTORY}") {
                     sh 'mkdir -p plans'
                     sh 'terraform init -no-color'
-                    sh 'terraform plan -out plans/plan-${commit}.tf -no-color > plans/plan-${commit}.txt'
+                    sh 'terraform plan -out plans/plan-${COMMIT_HASH}.tf -no-color > plans/plan-${COMMIT_HASH}.txt'
                 }
             }
         }
@@ -29,8 +29,8 @@ pipeline {
             when { expression { params.APPLY } }
             steps {
                 echo 'Applying Terraform objects'
-                dir("${terraform_directory}") {
-                    sh 'terraform apply -no-color -auto-approve plans/plan-${commit}.tf'
+                dir("${AM_TERRAFORM_DIRECTORY}") {
+                    sh 'terraform apply -no-color -auto-approve plans/plan-${COMMIT_HASH}.tf'
                 }
             }
         }
@@ -39,9 +39,9 @@ pipeline {
             when { expression { params.APPLY } }
             steps {
                 echo 'Exporting outputs as secrets'
-                dir("${terraform_directory}") {
+                dir("${AM_TERRAFORM_DIRECTORY}") {
                     sh 'terraform refresh'
-                    sh 'terraform output | tr -d \'\\\"\\ \' > ${resource_directory}/env.tf'
+                    sh 'terraform output | tr -d \'\\\"\\ \' > ${AM_RESOURCE_DIRECTORY}/env.tf'
                 }
                 script {
                     withCredentials([
@@ -50,7 +50,7 @@ pipeline {
                     ]) {
                         // json objects
                         def creds = readJSON text: DB_CREDS
-                        def outputs = readProperties file: env.resource_directory + '/env.tf'
+                        def outputs = readProperties file: env.AM_RESOURCE_DIRECTORY + '/env.tf'
 
                         // secret keys
                         creds.AWS_VPC_ID          = outputs.AWS_VPC_ID
@@ -59,7 +59,7 @@ pipeline {
 
                         // rewrite secret
                         String jsonOut = writeJSON returnText: true, json: creds
-                        sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:us-west-2:026390315914:secret:dev/AM/utopia-secrets-NE4x9z' --secret-string '${jsonOut}'"
+                        sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:${AWS_REGION_ID}:${AWS_ACCOUNT_ID}:secret:${SECRET_ID}' --secret-string '${jsonOut}'"
                     }
                 }
             }
