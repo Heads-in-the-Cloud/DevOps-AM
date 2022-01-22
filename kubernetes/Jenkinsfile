@@ -1,5 +1,10 @@
 pipeline {
-    agent {label 'aws-ready'}
+    agent {
+        node {
+            label 'aws-ready'
+            customWorkspace '/var/lib/jenkins-worker-node/AM-resources/kubernetes-resources'
+        }
+    }
     environment {
         AWS_REGION_ID = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
         AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
