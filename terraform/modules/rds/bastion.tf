@@ -20,7 +20,7 @@ resource "aws_instance" "bastion" {
 }
 
 resource "aws_security_group" "bastion_security" {
-  name = "am-bastion-security"
+  name = "AM-bastion-security"
   description = "Allow all SSH"
   vpc_id = var.vpc_id
 
@@ -39,7 +39,7 @@ resource "aws_security_group" "bastion_security" {
   }
 
   tags = {
-    Name = "am-bastion-securitygroup"
+    Name = "AM-bastion-security"
   }
 }
 

@@ -18,6 +18,10 @@ resource "aws_eks_cluster" "eks_cluster" {
     aws_iam_role_policy_attachment.EKS_cluster_policy,
     aws_iam_role_policy_attachment.EKS_vpc_policy
   ]
+
+  tags = {
+    Name = "AM-eks-cluster"
+  }
 }
 
 #############
