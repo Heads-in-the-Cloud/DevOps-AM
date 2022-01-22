@@ -25,3 +25,4 @@ terraform.tfstate*
 /terraform/credentials
 /terraform/bastion_key.pub
 /terraform/bastion_key
+/kubernetes/kubernetes-ingress/
