@@ -24,6 +24,19 @@ resource "aws_eks_cluster" "eks_cluster" {
   }
 }
 
+##############
+# Networking #
+##############
+
+// route 53
+resource "aws_route53_record" "eks_record" {
+  zone_id = var.r53_zone_id
+  name = "am-eks.hitwc.link"
+  type = "CNAME"
+  ttl = "60"
+  records = ["placeholder.text"]
+}
+
 #############
 # IAM Roles #
 #############

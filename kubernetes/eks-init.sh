@@ -32,5 +32,12 @@ kubectl apply -f secret.yaml
 # load objects
 cd objects && kubectl apply -f .
 
-# print eks endpoint
-kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}'
+# grab load balancer endpoint
+NEW_RECORD=$(kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}')
+
+# hook up Route53
+aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" \
+  --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$RECORD_NAME"'","Type":"CNAME","TTL":60,"ResourceRecords":[{"Value":"'"$NEW_RECORD"'"}]}}]}'
+
+# exit
+echo "Endpoint reachable at: '$RECORD_NAME'"

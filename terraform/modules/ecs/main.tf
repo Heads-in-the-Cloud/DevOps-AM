@@ -14,7 +14,7 @@ resource "aws_lb" "utopia_nwb" {
 // route 53
 resource "aws_route53_record" "utopia_record" {
   zone_id = var.r53_zone_id
-  name = "am-ecs-utopia.hitwc.link"
+  name = "am-ecs.hitwc.link"
   type = "CNAME"
   ttl = "20"
   records = [aws_lb.utopia_nwb.dns_name]

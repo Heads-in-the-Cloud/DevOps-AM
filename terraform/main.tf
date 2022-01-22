@@ -64,4 +64,5 @@ module "eks" {
   eks_public_subnets  = [module.network.all_subnets[2], module.network.all_subnets[3]]
   eks_subnets         = module.network.all_subnets
   vpc_id              = module.network.utopia_vpc
+  r53_zone_id         = local.zone_id
 }
