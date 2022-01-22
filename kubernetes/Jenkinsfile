@@ -2,6 +2,7 @@ pipeline {
     agent {label 'aws-ready'}
     environment {
         AWS_REGION_ID = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
+        AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
         SECRET_ID = 'dev/AM/utopia-secrets'
         EKS_CLUSTER_NAME = 'AM-eks-cluster'
         HOSTED_ZONE_ID = 'Z02774322V8FI017JONWO'
