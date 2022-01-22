@@ -1,10 +1,4 @@
 pipeline {
-    agent {
-        node {
-            label 'aws-ready'
-            customWorkspace '/' + env.AM_RESOURCE_DIRECTORY + '/terraform'
-        }
-    }
 
     environment {
         COMMIT_HASH = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
@@ -13,6 +7,13 @@ pipeline {
         SECRET_ID = "dev/AM/utopia-secrets"
         SECRET_ID_PUSH = "dev/AM/utopia-secrets-NE4x9z"
         OUTPUTS_FILEPATH = "${AM_RESOURCE_DIRECTORY}/env.tf"
+    }
+
+    agent {
+        node {
+            label 'aws-ready'
+            customWorkspace '/' + env.AM_RESOURCE_DIRECTORY + '/terraform'
+        }
     }
 
     parameters {
