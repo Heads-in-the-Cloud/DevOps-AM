@@ -40,6 +40,7 @@ pipeline {
         stage('Push EKS') {
             steps {
                 echo 'Running Kubernetes Initialization'
+                sh 'chmod +x kubernetes/eks-init.sh'
                 sh 'kubernetes/eks-init.sh'
             }
         }
