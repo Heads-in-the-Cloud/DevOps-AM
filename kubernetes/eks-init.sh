@@ -39,7 +39,8 @@ kubectl create secret generic utopia-secret \
   --from-literal=DB_PASSWORD="${AWS_RDS_PASSWORD}"
 
 # load objects
-cd objects && kubectl apply -f .
+cd objects
+for f in $(find .); do envsubst < $f | kubectl apply -f -; done
 
 # grab load balancer endpoint
 LB_ADDRESS=$(kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}')
