@@ -42,6 +42,20 @@ pipeline {
             }
         }
 
+        stage('Load Images') {
+            steps {
+                echo "Loading latest image hashes"
+                dir("${AM_RESOURCE_DIRECTORY}") {
+                    script {
+                        env.USERS_API_LATEST = sh(script:'jq -Mr \'.users\' images.json', returnStdout: true)
+                        env.BOOKINGS_API_LATEST = sh(script:'jq -Mr \'.bookings\' images.json', returnStdout: true)
+                        env.FLIGHTS_API_LATEST = sh(script:'jq -Mr \'.flights\' images.json', returnStdout: true)
+                        env.AUTH_API_LATEST = sh(script:'jq -Mr \'.auth\' images.json', returnStdout: true)
+                    }
+                }
+            }
+        }
+
         stage('Push EKS') {
             steps {
                 echo 'Running Kubernetes Initialization'
