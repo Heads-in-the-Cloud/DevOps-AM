@@ -2,7 +2,7 @@ pipeline {
     agent {
         node {
             label 'aws-ready'
-            customWorkspace '/var/lib/jenkins-worker-node/AM-resources/terraform-resources'
+            customWorkspace "${AM_TERRAFORM_DIRECTORY}"
         }
     }
 
