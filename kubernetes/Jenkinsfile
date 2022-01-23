@@ -45,7 +45,7 @@ pipeline {
         stage('Load Images') {
             steps {
                 echo "Loading latest image hashes"
-                dir("${AM_RESOURCE_DIRECTORY}") {
+                dir("${AM_RESOURCES_DIRECTORY}") {
                     script {
                         env.USERS_API_LATEST = sh(script:'jq -Mr \'.users\' images.json', returnStdout: true)
                         env.BOOKINGS_API_LATEST = sh(script:'jq -Mr \'.bookings\' images.json', returnStdout: true)
