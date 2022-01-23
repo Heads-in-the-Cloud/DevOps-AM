@@ -1,5 +1,11 @@
 pipeline {
-    agent {label 'aws-ready'}
+    agent {
+        node {
+            label 'aws-ready'
+            customWorkspace '/var/lib/jenkins-worker-node/AM-resources/ecs-resources'
+        }
+    }
+
     environment {
         ECS_CONTEXT_NAME = "am_aws"
         AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
