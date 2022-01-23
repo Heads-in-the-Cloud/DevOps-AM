@@ -12,7 +12,6 @@ pipeline {
         AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
         SECRET_ID = "dev/AM/utopia-secrets"
         SECRET_ID_PUSH = "dev/AM/utopia-secrets-NE4x9z"
-        OUTPUTS_FILEPATH = "${AM_RESOURCE_DIRECTORY}/env.tf"
     }
 
     parameters {
@@ -48,7 +47,7 @@ pipeline {
                 echo 'Exporting outputs as secrets'
                 dir("terraform") {
                     sh 'terraform refresh'
-                    sh 'terraform output | tr -d \'\\\"\\ \' > ${OUTPUTS_FILEPATH}'
+                    sh 'terraform output | tr -d \'\\\"\\ \' > env.tf'
                 }
             }
         }
@@ -64,7 +63,7 @@ pipeline {
                     ]) {
                         // json objects
                         def creds = readJSON text: DB_CREDS
-                        def outputs = readProperties file: env.OUTPUTS_FILEPATH
+                        def outputs = readProperties file: 'terraform/env.tf'
 
                         // secret keys
                         creds.AWS_VPC_ID          = outputs.AWS_VPC_ID
@@ -76,6 +75,14 @@ pipeline {
                         sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:${AWS_REGION_ID}:${AWS_ACCOUNT_ID}:secret:${SECRET_ID_PUSH}' --secret-string '${jsonOut}'"
                     }
                 }
+            }
+        }
+
+        stage('Cleanup') {
+            when { expression { params.APPLY } }
+            steps {
+                echo 'Removing temp files'
+                sh 'rm -f terraform/env.tf'
             }
         }
 
