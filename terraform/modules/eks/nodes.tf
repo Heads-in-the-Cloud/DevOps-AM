@@ -9,7 +9,7 @@ resource "aws_eks_node_group" "eks_nodes" {
   node_role_arn = aws_iam_role.EKS_nodegroup_role.arn
   subnet_ids = var.eks_public_subnets
 
-  instance_types = ["t3.large"]
+  instance_types = [ var.node_instance_type ]
 
   scaling_config {
     desired_size = 2

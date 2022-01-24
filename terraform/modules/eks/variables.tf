@@ -18,3 +18,8 @@ variable "r53_zone_id" {
   type = string
   default = ""
 }
+
+variable "node_instance_type" {
+  type = string
+  default = "t3.medium"
+}
