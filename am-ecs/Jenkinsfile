@@ -13,13 +13,8 @@ pipeline {
         SECRET_ID = "dev/AM/utopia-secrets"
     }
 
-    parameters {
-        booleanParam(name: "DESTROY", defaultValue: false)
-    }
-
     stages {
         stage('Load Environment') {
-            when { expression { !params.DESTROY } }
             steps {
                 echo 'Loading Environment'
                 script {
@@ -27,7 +22,6 @@ pipeline {
                         string(credentialsId: env.SECRET_ID,
                         variable: 'DB_CREDS')
                     ]) {
-                        // def outputs = readProperties file: '/var/lib/jenkins-worker-node/AM-resources/env.tf'
                         def jsonObj = readJSON text: DB_CREDS
                         env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
                         env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
@@ -40,7 +34,6 @@ pipeline {
         }
 
         stage('Push ECS') {
-            when { expression { !params.DESTROY } }
             steps {
                 echo 'Configuring ECS'
                 dir("am-ecs") {
@@ -51,15 +44,6 @@ pipeline {
             }
         }
 
-        stage('Destroy ECS') {
-            when { expression { params.DESTROY } }
-            steps {
-                echo 'Destroying ECS'
-                dir('am-ecs') {
-                    sh 'docker context use ${ECS_CONTEXT_NAME}'
-                    sh 'docker compose down'
-                }
-            }
-        }
+        // end stages
     }
 }
