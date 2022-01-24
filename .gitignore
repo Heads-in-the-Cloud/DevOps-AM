@@ -17,4 +17,12 @@ target/
 *.ipr
 
 .env
+.terraform
+.terraform.*
+/terraform/plans/
+terraform.tfstate*
 /kubernetes/secret.yaml
+/terraform/credentials
+/terraform/bastion_key.pub
+/terraform/bastion_key
+/kubernetes/kubernetes-ingress/
