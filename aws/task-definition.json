@@ -1,0 +1,63 @@
+{
+    "family": "AM-ecs-multiple-api-task",
+    "runtimePlatform": {
+        "operatingSystemFamily": "LINUX",
+        "cpuArchitecture": "X86_64"
+    },
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+        {
+            "essential": true,
+            "image": "amattsonsm/auth-api",
+            "memory": 512,
+            "name": "auth",
+            "portMappings": [
+                {
+                    "containerPort": 8443,
+                    "hostPort": 8443
+                }
+            ]
+        },
+        {
+            "essential": true,
+            "image": "amattsonsm/bookings-api",
+            "memory": 512,
+            "name": "bookings",
+            "portMappings": [
+                {
+                    "containerPort": 8082,
+                    "hostPort": 8082
+                }
+            ]
+        },
+        {
+            "essential": true,
+            "image": "amattsonsm/flights-api",
+            "memory": 512,
+            "name": "flights",
+            "portMappings": [
+                {
+                    "containerPort": 8081,
+                    "hostPort": 8081
+                }
+            ]
+        },
+        {
+            "essential": true,
+            "image": "amattsonsm/users-api",
+            "memory": 512,
+            "name": "users",
+            "portMappings": [
+                {
+                    "containerPort": 8083,
+                    "hostPort": 8083
+                }
+            ]
+        }
+    ],
+    "requiresCompatibilities": [
+      "FARGATE"
+    ],
+    "cpu": "512",
+    "memory": "2048"
+}

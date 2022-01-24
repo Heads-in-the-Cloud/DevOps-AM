@@ -16,14 +16,37 @@ spec:
     spec:
       containers:
         - name: api-auth-app
-          image: amattsonsm/auth-api:latest
+          image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-auth-api:$AUTH_API_LATEST
+          imagePullPolicy: Always
+          resources:
+            limits:
+              cpu: "900m"
+              memory: "1024Mi"
+            requests:
+              cpu: "350m"
+              memory: "512Mi"
           ports:
             - containerPort: 8443
           env:
-            - name: DB_URL_SPRING
+            - name: DB_ADDRESS
               valueFrom:
                 secretKeyRef:
-                  key: DB_URL_SPRING
+                  key: DB_ADDRESS
+                  name: utopia-secret
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  key: DB_NAME
+                  name: utopia-secret
+            - name: DB_TYPE
+              valueFrom:
+                secretKeyRef:
+                  key: DB_TYPE
+                  name: utopia-secret
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  key: DB_PORT
                   name: utopia-secret
             - name: DB_PASSWORD
               valueFrom:
@@ -46,6 +69,6 @@ spec:
   ports:
     - protocol: TCP
       port: 8443
-      name: https
+      name: http
   selector:
     app: api-auth-app
