@@ -86,6 +86,6 @@ pipeline {
             }
         }
 
-        //end
+        // end stages
     }
 }
