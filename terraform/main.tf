@@ -65,4 +65,5 @@ module "eks" {
   eks_subnets         = module.network.all_subnets
   vpc_id              = module.network.utopia_vpc
   r53_zone_id         = local.zone_id
+  node_instance_type  = "t3.medium"
 }
