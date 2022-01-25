@@ -68,5 +68,5 @@ variable "bastion_instance_type" {
 
 variable "bastion_ssh_keyname" {
   type = string
-  default = "bastion_key"
+  default = ""
 }

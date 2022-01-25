@@ -1,0 +1,64 @@
+---
+- name: Start Utopia Instances
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ../terraform/tf_output_vars.yaml
+    - ./ansible_varfile.yaml
+  tasks:
+    # Block of tasks for displaying info
+    - name: Get Info Block
+      block:
+        - name: Assert Variables
+          assert:
+            that:
+              - TF_SUBNET_PUBLIC_1 is defined
+              - TF_SECURITY_APIS is defined
+            fail_msg: "Terraform output variables defined in '../terraform/tf_output_vars.yaml' not found."
+
+        - name: Get Running Info
+          ec2_instance_info:
+          register: ec2info
+
+        - name: Print info
+          debug: var="ec2info.instances"
+      tags: ['never', 'getinfoonly']
+
+    # Block of tasks for a new EC2
+    - name: Create EC2 Block
+      block:
+        # task to launch EC2
+        - name: Launch EC2
+          tags: create_ec2
+          ec2:
+            region: "{{EC2_REGION_ID}}"
+            key_name: "{{EC2_SSH_KEYNAME}}"
+            group: "{{TF_SECURITY_APIS}}"
+            instance_type: "{{EC2_INSTANCE_TYPE}}"
+            image: "{{EC2_AMI_ID}}"
+            state: running
+            instance_tags:
+              Name: "{{EC2_INSTANCE_NAME}}"
+            vpc_subnet_id: "{{TF_SUBNET_PUBLIC_1}}"
+            assign_public_ip: yes
+          register: ec2
+          delegate_to: localhost
+
+        # Task to wait for ready and SSH-able
+        - name: Wait for SSH
+          local_action:
+            module: wait_for
+            host: "{{item.public_ip}}"
+            port: 22
+            delay: 10
+            timeout: 120
+          loop: "{{ec2.instances}}"
+
+        # Task to register the EC2
+        - name: Add instance to host group
+          add_host:
+            hostname: "{{item.public_ip}}"
+            groupname: launched
+          loop: "{{ec2.instances}}"
+      tags: ['never', 'ec2-create']
+

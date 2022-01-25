@@ -3,6 +3,7 @@
 This Repository contains all files pertaining to DevOps management.
 The repository structure is as follows:
 
+
 ### Source files
 
     .
@@ -14,6 +15,7 @@ The repository structure is as follows:
     │   ├── modules                 # Terraform submodules
     │   └── Jenkinsfile             # Terraform Jenkinsfile
     └── README.md
+
 
 ### Using Files
 
