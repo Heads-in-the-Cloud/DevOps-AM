@@ -1,10 +1,23 @@
-# DevOps Repository
+# AM DevOps Repository
 
-This Repository contains all files pertaining to local DevOps management. Currently, this includes:
+This Repository contains all files pertaining to DevOps management.
+The repository structure is as follows:
 
-1. docker-compose.yml
-    * Builds images amattsonsm/flights-api, users-api, and bookings-api on separate ports using a .env file.
-    * .env file must contain definitions for: 
-        * spring.datasource.url
-        * spring.datasource.username
-        * spring.datasource.password
+### Source files
+
+    .
+    ├── am-ecs                  # ECS creation files (docker-compose)
+    │   └── Jenkinsfile             # ECS Jenkinsfile
+    ├── kubernetes              # EKS and local creation files (yamls)
+    │   └── Jenkinsfile             # EKS Jenkinsfile
+    ├── terraform               # Terraform AWS Infrastructure
+    │   ├── modules                 # Terraform submodules
+    │   └── Jenkinsfile             # Terraform Jenkinsfile
+    └── README.md
+
+### Using Files
+
+1. Terraform Jenkinsfile should be run first to initialize AWS resources.
+2. ECS can be launched by using docker-compose up.
+3. EKS can be launched by injecting environment variables and running eks-init.
+4. ECS or EKS are launched in a more stable manner by using their Jenkinsfiles.
