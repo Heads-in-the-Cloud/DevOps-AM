@@ -67,3 +67,10 @@ module "eks" {
   r53_zone_id         = local.zone_id
   node_instance_type  = "t3.small"
 }
+
+resource "local_file" "ansible_vars" {
+  filename = "./tf_ansible_vars.yaml"
+  content = <<-VARS
+    tf_test: ${module.utopia-db.db_address}
+  VARS
+}
