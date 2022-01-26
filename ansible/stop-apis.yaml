@@ -9,7 +9,7 @@
       ec2:
         instance_tags:
           Name: "{{EC2_INSTANCE_NAME}}"
-        stage: terminated
+        state: terminated
         region: "{{EC2_REGION_ID}}"
 
 
