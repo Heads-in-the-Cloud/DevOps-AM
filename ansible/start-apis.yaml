@@ -27,7 +27,6 @@
     # Block of tasks for a new EC2
     - name: Create EC2 Block
       block:
-
         # task to launch EC2
         - name: Launch EC2
           tags: create_ec2
@@ -61,5 +60,5 @@
             hostname: "{{item.public_ip}}"
             groupname: launched
           loop: "{{ec2.instances}}"
-
       tags: ['never', 'ec2-create']
+
