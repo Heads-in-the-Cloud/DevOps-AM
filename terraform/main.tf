@@ -75,23 +75,17 @@ module "eks" {
   node_instance_type  = "t3.small"
 }
 
-//module "ansible" {
-//  source                = "./modules/ansible"
-//  ami_id                = "ami-066333d9c572b0680"
-//  instance_type         = "t2.medium"
-//  public_subnet_id      = module.network.all_subnets[3]
-//  ssh_keyname           = aws_key_pair.bastion_key.key_name
-//  vpc_id                = module.network.utopia_vpc
-//  r53_zone_id           = local.zone_id
-//  endpoint              = local.api_endpoint
-//}
+module "ansible" {
+  source                = "./modules/ansible"
+  vpc_id                = module.network.utopia_vpc
+  r53_zone_id           = local.zone_id
+  endpoint              = local.api_endpoint
+}
 
 resource "local_file" "ansible_vars" {
   filename = "./tf_output_vars.yaml"
   content = <<-VARS
-    TF_VPC_ID: ${module.network.utopia_vpc}
-    TF_RDS_ENDPOINT: ${module.utopia-db.db_address}
-    TF_ALB_ID: ${module.ecs.ALB_ID}
     TF_SUBNET_PUBLIC_1: ${module.network.all_subnets[3]}
+    TF_SECURITY_APIS: ${module.ansible.security_group_name}
   VARS
 }

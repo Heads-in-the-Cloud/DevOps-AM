@@ -4,6 +4,7 @@
   connection: local
   vars_files:
     - ../terraform/tf_output_vars.yaml
+    - ./ansible_varfile.yaml
   tasks:
     # Block of tasks for displaying info
     - name: Get Info Block
@@ -12,6 +13,7 @@
           assert:
             that:
               - TF_SUBNET_PUBLIC_1 is defined
+              - TF_SECURITY_APIS is defined
             fail_msg: "Terraform output variables defined in '../terraform/tf_output_vars.yaml' not found."
 
         - name: Get Running Info
@@ -20,7 +22,7 @@
 
         - name: Print info
           debug: var="ec2info.instances"
-      tags: ['always', 'getinfoonly']
+      tags: ['never', 'getinfoonly']
 
     # Block of tasks for a new EC2
     - name: Create EC2 Block
@@ -30,28 +32,18 @@
         - name: Launch EC2
           tags: create_ec2
           ec2:
-            region: us-west-2
-            key_name: GroupKey
-            group: <securitygroup>
-            instance_type: t2.medium
-            image: ami-066333d9c572b0680
-            wait: yes
-            wait_timeout: 500
-            count: 1
+            region: "{{EC2_REGION_ID}}"
+            key_name: "{{EC2_SSH_KEYNAME}}"
+            group: "{{TF_SECURITY_APIS}}"
+            instance_type: "{{EC2_INSTANCE_TYPE}}"
+            image: "{{EC2_AMI_ID}}"
+            state: running
             instance_tags:
-              name: AM-api-test
-            monitoring: no
+              Name: "{{EC2_INSTANCE_NAME}}"
             vpc_subnet_id: "{{TF_SUBNET_PUBLIC_1}}"
             assign_public_ip: yes
           register: ec2
           delegate_to: localhost
-
-        # Task to register the EC2
-        - name: Add instance to host group
-          add_host:
-            hostname: "{{item.public_ip}}"
-            groupname: launched
-          loop: "{{ec2.instances}}"
 
         # Task to wait for ready and SSH-able
         - name: Wait for SSH
@@ -61,6 +53,13 @@
             port: 22
             delay: 10
             timeout: 120
+          loop: "{{ec2.instances}}"
+
+        # Task to register the EC2
+        - name: Add instance to host group
+          add_host:
+            hostname: "{{item.public_ip}}"
+            groupname: launched
           loop: "{{ec2.instances}}"
 
       tags: ['never', 'ec2-create']
