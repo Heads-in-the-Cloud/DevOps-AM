@@ -37,6 +37,7 @@ kubectl create secret generic utopia-secret \
   --from-literal=DB_PASSWORD="${AWS_RDS_PASSWORD}"
 
 # load and update API and Ingress objects
+# TODO: parameterize
 cd objects
 for f in $(find .); do envsubst < $f | kubectl apply -f -; done
 
