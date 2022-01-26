@@ -92,6 +92,6 @@ resource "local_file" "ansible_vars" {
     TF_VPC_ID: ${module.network.utopia_vpc}
     TF_RDS_ENDPOINT: ${module.utopia-db.db_address}
     TF_ALB_ID: ${module.ecs.ALB_ID}
-    TF_API_ENDPOINT: ${local.api_endpoint}
+    TF_SUBNET_PUBLIC_1: ${module.network.all_subnets[3]}
   VARS
 }
