@@ -18,6 +18,18 @@ resource "aws_instance" "api_instance"{
   }
 }
 
+##############
+# Networking #
+##############
+
+resource "aws_route53_record" "api_standalone_record" {
+  zone_id = var.r53_zone_id
+  name = var.endpoint
+  type = "A"
+  ttl = 60
+  records = aws_instance.api_instance.public_ip
+}
+
 ############
 # Security #
 ############

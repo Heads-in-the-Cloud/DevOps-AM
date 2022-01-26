@@ -1,0 +1,34 @@
+---
+- name: Start Utopia Instances
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ../terraform/tf_output_vars.yaml
+  assert:
+    that:
+      - TF_VPC_ID is defined
+      - TF_RDS_ENDPOINT is defined
+      - TF_ALB_ID is defined
+      - TF_API_ENDPOINT is defined
+    fail_msg: "Terraform output variables defined in '../terraform/tf_output_vars.yaml' not found."
+  tasks:
+    - name: Get Info Block
+      block:
+        - name: Get Running Info
+          ec2_instance_info:
+          register: ec2info
+
+        - name: Print info
+          debug: var="ec2info.instances"
+      tags: ['always', 'getinfoonly']
+
+    - name: Create EC2 Block
+      block:
+        - name: Launch EC2
+          tags: create_ec2
+          ec2:
+            region: us-west-2
+            key_name: GroupKey
+            group: <securitygroup>
+            instance_type: t2.medium
+            image: ami-066333d9c572b0680

@@ -24,6 +24,7 @@ locals {
     data.aws_secretsmanager_secret_version.secrets.secret_string
   )
   zone_id = "Z02774322V8FI017JONWO"
+  api_endpoint = "am-api.hitwc.link"
 }
 
 resource "aws_key_pair" "bastion_key" {
@@ -74,14 +75,16 @@ module "eks" {
   node_instance_type  = "t3.small"
 }
 
-module "ansible" {
-  source                = "./modules/ansible"
-  ami_id                = "ami-066333d9c572b0680"
-  instance_type         = "t2.medium"
-  public_subnet_id      = module.network.all_subnets[3]
-  ssh_keyname           = aws_key_pair.bastion_key.key_name
-  vpc_id                = module.network.utopia_vpc
-}
+//module "ansible" {
+//  source                = "./modules/ansible"
+//  ami_id                = "ami-066333d9c572b0680"
+//  instance_type         = "t2.medium"
+//  public_subnet_id      = module.network.all_subnets[3]
+//  ssh_keyname           = aws_key_pair.bastion_key.key_name
+//  vpc_id                = module.network.utopia_vpc
+//  r53_zone_id           = local.zone_id
+//  endpoint              = local.api_endpoint
+//}
 
 resource "local_file" "ansible_vars" {
   filename = "./tf_output_vars.yaml"
@@ -89,5 +92,6 @@ resource "local_file" "ansible_vars" {
     TF_VPC_ID: ${module.network.utopia_vpc}
     TF_RDS_ENDPOINT: ${module.utopia-db.db_address}
     TF_ALB_ID: ${module.ecs.ALB_ID}
+    TF_API_ENDPOINT: ${local.api_endpoint}
   VARS
 }
