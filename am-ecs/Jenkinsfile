@@ -13,9 +13,6 @@ pipeline {
         SECRET_ID = "dev/AM/utopia-secrets"
     }
 
-    blockOn('AM-Terraform-Apply') { blockLevel('GLOBAL') }
-    blockOn('AM-Destroy') { blockLevel('GLOBAL') }
-
     stages {
         stage('Load Environment') {
             steps {

@@ -16,9 +16,6 @@ pipeline {
         SCRIPT_NAME = 'eks-init.sh'
     }
 
-    blockOn('AM-Terraform-Apply') { blockLevel('GLOBAL') }
-    blockOn('AM-Destroy') { blockLevel('GLOBAL') }
-
     stages {
         stage('Load Environment') {
             steps {
