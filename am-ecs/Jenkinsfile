@@ -45,7 +45,7 @@ pipeline {
             steps {
                 echo 'Pushing Up to ECS'
                 dir("am-ecs") {
-                    sh 'docker compose up --no-color'
+                    sh 'docker compose up'
                 }
             }
         }
