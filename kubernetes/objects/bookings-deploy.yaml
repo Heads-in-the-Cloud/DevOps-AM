@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: api-bookings-app
-          image: 026390315914.dkr.ecr.us-west-2.amazonaws.com/am-bookings-api:$BOOKINGS_API_LATEST
+          image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-bookings-api:$BOOKINGS_API_LATEST
           imagePullPolicy: Always
           resources:
             limits:
