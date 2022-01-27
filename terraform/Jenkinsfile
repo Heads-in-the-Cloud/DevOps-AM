@@ -18,6 +18,10 @@ pipeline {
         booleanParam(name: "APPLY", defaultValue: false)
     }
 
+    blockOn('AM-EKS-Launch') { blockLevel('GLOBAL') }
+    blockOn('AM-ECS-Launch') { blockLevel('GLOBAL') }
+    blockOn('AM-Destroy') { blockLevel('GLOBAL') }
+
     stages {
 
         stage('Terraform Plan') {
