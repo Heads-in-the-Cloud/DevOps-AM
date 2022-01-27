@@ -1,7 +1,7 @@
 
-#################
-# Database Info #
-#################
+#######################
+# Database Instancing #
+#######################
 
 variable "db_engine" {
   type = string
@@ -22,6 +22,10 @@ variable "db_name" {
   type = string
   default = "utopia"
 }
+
+#####################
+# Database Metadata #
+#####################
 
 variable "db_username" {
   type = string

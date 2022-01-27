@@ -37,7 +37,6 @@ kubectl create secret generic utopia-secret \
   --from-literal=DB_PASSWORD="${AWS_RDS_PASSWORD}"
 
 # load and update API and Ingress objects
-# TODO: parameterize
 cd objects
 for f in $(find .); do envsubst < $f | kubectl apply -f -; done
 
@@ -45,9 +44,9 @@ for f in $(find .); do envsubst < $f | kubectl apply -f -; done
 LB_ADDRESS=$(kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}')
 
 # hook up Route53 to loadbalancer
-aws route53 change-resource-record-sets --hosted-zone-id "$HOSTED_ZONE_ID" \
-  --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$RECORD_NAME"'","Type":"CNAME","TTL":60,"ResourceRecords":[{"Value":"'"$LB_ADDRESS"'"}]}}]}'
+aws route53 change-resource-record-sets --hosted-zone-id "$AWS_HOSTED_ZONE_ID" \
+  --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$AM_EKS_RECORD_NAME"'","Type":"CNAME","TTL":60,"ResourceRecords":[{"Value":"'"$LB_ADDRESS"'"}]}}]}'
 
 # info and exit
 echo "Balancer Address: '$LB_ADDRESS'"
-echo "Endpoint reachable at: '$RECORD_NAME'"
+echo "Endpoint reachable at: '$AM_EKS_RECORD_NAME'"

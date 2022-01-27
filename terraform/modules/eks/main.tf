@@ -4,14 +4,14 @@
 ######################
 
 resource "aws_eks_cluster" "eks_cluster" {
-  name = "AM-eks-cluster"
-  role_arn = aws_iam_role.eks_cluster_role.arn
+  name      = "AM-eks-cluster"
+  role_arn  = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
-    subnet_ids = var.eks_subnets
-    security_group_ids = [aws_security_group.eks_api_access.id]
+    subnet_ids              = var.eks_subnets
+    security_group_ids      = [aws_security_group.eks_api_access.id]
     endpoint_private_access = true
-    endpoint_public_access = true
+    endpoint_public_access  = true
   }
 
   depends_on = [
@@ -30,11 +30,11 @@ resource "aws_eks_cluster" "eks_cluster" {
 
 // route 53
 resource "aws_route53_record" "eks_record" {
-  zone_id = var.r53_zone_id
-  name = "am-eks.hitwc.link"
-  type = "CNAME"
-  ttl = "60"
-  records = ["placeholder.text"]
+  zone_id     = var.r53_zone_id
+  name        = var.record_name
+  type        = "CNAME"
+  ttl         = "30"
+  records     = ["placeholder.text"]
 }
 
 #############
@@ -74,7 +74,7 @@ resource "aws_iam_role_policy_attachment" "EKS_vpc_policy" {
 
 resource "aws_security_group" "eks_api_access" {
   name = "AM-eks-allow-traffic"
-  description = "Open HTTP and HTTPS connections"
+  description = "Open HTTP and HTTPS connections, plus APIs"
   vpc_id = var.vpc_id
 
   # SSH

@@ -2,14 +2,12 @@ pipeline {
     agent {
         node {
             label 'aws-ready'
-            customWorkspace "${AM_ECS_DIRECTORY}"
+            customWorkspace "${AM_DEVOPS_DIRECTORY}"
         }
     }
 
     environment {
         ECS_CONTEXT_NAME = "am_aws"
-        AWS_ACCOUNT_ID = "${sh(script:'aws sts get-caller-identity --query "Account" --output text', returnStdout: true).trim()}"
-        AWS_REGION_ID = "${sh(script:'aws configure get region', returnStdout: true).trim()}"
         SECRET_ID = "dev/AM/utopia-secrets"
     }
 

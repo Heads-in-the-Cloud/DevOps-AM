@@ -20,6 +20,10 @@ resource "aws_instance" "bastion" {
     DB_USERNAME   = var.db_username
     DB_PASSWORD   = var.db_password
   })
+
+  lifecycle {
+    ignore_changes = [ associate_public_ip_address ]
+  }
 }
 
 ############
