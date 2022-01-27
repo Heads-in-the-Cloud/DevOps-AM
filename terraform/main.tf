@@ -66,7 +66,7 @@ module "ansible" {
   endpoint              = local.api_endpoint
 }
 
-resource "local_file" "ansible_vars" {
+resource "local_file" "ansible_eks_vars" {
   filename = "${AM_ANSIBLE_DIRECTORY}/vars/dynamic/eks/tf_output_vars.yaml"
   content = <<-VARS
     tf_subnet_public_1: ${module.network.all_subnets[2]}
@@ -75,3 +75,10 @@ resource "local_file" "ansible_vars" {
     tf_eks_iam_role_arn: ${module.eks.iam_role_arn}
   VARS
 }
+
+//resource "local_file" "ansible_ec2_vars" {
+//  filename = "${AM_ANSIBLE_DIRECTORY}/vars/dynamic/ec2/tf_output_vars.yaml"
+//  content = <<-VARS
+//    var: val
+//  VARS
+//}
