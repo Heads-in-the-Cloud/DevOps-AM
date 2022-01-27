@@ -67,7 +67,7 @@ module "ansible" {
 }
 
 resource "local_file" "ansible_eks_vars" {
-  filename = "${AM_ANSIBLE_DIRECTORY}/vars/dynamic/eks/tf_output_vars.yaml"
+  filename = "outputs/eks_output_vars.yaml"
   content = <<-VARS
     tf_subnet_public_1: ${module.network.all_subnets[2]}
     tf_subnet_public_2: ${module.network.all_subnets[3]}
