@@ -1,0 +1,16 @@
+---
+- name: Stop Utopia Instances
+  hosts: localhost
+  connection: local
+  vars_files:
+    - ./ec2_varfile.yaml
+  tasks:
+    - name: Stop Instances
+      ec2:
+        instance_ids: "{{ec2.instance_ids}}"
+        state: absent
+        region: "{{EC2_REGION_ID}}"
+
+
+# ANSIBLE_NOCOLOR=True ansible-playbook ec2-api-start.yaml --connection=local -e "ansible_python_interpreter=/usr/bin/python3" --tags=ec2-create
+# ANSIBLE_NOCOLOR=True ansible-playbook ec2-api-stop.yaml --connection=local -e "ansible_python_interpreter=/usr/bin/python3"

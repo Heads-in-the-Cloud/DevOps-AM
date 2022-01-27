@@ -3,22 +3,6 @@ data "aws_secretsmanager_secret_version" "secrets" {
   secret_id = "dev/AM/utopia-secrets"
 }
 
-data "aws_ecr_repository" "ecr-flights" {
-  name = "am-flights-api"
-}
-
-data "aws_ecr_repository" "ecr-users" {
-  name = "am-users-api"
-}
-
-data "aws_ecr_repository" "ecr-bookings" {
-  name = "am-bookings-api"
-}
-
-data "aws_ecr_repository" "ecr-auth" {
-  name = "am-auth-api"
-}
-
 locals {
   db_creds = jsondecode(
     data.aws_secretsmanager_secret_version.secrets.secret_string
@@ -83,9 +67,11 @@ module "ansible" {
 }
 
 resource "local_file" "ansible_vars" {
-  filename = "./tf_output_vars.yaml"
+  filename = "${AM_ANSIBLE_DIRECTORY}/vars/dynamic/eks/tf_output_vars.yaml"
   content = <<-VARS
-    TF_SUBNET_PUBLIC_1: ${module.network.all_subnets[3]}
-    TF_SECURITY_APIS: ${module.ansible.security_group_name}
+    tf_subnet_public_1: ${module.network.all_subnets[2]}
+    tf_subnet_public_2: ${module.network.all_subnets[3]}
+    tf_eks_security_group: ${module.ansible.security_group_name}
+    tf_eks_iam_role_arn: ${module.eks.iam_role_arn}
   VARS
 }

@@ -4,7 +4,7 @@
   connection: local
   vars_files:
     - ../terraform/tf_output_vars.yaml
-    - ./ansible_varfile.yaml
+    - ./ec2_varfile.yaml
   tasks:
     # Block of tasks for displaying info
     - name: Get Info Block

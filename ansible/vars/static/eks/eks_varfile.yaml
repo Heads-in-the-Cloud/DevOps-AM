@@ -1,0 +1,20 @@
+# Environment info
+ansible_python_interpreter: /usr/bin/python3
+
+# AWS info
+eks_aws_region: us-west-2
+eks_aws_profilename: aidan
+
+# Network info
+eks_r53_hostedzone: Z02774322V8FI017JONWO
+eks_r53_zonename: am-eks.hitwc.link
+
+# Cluster info
+eks_clustername: AM-eks-ansible-cluster
+eks_clusterversion: 1.21
+
+# Worker node info
+eks_worker_groupname: AM-eks-ansible-nodegroup
+eks_worker_instancetype: t3.medium
+eks_worker_count: 2
+eks_worker_volumesize: 20
