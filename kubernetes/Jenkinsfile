@@ -7,14 +7,15 @@ pipeline {
     }
 
     environment {
-        SECRET_ID = 'dev/AM/utopia-secrets'
-        EKS_CLUSTER_NAME = 'AM-eks-cluster'
-        EKS_SCRIPT_NAME = 'eks-init.sh'
+        SECRET_ID         = 'dev/AM/utopia-secrets'
+        EKS_CLUSTER_NAME  = 'AM-eks-cluster'
+        EKS_SCRIPT_NAME   = 'eks-init.sh'
         EKS_REPLICA_COUNT = 2
+
         // for t2.medium: 1930m cpu, 3332Mi, 4 pods
-        EKS_CONTAINER_CPU_LIMIT = "450m"
-        EKS_CONTAINER_MEM_LIMIT = "250m"
-        EKS_CONTAINER_CPU_REQUEST = "800Mi"
+        EKS_CONTAINER_CPU_LIMIT   = "450m"
+        EKS_CONTAINER_CPU_REQUEST = "250m"
+        EKS_CONTAINER_MEM_LIMIT   = "800Mi"
         EKS_CONTAINER_MEM_REQUEST = "400Mi"
     }
 
