@@ -8,7 +8,7 @@ spec:
   selector:
     matchLabels:
       app: api-users-app
-  replicas: 1
+  replicas: $EKS_REPLICA_COUNT
   template:
     metadata:
       labels:

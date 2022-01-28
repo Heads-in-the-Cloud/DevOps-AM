@@ -84,7 +84,7 @@ module "eks" {
   record_name         = var.EKS_RECORD
 
   # instancing
-  node_instance_type  = "t3.small"
+  node_instance_type  = "t3.medium"
 }
 
 

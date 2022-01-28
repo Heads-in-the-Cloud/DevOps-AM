@@ -10,6 +10,7 @@ pipeline {
         SECRET_ID = 'dev/AM/utopia-secrets'
         EKS_CLUSTER_NAME = 'AM-eks-cluster'
         EKS_SCRIPT_NAME = 'eks-init.sh'
+        EKS_REPLICA_COUNT = 2
     }
 
     stages {
