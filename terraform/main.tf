@@ -34,8 +34,8 @@ module "network" {
   vpc_subnet_1_public_cidr    = "10.0.3.0/24"
   vpc_subnet_2_public_cidr    = "10.0.4.0/24"
   route_cidr                  = "0.0.0.0/0"
-  zone_1                      = var.REGION_ID + "a"
-  zone_2                      = var.REGION_ID + "b"
+  zone_1                      = "${var.REGION_ID}a"
+  zone_2                      = "${var.REGION_ID}b"
 }
 
 module "utopia-db" {
