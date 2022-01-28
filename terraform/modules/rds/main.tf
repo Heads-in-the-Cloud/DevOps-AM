@@ -1,7 +1,7 @@
 
 // AWS RDS Instance
 resource "aws_db_instance" "rds" {
-  allocated_storage     = 10
+  allocated_storage     = 20
   engine                = var.db_engine
   engine_version        = var.db_engine_version
   instance_class        = var.db_instance_class
