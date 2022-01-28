@@ -4,15 +4,17 @@ metadata:
   name: api-flights-deploy
   labels:
     app: api-flights-app
+    group: utopia
 spec:
   selector:
     matchLabels:
       app: api-flights-app
-  replicas: 1
+  replicas: $EKS_REPLICA_COUNT
   template:
     metadata:
       labels:
         app: api-flights-app
+        group: utopia
     spec:
       containers:
         - name: api-flights-app
@@ -20,11 +22,11 @@ spec:
           imagePullPolicy: Always
           resources:
             limits:
-              cpu: "900m"
-              memory: "1024Mi"
+              cpu: "$EKS_CONTAINER_CPU_LIMIT"
+              memory: "$EKS_CONTAINER_MEM_LIMIT"
             requests:
-              cpu: "350m"
-              memory: "512Mi"
+              cpu: "$EKS_CONTAINER_CPU_REQUEST"
+              memory: "$EKS_CONTAINER_MEM_REQUEST"
           ports:
             - containerPort: 8081
           env:
@@ -57,6 +59,16 @@ spec:
               valueFrom:
                 secretKeyRef:
                   key: DB_USERNAME
+                  name: utopia-secret
+            - name: DB_CONNECTION_POOL_MIN
+              valueFrom:
+                secretKeyRef:
+                  key: DB_CONNECTION_POOL_MIN
+                  name: utopia-secret
+            - name: DB_CONNECTION_POOL_MAX
+              valueFrom:
+                secretKeyRef:
+                  key: DB_CONNECTION_POOL_MAX
                   name: utopia-secret
 ---
 apiVersion: v1

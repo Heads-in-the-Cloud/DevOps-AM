@@ -34,7 +34,9 @@ kubectl create secret generic utopia-secret \
   --from-literal=DB_TYPE=mysql \
   --from-literal=DB_ADDRESS="${AWS_RDS_ENDPOINT}" \
   --from-literal=DB_USERNAME="${AWS_RDS_USERNAME}" \
-  --from-literal=DB_PASSWORD="${AWS_RDS_PASSWORD}"
+  --from-literal=DB_PASSWORD="${AWS_RDS_PASSWORD}" \
+  --from-literal=DB_CONNECTION_POOL_MIN="${DB_POOL_MIN}" \
+  --from-literal=DB_CONNECTION_POOL_MAX="${DB_POOL_MAX}"
 
 # load and update API and Ingress objects
 cd objects

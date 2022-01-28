@@ -9,6 +9,15 @@ pipeline {
     environment {
         ECS_CONTEXT_NAME = "am_aws"
         SECRET_ID = "dev/AM/utopia-secrets"
+
+        ECS_MEM_LIMIT   = "1024M"
+        ECS_MEM_REQUEST = "256M"
+        ECS_CPU_LIMIT   = "1.0"
+        ECS_CPU_REQUEST = "0.5"
+        ECS_REPLICAS    = "2"
+
+        DB_POOL_MIN     = 2
+        DB_POOL_MAX     = 4
     }
 
     stages {
@@ -27,6 +36,29 @@ pipeline {
                         env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
                         env.AWS_ALB_ID          = jsonObj.AWS_ALB_ID
                     }
+                }
+            }
+        }
+
+        stage('Fill Template') {
+            steps {
+                echo 'Inserting Environment Variables into docker-compose'
+                dir("am-ecs") {
+                    sh '''
+                        envsubst \' \
+                        $ECS_MEM_LIMIT \
+                        $ECS_MEM_REQUEST \
+                        $ECS_CPU_LIMIT \
+                        $ECS_CPU_REQUEST \
+                        $ECS_REPLICAS \
+                        $AWS_ACCOUNT_ID \
+                        $AWS_REGION_ID \
+                        $AWS_VPC_ID \
+                        $AWS_ALB_ID \
+                        $DB_POOL_MIN \
+                        $DB_POOL_MAX \
+                        \' < docker-compose-template.yml > docker-compose.yml
+                    '''
                 }
             }
         }

@@ -69,7 +69,7 @@ module "ecs" {
   r53_zone_id     = var.HOSTED_ZONE
   record_name     = var.ECS_RECORD
   vpc_id          = module.network.utopia_vpc
-  service_subnets = [module.network.all_subnets[2]]
+  service_subnets = [module.network.all_subnets[2], module.network.all_subnets[3]]
 
 }
 
@@ -84,7 +84,7 @@ module "eks" {
   record_name         = var.EKS_RECORD
 
   # instancing
-  node_instance_type  = "t3.small"
+  node_instance_type  = "t3.medium"
 }
 
 

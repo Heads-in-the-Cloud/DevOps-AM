@@ -7,15 +7,17 @@ pipeline {
     }
 
     environment {
-        COMMIT_HASH = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
-        SECRET_ID = "dev/AM/utopia-secrets"
-        SECRET_ID_PUSH = "dev/AM/utopia-secrets-NE4x9z"
+        COMMIT_HASH     = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
+        SECRET_ID       = "dev/AM/utopia-secrets"
+        SECRET_ID_PUSH  = "dev/AM/utopia-secrets-NE4x9z"
 
         // Terraform passthrough
-        TF_VAR_ECS_RECORD = "${AM_ECS_RECORD_NAME}"
-        TF_VAR_EKS_RECORD = "${AM_EKS_RECORD_NAME}"
-        TF_VAR_HOSTED_ZONE = "${AWS_HOSTED_ZONE_ID}"
-        TF_VAR_REGION_ID = "${AWS_REGION_ID}"
+        TF_VAR_ECS_RECORD     = "${AM_ECS_RECORD_NAME}"
+        TF_VAR_EKS_RECORD     = "${AM_EKS_RECORD_NAME}"
+        TF_VAR_HOSTED_ZONE    = "${AWS_HOSTED_ZONE_ID}"
+        TF_VAR_REGION_ID      = "${AWS_REGION_ID}"
+        TF_VAR_AWS_ACCESS_KEY = credentials('AM_AWS_ACCESS')
+        TF_VAR_AWS_SECRET_KEY = credentials('AM_AWS_SECRET')
     }
 
     parameters {
