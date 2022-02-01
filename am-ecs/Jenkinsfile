@@ -14,6 +14,7 @@ pipeline {
         ECS_MEM_REQUEST = "256M"
         ECS_CPU_LIMIT   = "1.0"
         ECS_CPU_REQUEST = "0.5"
+        ECS_REPLICAS    = "2"
     }
 
     stages {

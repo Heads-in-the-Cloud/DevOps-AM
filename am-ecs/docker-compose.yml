@@ -17,6 +17,7 @@ services:
       - DB_TYPE=mysql
       - DB_PORT=3306
     deploy:
+      replicas: "${ECS_REPLICAS}"
       resources:
         limits:
           cpus: "${ECS_CPU_LIMIT}"
@@ -40,6 +41,7 @@ services:
       - DB_TYPE=mysql
       - DB_PORT=3306
     deploy:
+      replicas: "${ECS_REPLICAS}"
       resources:
         limits:
           cpus: "${ECS_CPU_LIMIT}"
@@ -63,6 +65,7 @@ services:
       - DB_TYPE=mysql
       - DB_PORT=3306
     deploy:
+      replicas: "${ECS_REPLICAS}"
       resources:
         limits:
           cpus: "${ECS_CPU_LIMIT}"
@@ -86,6 +89,7 @@ services:
       - DB_TYPE=mysql
       - DB_PORT=3306
     deploy:
+      replicas: "${ECS_REPLICAS}"
       resources:
         limits:
           cpus: "${ECS_CPU_LIMIT}"
