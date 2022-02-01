@@ -1,12 +1,12 @@
 version: "3.9"
-x-aws-vpc: "$AWS_VPC_ID"
-x-aws-loadbalancer: "$AWS_ALB_ID"
+x-aws-vpc: "${AWS_VPC_ID}"
+x-aws-loadbalancer: "${AWS_ALB_ID}"
 services:
   ###########
   # FLIGHTS #
   ###########
   flights:
-    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-flights-api:latest
+    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-flights-api
     ports:
       - 8081:8081
     environment:
@@ -30,7 +30,7 @@ services:
   # USERS #
   #########
   users:
-    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-users-api:latest
+    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-users-api
     ports:
       - 8083:8083
     environment:
@@ -54,7 +54,7 @@ services:
   # BOOKINGS #
   ############
   bookings:
-    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-bookings-api:latest
+    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-bookings-api
     ports:
       - 8082:8082
     environment:
@@ -78,7 +78,7 @@ services:
   # AUTH #
   ########
   auth:
-    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-auth-api:latest
+    image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-auth-api
     ports:
       - 8443:8443
     environment:
