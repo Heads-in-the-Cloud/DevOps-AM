@@ -9,6 +9,11 @@ pipeline {
     environment {
         ECS_CONTEXT_NAME = "am_aws"
         SECRET_ID = "dev/AM/utopia-secrets"
+
+        ECS_MEM_LIMIT   = "1024M"
+        ECS_MEM_REQUEST = "256M"
+        ECS_CPU_LIMIT   = "1.0"
+        ECS_CPU_REQUEST = "0.5"
     }
 
     stages {
