@@ -41,7 +41,19 @@ pipeline {
             steps {
                 echo 'Inserting Environment Variables into docker-compose'
                 dir("am-ecs") {
-                    sh 'envsubst < docker-compose-template.yml > docker-compose.yml'
+                    sh '''
+                        envsubst \' \
+                        $ECS_MEM_LIMIT \
+                        $ECS_MEM_REQUEST \
+                        $ECS_CPU_LIMIT \
+                        $ECS_CPU_REQUEST \
+                        $ECS_REPLICAS \
+                        $AWS_ACCOUNT_ID \
+                        $AWS_REGION_ID \
+                        $AWS_VPC_ID \
+                        $AWS_ALB_ID \
+                        \' < docker-compose-template.yml > docker-compose.yml'
+                    '''
                 }
             }
         }
