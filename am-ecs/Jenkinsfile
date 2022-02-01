@@ -40,7 +40,9 @@ pipeline {
         stage('Fill Template') {
             steps {
                 echo 'Inserting Environment Variables into docker-compose'
-                sh 'envsubst < docker-compose-template.yml > docker-compose.yml'
+                dir("am-ecs") {
+                    sh 'envsubst < docker-compose-template.yml > docker-compose.yml'
+                }
             }
         }
 
