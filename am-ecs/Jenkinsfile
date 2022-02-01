@@ -52,7 +52,7 @@ pipeline {
                         $AWS_REGION_ID \
                         $AWS_VPC_ID \
                         $AWS_ALB_ID \
-                        \' < docker-compose-template.yml > docker-compose.yml'
+                        \' < docker-compose-template.yml > docker-compose.yml
                     '''
                 }
             }
