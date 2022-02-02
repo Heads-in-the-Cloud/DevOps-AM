@@ -15,6 +15,9 @@ pipeline {
         ECS_CPU_LIMIT   = "1.0"
         ECS_CPU_REQUEST = "0.5"
         ECS_REPLICAS    = "2"
+
+        DB_POOL_MIN     = 2
+        DB_POOL_MAX     = 4
     }
 
     stages {
@@ -52,6 +55,8 @@ pipeline {
                         $AWS_REGION_ID \
                         $AWS_VPC_ID \
                         $AWS_ALB_ID \
+                        $DB_POOL_MIN \
+                        $DB_POOL_MAX \
                         \' < docker-compose-template.yml > docker-compose.yml
                     '''
                 }

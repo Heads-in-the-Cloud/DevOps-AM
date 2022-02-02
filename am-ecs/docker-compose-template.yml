@@ -13,6 +13,8 @@ services:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
       - DB_ADDRESS=${AWS_RDS_ENDPOINT}
+      - DB_CONNECTION_POOL_MIN=${DB_POOL_MIN}
+      - DB_CONNECTION_POOL_MAX=${DB_POOL_MAX}
       - DB_NAME=utopia
       - DB_TYPE=mysql
       - DB_PORT=3306
@@ -37,6 +39,8 @@ services:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
       - DB_ADDRESS=${AWS_RDS_ENDPOINT}
+      - DB_CONNECTION_POOL_MIN=${DB_POOL_MIN}
+      - DB_CONNECTION_POOL_MAX=${DB_POOL_MAX}
       - DB_NAME=utopia
       - DB_TYPE=mysql
       - DB_PORT=3306
@@ -61,6 +65,8 @@ services:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
       - DB_ADDRESS=${AWS_RDS_ENDPOINT}
+      - DB_CONNECTION_POOL_MIN=${DB_POOL_MIN}
+      - DB_CONNECTION_POOL_MAX=${DB_POOL_MAX}
       - DB_NAME=utopia
       - DB_TYPE=mysql
       - DB_PORT=3306
@@ -85,6 +91,8 @@ services:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
       - DB_ADDRESS=${AWS_RDS_ENDPOINT}
+      - DB_CONNECTION_POOL_MIN=${DB_POOL_MIN}
+      - DB_CONNECTION_POOL_MAX=${DB_POOL_MAX}
       - DB_NAME=utopia
       - DB_TYPE=mysql
       - DB_PORT=3306

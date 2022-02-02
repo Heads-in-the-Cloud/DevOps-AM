@@ -58,6 +58,16 @@ spec:
                 secretKeyRef:
                   key: DB_USERNAME
                   name: utopia-secret
+            - name: DB_CONNECTION_POOL_MIN
+              valueFrom:
+                secretKeyRef:
+                  key: DB_CONNECTION_POOL_MIN
+                  name: utopia-secret
+            - name: DB_CONNECTION_POOL_MAX
+              valueFrom:
+                secretKeyRef:
+                  key: DB_CONNECTION_POOL_MAX
+                  name: utopia-secret
 ---
 apiVersion: v1
 kind: Service

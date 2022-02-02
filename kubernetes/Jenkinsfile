@@ -17,6 +17,9 @@ pipeline {
         EKS_CONTAINER_CPU_REQUEST = "250m"
         EKS_CONTAINER_MEM_LIMIT   = "800Mi"
         EKS_CONTAINER_MEM_REQUEST = "400Mi"
+
+        DB_POOL_MIN = 2
+        DB_POOL_MAX = 4
     }
 
     stages {
