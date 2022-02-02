@@ -42,7 +42,7 @@ module "utopia-db" {
   source                = "./modules/rds"
 
   # instancing
-  db_instance_class     = "db.t2.micro"
+  db_instance_class     = "db.t3.small"
   db_name               = "amUtopiaDB"
   db_engine             = "mysql"
   db_engine_version     = "8.0.23"
