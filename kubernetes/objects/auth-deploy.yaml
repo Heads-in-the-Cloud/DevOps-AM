@@ -4,6 +4,7 @@ metadata:
   name: api-auth-deploy
   labels:
     app: api-auth-app
+    group: utopia
 spec:
   selector:
     matchLabels:
@@ -13,6 +14,7 @@ spec:
     metadata:
       labels:
         app: api-auth-app
+        group: utopia
     spec:
       containers:
         - name: api-auth-app

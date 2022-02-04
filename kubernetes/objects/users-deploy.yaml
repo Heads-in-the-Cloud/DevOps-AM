@@ -4,6 +4,7 @@ metadata:
   name: api-users-deploy
   labels:
     app: api-users-app
+    group: utopia
 spec:
   selector:
     matchLabels:
@@ -13,6 +14,7 @@ spec:
     metadata:
       labels:
         app: api-users-app
+        group: utopia
     spec:
       containers:
         - name: api-users-app
