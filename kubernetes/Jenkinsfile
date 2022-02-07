@@ -66,9 +66,8 @@ pipeline {
         stage('Push EKS') {
             steps {
                 echo 'Running Kubernetes Initialization'
-                dir('kubernetes') {
-                  sh 'chmod +x ${EKS_SCRIPT_NAME}'
-                  sh './${EKS_SCRIPT_NAME}'
+                dir("${AM_DEVOPS_DIRECTORY}/ansible") {
+                  sh 'ANSIBLE_NOCOLOR=True ansible-playbook eks-init.yaml --connection=local -e "ansible_python_interpreter=/usr/bin/python3" --tags=eks-init'
                 }
             }
         }
