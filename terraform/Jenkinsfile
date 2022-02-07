@@ -18,6 +18,7 @@ pipeline {
         TF_VAR_REGION_ID      = "${AWS_REGION_ID}"
         TF_VAR_AWS_ACCESS_KEY = credentials('AM_AWS_ACCESS')
         TF_VAR_AWS_SECRET_KEY = credentials('AM_AWS_SECRET')
+        TF_VAR_AWS_SECRET_ID  = "${AM_SECRET_ID}"
     }
 
     parameters {
@@ -25,6 +26,22 @@ pipeline {
     }
 
     stages {
+
+        stage('Load Environment') {
+            steps {
+                echo 'Loading Environment'
+                script {
+                    withCredentials([
+                        string(credentialsId: SECRET_ID,
+                        variable: 'DB_CREDS')
+                    ]) {
+                        def jsonObj = readJSON text: DB_CREDS
+                        env.TF_VAR_DB_USERNAME    = jsonObj.DB_USERNAME
+                        env.TF_VAR_DB_PASSWORD    = jsonObj.DB_PASSWORD
+                    }
+                }
+            }
+        }
 
         stage('Terraform Plan') {
             steps {

@@ -1,0 +1,119 @@
+
+---
+
+###############################################################################
+#    EKS CLUSTER DEPLOY AND UPDATE MODULE                                     #
+###############################################################################
+#
+# Tags:
+#
+#  - eks-init: inclusive tag for a full initial setup, to be run once.
+#              Runs the below in order:
+#
+#    - eks-configure: first-time startup config, to be run once.
+#    - eks-create:    pod and API creation, run on any API update.
+#    - eks-post:      updates Route53, to be run after configure and create.
+#
+###############################################################################
+#    EKS CLUSTER DEPLOY AND UPDATE MODULE                                     #
+###############################################################################
+
+- name: Deploy to EKS Cluster
+  hosts: localhost
+  connection: local
+  vars:
+    eks_location: "{{ansible_env.AM_DEVOPS_DIRECTORY}}/kubernetes"
+  tasks:
+
+    #################
+    # EKS Configure #  // runs initially to set up environment.
+    #################
+    - name: EKS-Configure Block
+      block:
+
+        # Create Ingress default resources
+        - name: Ingress setup
+          shell: |
+            kubectl apply -f ns-sa.yaml
+            kubens nginx-ingress
+            kubectl apply -f default-server-secret.yaml
+          args:
+            chdir: "{{ eks_location }}/init"
+
+        # Create custom Ingress configs
+        - name: Configs setup
+          shell: |
+            kubectl apply -f .
+          args:
+            chdir: "{{ eks_location }}/eks-custom"
+
+        # Create custom Ingress resources
+        - name: Ingress Control setup
+          shell: |
+            kubectl apply -f .
+          args:
+            chdir: "{{ eks_location }}/eks-config"
+
+        # Wait for Ingress to come online
+        - name: Ingress wait
+          shell: |
+            kubectl wait --namespace nginx-ingress \
+                --for=condition=ready pod \
+                --selector=app.component=controller \
+                --timeout=180s
+
+        # Create and move to custom Namespace
+        - name: Namespace create
+          shell: |
+            kubectl create ns ${EKS_API_NAMESPACE}
+            kubens ${EKS_API_NAMESPACE}
+
+        # Create secret for use by APIs
+        - name: Secret create
+          shell: |
+            kubectl create secret generic utopia-secret \
+              --from-literal=DB_NAME=utopia \
+              --from-literal=DB_PORT=3306 \
+              --from-literal=DB_TYPE=mysql \
+              --from-literal=DB_ADDRESS="${AWS_RDS_ENDPOINT}" \
+              --from-literal=DB_USERNAME="${AWS_RDS_USERNAME}" \
+              --from-literal=DB_PASSWORD="${AWS_RDS_PASSWORD}" \
+              --from-literal=DB_CONNECTION_POOL_MIN="${DB_POOL_MIN}" \
+              --from-literal=DB_CONNECTION_POOL_MAX="${DB_POOL_MAX}"
+      tags: ['never', 'eks-init', 'eks-configure']
+
+    #############
+    # EKS Build #  // runs on create and update to maintain pods.
+    #############
+    - name: EKS-Create Block
+      block:
+
+        # Create custom API Objects from definitions
+        - name: Create APIs
+          shell: |
+            for f in $(find .); do envsubst < $f | kubectl apply -f -; done
+          args:
+            chdir: "{{ eks_location }}/objects"
+      tags: ['never', 'eks-init', 'eks-create', 'eks-update']
+
+      ############
+      # EKS Post #  // runs after initialization and first pod creation for updates.
+      ############
+    - name: EKS-Post Block
+      block:
+
+        # Get LoadBalancer address and store
+        - name: Get LoadBalancer
+          shell: |
+            kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}'
+          register: LB_ADDRESS
+
+        # Show LoadBalancer address output
+        - debug: var=LB_ADDRESS.stdout
+
+        # Register LoadBalancer with Route53
+        - name: Register Route53
+          shell: |
+            aws route53 change-resource-record-sets --hosted-zone-id "$AWS_HOSTED_ZONE_ID" \
+              --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$AM_EKS_RECORD_NAME"'","Type":"CNAME","TTL":60,"ResourceRecords":[{"Value":"'"{{ LB_ADDRESS.stdout }}"'"}]}}]}'
+      tags: ['never', 'eks-init', 'eks-post']
