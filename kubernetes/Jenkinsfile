@@ -54,10 +54,10 @@ pipeline {
                 echo "Loading latest image hashes"
                 dir("${AM_RESOURCES_DIRECTORY}") {
                     script {
-                        env.USERS_API_LATEST = sh(script:'jq -Mr \'.users\' images.json', returnStdout: true)
-                        env.BOOKINGS_API_LATEST = sh(script:'jq -Mr \'.bookings\' images.json', returnStdout: true)
-                        env.FLIGHTS_API_LATEST = sh(script:'jq -Mr \'.flights\' images.json', returnStdout: true)
-                        env.AUTH_API_LATEST = sh(script:'jq -Mr \'.auth\' images.json', returnStdout: true)
+                        env.USERS_API_LATEST = sh(script:'jq -Mr \'.users\' images-${AWS_REGION_ID}.json', returnStdout: true)
+                        env.BOOKINGS_API_LATEST = sh(script:'jq -Mr \'.bookings\' images-${AWS_REGION_ID}.json', returnStdout: true)
+                        env.FLIGHTS_API_LATEST = sh(script:'jq -Mr \'.flights\' images-${AWS_REGION_ID}.json', returnStdout: true)
+                        env.AUTH_API_LATEST = sh(script:'jq -Mr \'.auth\' images-${AWS_REGION_ID}.json', returnStdout: true)
                     }
                 }
             }

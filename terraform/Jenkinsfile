@@ -19,6 +19,8 @@ pipeline {
         TF_VAR_AWS_ACCESS_KEY = credentials('AM_AWS_ACCESS')
         TF_VAR_AWS_SECRET_KEY = credentials('AM_AWS_SECRET')
         TF_VAR_AWS_SECRET_ID  = "${AM_SECRET_ID}"
+        TF_VAR_AZ_1           = "${AWS_REGION_AZ_1}"
+        TF_VAR_AZ_2           = "${AWS_REGION_AZ_2}"
     }
 
     parameters {
@@ -70,7 +72,7 @@ pipeline {
                 echo 'Exporting outputs as secrets'
                 dir("terraform") {
                     sh 'terraform refresh'
-                    sh 'terraform output | tr -d \'\\\"\\ \' > env.tf'
+                    sh 'terraform output | tr -d \'\\\"\\ \' > env.txt'
                 }
             }
         }
@@ -86,7 +88,7 @@ pipeline {
                     ]) {
                         // json objects
                         def creds = readJSON text: DB_CREDS
-                        def outputs = readProperties file: 'terraform/env.tf'
+                        def outputs = readProperties file: 'terraform/env.txt'
 
                         // secret keys
                         creds.AWS_VPC_ID          = outputs.AWS_VPC_ID
@@ -95,7 +97,7 @@ pipeline {
 
                         // rewrite secret
                         String jsonOut = writeJSON returnText: true, json: creds
-                        sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:${AWS_REGION_ID}:${AWS_ACCOUNT_ID}:secret:${SECRET_ID_PUSH}' --secret-string '${jsonOut}'"
+                        sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:${AWS_REGION_ID}:${AWS_ACCOUNT_ID}:secret:${SECRET_ID_PUSH}' --region ${AWS_REGION_ID} --secret-string '${jsonOut}'"
                     }
                 }
             }
@@ -105,7 +107,7 @@ pipeline {
             when { expression { params.APPLY } }
             steps {
                 echo 'Removing temp files'
-                sh 'rm -f terraform/env.tf'
+                sh 'rm -f terraform/env.txt'
             }
         }
 

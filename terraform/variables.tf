@@ -34,3 +34,11 @@ variable "DB_USERNAME" {
 variable "DB_PASSWORD" {
   type = string
 }
+
+variable "AZ_1" {
+  type = string
+}
+
+variable "AZ_2" {
+  type = string
+}

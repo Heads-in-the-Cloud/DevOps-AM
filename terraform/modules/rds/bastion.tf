@@ -3,9 +3,19 @@
 # INSTANCE #
 ############
 
+data "aws_ami" "linux" {
+  owners = ["amazon"]
+  most_recent = true
+
+  filter {
+    name = "name"
+    values = ["amzn2-ami-hvm*"]
+  }
+}
+
 resource "aws_instance" "bastion" {
   // general info
-  ami                         = var.ami_id
+  ami                         = data.aws_ami.linux.id
   instance_type               = var.bastion_instance_type
   associate_public_ip_address = true
   subnet_id                   = var.public_subnet_id
