@@ -84,8 +84,7 @@
           register: LB_ADDRESS
 
         # Show LoadBalancer address output
-        - debug:
-            address: LB_ADDRESS.stdout
+        - debug: var=LB_ADDRESS.stdout
 
         # Register LoadBalancer with Route53
         - name: Register Route53
