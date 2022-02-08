@@ -9,12 +9,7 @@ data "aws_ami" "linux" {
 
   filter {
     name = "name"
-    values = ["Amazon Linux 2 AMI (HVM) - Kernel 5.*"]
-  }
-
-  filter {
-    name = "root-device-type"
-    values = ["ebs"]
+    values = ["amzn2-ami-hvm*"]
   }
 }
 
