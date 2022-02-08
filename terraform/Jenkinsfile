@@ -19,7 +19,6 @@ pipeline {
         TF_VAR_AWS_ACCESS_KEY = credentials('AM_AWS_ACCESS')
         TF_VAR_AWS_SECRET_KEY = credentials('AM_AWS_SECRET')
         TF_VAR_AWS_SECRET_ID  = "${AM_SECRET_ID}"
-        TF_VAR_
     }
 
     parameters {
