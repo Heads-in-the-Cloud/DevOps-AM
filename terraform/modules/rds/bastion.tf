@@ -3,9 +3,24 @@
 # INSTANCE #
 ############
 
+data "aws_ami" "linux" {
+  owners = "amazon"
+  most_recent = true
+
+  filter {
+    name = "name"
+    values = ["Amazon Linux 2 AMI (HVM) - Kernel 5.*"]
+  }
+
+  filter {
+    name = "root-device-type"
+    values = ["ebs"]
+  }
+}
+
 resource "aws_instance" "bastion" {
   // general info
-  ami                         = var.ami_id
+  ami                         = data.aws_ami.linux.id
   instance_type               = var.bastion_instance_type
   associate_public_ip_address = true
   subnet_id                   = var.public_subnet_id
