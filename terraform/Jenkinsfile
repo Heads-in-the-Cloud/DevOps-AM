@@ -72,7 +72,7 @@ pipeline {
                 echo 'Exporting outputs as secrets'
                 dir("terraform") {
                     sh 'terraform refresh'
-                    sh 'terraform output | tr -d \'\\\"\\ \' > env.tf'
+                    sh 'terraform output | tr -d \'\\\"\\ \' > env.txt'
                 }
             }
         }
@@ -88,7 +88,7 @@ pipeline {
                     ]) {
                         // json objects
                         def creds = readJSON text: DB_CREDS
-                        def outputs = readProperties file: 'terraform/env.tf'
+                        def outputs = readProperties file: 'terraform/env.txt'
 
                         // secret keys
                         creds.AWS_VPC_ID          = outputs.AWS_VPC_ID
@@ -107,7 +107,7 @@ pipeline {
             when { expression { params.APPLY } }
             steps {
                 echo 'Removing temp files'
-                sh 'rm -f terraform/env.tf'
+                sh 'rm -f terraform/env.txt'
             }
         }
 
