@@ -67,7 +67,7 @@ pipeline {
             steps {
                 echo 'Running Kubernetes Initialization'
                 dir("${AM_DEVOPS_DIRECTORY}/ansible") {
-                  sh 'ANSIBLE_NOCOLOR=True ansible-playbook eks-init.yaml --connection=local -e "ansible_python_interpreter=/usr/bin/python3" --tags=eks-init'
+                  sh 'ANSIBLE_NOCOLOR=True ansible-playbook eks-init.yaml --connection=local -e "ansible_python_interpreter=/usr/bin/python3" --tags=eks-init -v'
                 }
             }
         }
