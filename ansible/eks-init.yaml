@@ -65,11 +65,12 @@
         # Create and move to custom Namespace
         - name: Namespace create
           shell: |
-            kubectl create ns ${EKS_API_NAMESPACE}
+            kubectl create ns "${EKS_API_NAMESPACE}"
 
         # Create secret for use by APIs
         - name: Secret create
           shell: |
+            kubens "${EKS_API_NAMESPACE}"
             kubectl create secret generic utopia-secret \
               --from-literal=DB_NAME=utopia \
               --from-literal=DB_PORT=3306 \
@@ -90,7 +91,7 @@
         # Move to Custom Namespace
         - name: Namespace switch
           shell: |
-            kubens ${EKS_API_NAMESPACE}
+            kubens "${EKS_API_NAMESPACE}"
 
         # Create custom API Objects from definitions
         - name: Create APIs
