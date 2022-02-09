@@ -66,7 +66,6 @@
         - name: Namespace create
           shell: |
             kubectl create ns ${EKS_API_NAMESPACE}
-            kubens ${EKS_API_NAMESPACE}
 
         # Create secret for use by APIs
         - name: Secret create
@@ -87,6 +86,11 @@
     #############
     - name: EKS-Create Block
       block:
+
+        # Move to Custom Namespace
+        - name: Namespace switch
+          shell: |
+            kubens ${EKS_API_NAMESPACE}
 
         # Create custom API Objects from definitions
         - name: Create APIs

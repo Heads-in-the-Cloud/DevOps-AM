@@ -19,6 +19,12 @@ Parameters:
   SubnetPublic2CIDR:
     Type: String
     Default: 10.0.4.0/24
+  DBUsername:
+    Description: Enter an admin username for the created Database
+    Type: String
+  DBPassword:
+    Description: Enter an admin password for the created Database
+    Type: String
 
 Resources:
 
@@ -119,6 +125,59 @@ Resources:
     Properties:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref SubnetPublic2
+
+  ###############
+  # RDS Section #
+  ###############
+
+  # Networking
+  DBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Private Subnets for DB Usage
+      DBSubnetGroupName: subnet-group-private
+      SubnetIds:
+        - !Ref SubnetPrivate1
+        - !Ref SubnetPrivate2
+      Tags:
+        - Key: Name
+          Value: AM Utopia DB Subnet Group
+
+  # Security Group
+  DBSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow Access to RDS Instance over 3306 and SSH
+      GroupName: AM_DB_Security
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 3306
+          ToPort: 3306
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: AM_DB_Security
+
+  # Database
+  UtopiaDB:
+    Type: AWS::RDS:DBInstance
+    Properties:
+      AllocatedStorage: 20
+      Engine: mysql
+      EngineVersion: 8.0.23
+      DBInstanceClass: db.t3.small
+      DBSubnetGroupName: !Ref DBSubnetGroup
+      DBName: utopia
+      MasterUsername: !Ref DBUsername
+      MasterUserPassword: !Ref DBPassword
+      DBSecurityGroups:
+        - !Ref DBSecurityGroup
+
+# end
 
 Outputs:
   VPC:
