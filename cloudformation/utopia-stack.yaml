@@ -20,11 +20,16 @@ Parameters:
     Type: String
     Default: 10.0.4.0/24
   DBUsername:
-    Description: Enter an admin username for the created Database
-    Type: String
-  DBPassword:
     Description: Enter an admin password for the created Database
     Type: String
+    Default: username
+  DBUserPassword:
+    Description: Enter an admin username for the created Database
+    Type: String
+    Default: password
+  BastionAmiID:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
 
 Resources:
 
@@ -41,7 +46,7 @@ Resources:
       EnableDnsHostnames: true
       Tags:
         - Key: Name
-          Value: !Ref EnvironmentName
+          Value: !Sub AM-VPC-${EnvironmentName}
 
   # Public Subnets
   SubnetPublic1:
@@ -53,7 +58,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Public Subnet (AZ1)
+          Value: !Sub AM-${EnvironmentName}-Public-1
   SubnetPublic2:
     Type: AWS::EC2::Subnet
     Properties:
@@ -63,7 +68,7 @@ Resources:
       MapPublicIpOnLaunch: true
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Public Subnet (AZ2)
+          Value: !Sub AM-${EnvironmentName}-Public-2
 
   # Private Subnets
   SubnetPrivate1:
@@ -75,7 +80,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private Subnet (AZ1)
+          Value: !Sub AM-${EnvironmentName}-Private-1
   SubnetPrivate2:
     Type: AWS::EC2::Subnet
     Properties:
@@ -85,7 +90,7 @@ Resources:
       MapPublicIpOnLaunch: false
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Private Subnet (AZ2)
+          Value: !Sub AM-${EnvironmentName}-Private-2
 
   # Internet Gateway (public)
   InternetGateway:
@@ -93,7 +98,7 @@ Resources:
     Properties:
       Tags:
         - Key: Name
-          Value: !Ref EnvironmentName
+          Value: !Sub AM-${EnvironmentName}-IGW
   InternetGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
@@ -107,7 +112,7 @@ Resources:
       VpcId: !Ref UtopiaVPC
       Tags:
         - Key: Name
-          Value: !Sub ${EnvironmentName} Public Routes
+          Value: !Sub AM-${EnvironmentName}-Routes-Public
   PublicRoute:
     Type: AWS::EC2::Route
     DependsOn: InternetGatewayAttachment
@@ -141,14 +146,15 @@ Resources:
         - !Ref SubnetPrivate2
       Tags:
         - Key: Name
-          Value: AM Utopia DB Subnet Group
+          Value: !Sub AM-${EnvironmentName}-DB-subnets
 
   # Security Group
-  DBSecurityGroup:
+  EC2SecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allow Access to RDS Instance over 3306 and SSH
-      GroupName: AM_DB_Security
+      GroupName: am_db_security
+      VpcId: !Ref UtopiaVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 3306
@@ -160,11 +166,22 @@ Resources:
           CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
-          Value: AM_DB_Security
+          Value: !Sub AM-${EnvironmentName}-DB-EC2-sg
+  DBSecurityGroup:
+    Type: AWS::RDS::DBSecurityGroup
+    Properties:
+      GroupDescription: Allow Access to RDS Instance over 3306 and SSH
+      EC2VpcId: !Ref UtopiaVPC
+      DBSecurityGroupIngress:
+        -
+          EC2SecurityGroupId: !Ref EC2SecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub AM-${EnvironmentName}-DB-sg
 
   # Database
   UtopiaDB:
-    Type: AWS::RDS:DBInstance
+    Type: AWS::RDS::DBInstance
     Properties:
       AllocatedStorage: 20
       Engine: mysql
@@ -173,9 +190,70 @@ Resources:
       DBSubnetGroupName: !Ref DBSubnetGroup
       DBName: utopia
       MasterUsername: !Ref DBUsername
-      MasterUserPassword: !Ref DBPassword
+      MasterUserPassword: !Ref DBUserPassword
       DBSecurityGroups:
         - !Ref DBSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub AM-${EnvironmentName}-DB-SQL
+
+  ################
+  # Bastion Host #
+  ################
+
+  # IAM Profile and Policies
+  BastionIAMProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      InstanceProfileName: !Sub AM-${EnvironmentName}-Bastion-Profile
+      Path: /
+      Roles:
+        -
+          Ref: BastionIAMRole
+  BastionIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+      RoleName: !Sub AM-${EnvironmentName}-Bastion-Role
+      Path: /
+  BastionRolePolicies:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Sub AM-${EnvironmentName}-Bastion-S3-Access-Policy
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 's3:*'
+            Resource: '*'
+      Roles:
+        - !Ref BastionIAMRole
+
+  # Instance
+  BastionHost:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref BastionAmiID
+      InstanceType: t2.micro
+      IamInstanceProfile: !Ref BastionIAMProfile
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: true
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref EC2SecurityGroup
+          SubnetId: !Ref SubnetPublic1
+      KeyName: bastion_key
+      Tags:
+        - Key: Name
+          Value: !Sub AM-${EnvironmentName}-BastionHost
 
 # end
 
