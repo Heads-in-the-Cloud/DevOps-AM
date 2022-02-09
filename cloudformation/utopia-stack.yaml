@@ -179,6 +179,15 @@ Resources:
         - Key: Name
           Value: !Sub AM-${EnvironmentName}-DB-sg
 
+  # Parameter Group
+  DBParameterGroup:
+    Type: AWS::RDS::DBParameterGroup
+    Properties:
+      Description: Allow certain actions to give admin access to SUPER
+      Family: mysql8.0
+      Parameters:
+        log_bin_trust_function_creators: 1
+
   # Database
   UtopiaDB:
     Type: AWS::RDS::DBInstance
@@ -191,6 +200,7 @@ Resources:
       DBName: utopia
       MasterUsername: !Ref DBUsername
       MasterUserPassword: !Ref DBUserPassword
+      DBParameterGroupName: !Ref DBParameterGroup
       DBSecurityGroups:
         - !Ref DBSecurityGroup
       Tags:
@@ -250,7 +260,19 @@ Resources:
           GroupSet:
             - !Ref EC2SecurityGroup
           SubnetId: !Ref SubnetPublic1
-      KeyName: bastion_key
+      KeyName: bastion_key_cf
+      UserData:
+        Fn::Base64: !Sub
+          - |
+            #!/bin/bash
+            yum update -y
+            yum install -y vim mysql
+            aws s3 cp s3://am-utopia-items/db-create.sql .
+            echo "${RDS_ENDPOINT}, ${RDS_USERNAME}, ${RDS_PASSWORD}"
+            mysql -h "${RDS_ENDPOINT}" -u "${RDS_USERNAME}" -p"${RDS_PASSWORD}" < db-create.sql
+          - RDS_ENDPOINT: !GetAtt UtopiaDB.Endpoint.Address
+            RDS_USERNAME: !Ref DBUsername
+            RDS_PASSWORD: !Ref DBUserPassword
       Tags:
         - Key: Name
           Value: !Sub AM-${EnvironmentName}-BastionHost
