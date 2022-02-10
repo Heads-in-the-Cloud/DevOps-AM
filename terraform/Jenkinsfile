@@ -97,7 +97,7 @@ pipeline {
 
                         // rewrite secret
                         String jsonOut = writeJSON returnText: true, json: creds
-                        sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:us-west-2:${AWS_ACCOUNT_ID}:secret:${SECRET_ID_PUSH}' --region us-west-2 --secret-string '${jsonOut}'"
+                        sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:${AWS_REGION_ID}:${AWS_ACCOUNT_ID}:secret:${SECRET_ID_PUSH}' --region ${AWS_REGION_ID} --secret-string '${jsonOut}'"
                     }
                 }
             }

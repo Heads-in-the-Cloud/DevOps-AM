@@ -268,7 +268,6 @@ Resources:
             yum update -y
             yum install -y vim mysql
             aws s3 cp s3://am-utopia-items/db-create.sql .
-            echo "${RDS_ENDPOINT}, ${RDS_USERNAME}, ${RDS_PASSWORD}"
             mysql -h "${RDS_ENDPOINT}" -u "${RDS_USERNAME}" -p"${RDS_PASSWORD}" < db-create.sql
           - RDS_ENDPOINT: !GetAtt UtopiaDB.Endpoint.Address
             RDS_USERNAME: !Ref DBUsername
