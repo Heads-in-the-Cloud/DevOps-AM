@@ -30,6 +30,15 @@ Parameters:
   BastionAmiID:
     Type: AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>
     Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+  HostedZoneID:
+    Type: String
+    Default: Z02774322V8FI017JONWO
+  EKSRecordName:
+    Type: String
+    Default: am-eks.hitwc.link
+  ECSRecordName:
+    Type: String
+    Default: am-ecs.hitwc.link
 
 Resources:
 
@@ -276,9 +285,158 @@ Resources:
         - Key: Name
           Value: !Sub AM-${EnvironmentName}-BastionHost
 
+  #####################
+  # EKS Cluster/Nodes #
+  #####################
+
+  # Roles
+  EKSIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Principal:
+              Service:
+                - eks.amazonaws.com
+      RoleName: !Sub AM-${EnvironmentName}-EKS-Cluster-Role
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKSClusterPolicy
+        - arn:aws:iam::aws:policy/AmazonEKSVPCResourceController
+  EKSNodegroupIAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'sts:AssumeRole'
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+      RoleName: !Sub AM-${EnvironmentName}-EKS-Nodegroup-Role
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy
+        - arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly
+        - arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy
+
+  # Security Group
+  EKSSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow Access to APIs
+      GroupName: am_eks_security
+      VpcId: !Ref UtopiaVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8083
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 8443
+          ToPort: 8443
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Sub AM-${EnvironmentName}-EKS-sg
+
+  # Cluster
+  EKSCluster:
+    Type: AWS::EKS::Cluster
+    Properties:
+      Name: !Sub AM-${EnvironmentName}-EKS-Cluster
+      RoleArn: !GetAtt EKSIAMRole.Arn
+      ResourcesVpcConfig:
+        EndpointPrivateAccess: true
+        EndpointPublicAccess: true
+        SecurityGroupIds:
+          - !Ref EKSSecurityGroup
+        SubnetIds:
+          - !Ref SubnetPublic1
+          - !Ref SubnetPublic2
+          - !Ref SubnetPrivate1
+          - !Ref SubnetPrivate2
+
+  # Nodegroup
+  EKSNodeGroup:
+    Type: AWS::EKS::Nodegroup
+    Properties:
+      NodegroupName: !Sub AM-${EnvironmentName}-EKS-nodegroup
+      ClusterName: !Ref EKSCluster
+      NodeRole: !GetAtt EKSNodegroupIAMRole.Arn
+      Subnets:
+        - !Ref SubnetPublic1
+        - !Ref SubnetPublic2
+      ScalingConfig:
+        DesiredSize: 2
+        MaxSize: 4
+        MinSize: 2
+
+  # Route53 record
+  EKSRouteRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneID
+      Name: !Ref EKSRecordName
+      Type: CNAME
+      TTL: 30
+      ResourceRecords:
+        - placeholder.text
+
+
+  ###############
+  # ECS Cluster #
+  ###############
+
+  # LoadBalancer
+  ECSLoadBalancer:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub AM-${EnvironmentName}-ecs-nwb
+      Type: network
+      Subnets:
+        - !Ref SubnetPublic1
+        - !Ref SubnetPublic2
+      Scheme: internet-facing
+
+  # Route53 record
+  ECSRouteRecord:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneID
+      Name: !Ref ECSRecordName
+      Type: CNAME
+      TTL: 30
+      ResourceRecords:
+        - !GetAtt ECSLoadBalancer.DNSName
+
+
 # end
 
 Outputs:
-  VPC:
+  VPCId:
     Description: References the created Utopia-VPC
     Value: !Ref UtopiaVPC
+  RDSEndpoint:
+    Description: Where to reach the RDS Instance
+    Value: !GetAtt UtopiaDB.Endpoint.Address
+  ALBId:
+    Description: ALB for docker compose to attach to
+    Value: !Ref ECSLoadBalancer
+  EKSClusterName:
+    Description: EKS Cluster Name for kubernetes access
+    Value: !Ref EKSCluster
