@@ -94,9 +94,11 @@ pipeline {
                         def outputs = readProperties file: 'terraform/env.txt'
 
                         // secret keys
-                        creds.AWS_VPC_ID          = outputs.AWS_VPC_ID
-                        creds.AWS_RDS_ENDPOINT    = outputs.AWS_RDS_ENDPOINT
-                        creds.AWS_ALB_ID          = outputs.AWS_ALB_ID
+                        creds.AWS_VPC_ID            = outputs.AWS_VPC_ID
+                        creds.AWS_RDS_ENDPOINT      = outputs.AWS_RDS_ENDPOINT
+                        creds.AWS_ALB_ID            = outputs.AWS_ALB_ID
+                        creds.AWS_EKS_CLUSTER_NAME  = outputs.AWS_EKS_CLUSTER_NAME
+                        creds.AWS_ECS_SG            = outputs.AWS_ECS_SG
 
                         // rewrite secret
                         String jsonOut = writeJSON returnText: true, json: creds
