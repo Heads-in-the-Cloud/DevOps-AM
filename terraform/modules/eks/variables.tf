@@ -28,6 +28,19 @@ variable "record_name" {
   default = ""
 }
 
+variable "eks_sg_id" {
+  type = string
+  default = ""
+}
+
+variable "environment_name" {
+  type = string
+}
+
+variable "deploy_mode" {
+  type = string
+}
+
 ##############
 # Instancing #
 ##############

@@ -9,41 +9,9 @@ resource "aws_db_instance" "rds" {
   username              = var.db_username
   password              = var.db_password
   db_subnet_group_name  = var.subnet_group_id
-  vpc_security_group_ids = [aws_security_group.db_security.id]
+  vpc_security_group_ids = [var.rds_sg_id]
   skip_final_snapshot   = true
   tags = {
-    Name = "AM-terraform-db"
-  }
-}
-
-// RDS Security Group
-resource "aws_security_group" "db_security" {
-  name          = "AM-rds-security"
-  description   = "Allow all SSH and SQL traffic"
-  vpc_id        = var.vpc_id
-
-  ingress {
-    from_port   = 3306
-    to_port     = 3306
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port     = 0
-    to_port       = 0
-    protocol      = "-1"
-    cidr_blocks   = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "AM-rds-security"
+    Name = "${var.environment_name}-rds"
   }
 }

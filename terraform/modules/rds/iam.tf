@@ -1,11 +1,12 @@
 
+
 resource "aws_iam_instance_profile" "bastion_profile" {
-  name = "AM-bastion-profile"
+  name = "${var.environment_name}-bastion-profile"
   role = aws_iam_role.bastion_iam_role.name
 }
 
 resource "aws_iam_role" "bastion_iam_role" {
-  name = "AM-bastion-s3-access-role"
+  name = "${var.environment_name}-bastion-s3-access-role"
   assume_role_policy = data.aws_iam_policy_document.bastion_policy_doc.json
 }
 
