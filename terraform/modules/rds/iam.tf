@@ -1,4 +1,5 @@
 
+
 resource "aws_iam_instance_profile" "bastion_profile" {
   name = "AM-bastion-profile"
   role = aws_iam_role.bastion_iam_role.name

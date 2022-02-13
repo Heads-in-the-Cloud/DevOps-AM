@@ -22,3 +22,11 @@ variable "record_name" {
   type = string
   default = ""
 }
+
+variable "environment_name" {
+  type = string
+}
+
+variable "deploy_mode" {
+  type = string
+}

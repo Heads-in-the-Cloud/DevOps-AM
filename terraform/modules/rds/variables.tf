@@ -1,4 +1,16 @@
 
+###########
+# General #
+###########
+
+variable "environment_name" {
+  type = string
+}
+
+variable "deploy_mode" {
+  type = string
+}
+
 #######################
 # Database Instancing #
 #######################
@@ -52,6 +64,16 @@ variable "public_subnet_id" {
 }
 
 variable "vpc_id" {
+  type = string
+  default = ""
+}
+
+variable "rds_sg_id" {
+  type = string
+  default = ""
+}
+
+variable "bastion_sg_id" {
   type = string
   default = ""
 }
