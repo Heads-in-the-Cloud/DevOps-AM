@@ -44,7 +44,7 @@ pipeline {
             steps {
                 echo 'Preparing EKS materials'
                 sh 'docker context use default'
-                sh 'aws eks --region ${AWS_REGION_ID} update-kubeconfig --name ${AWS_CLUSTER_NAME}'
+                sh "aws eks --region ${AWS_REGION_ID} update-kubeconfig --name ${AWS_CLUSTER_NAME}"
                 sh 'aws ecr get-login-password --region ${AWS_REGION_ID} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com'
             }
         }
