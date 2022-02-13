@@ -10,7 +10,7 @@ resource "aws_key_pair" "bastion_key" {
 
 locals {
   bastion_ami_tag   = "ami-00f7e5c52c0f43726"
-  environment_name  = "AM-Utopia-${var.DEPLOY_MODE}"
+  environment_name  = "AM-Utopia-TF-${var.DEPLOY_MODE}"
 }
 
 

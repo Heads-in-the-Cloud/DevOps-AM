@@ -22,7 +22,7 @@ resource "aws_instance" "bastion" {
   key_name                    = var.bastion_ssh_keyname
   vpc_security_group_ids      = [var.bastion_sg_id]
   iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
-  tags = { Name               = "AM-bastion" }
+  tags = { Name               = "${var.environment_name}-bastion" }
 
   // startup script
   user_data                   = templatefile("${path.module}/bastion_init.sh", {
