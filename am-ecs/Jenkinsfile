@@ -18,6 +18,9 @@ pipeline {
 
         DB_POOL_MIN     = 2
         DB_POOL_MAX     = 4
+
+        // AWS Region Override
+        AWS_PROFILE     = "am_aws"
     }
 
     stages {
@@ -35,8 +38,16 @@ pipeline {
                         env.AWS_VPC_ID          = jsonObj.AWS_VPC_ID
                         env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
                         env.AWS_ALB_ID          = jsonObj.AWS_ALB_ID
+                        env.AWS_ECS_SG          = jsonObj.AWS_ECS_SG
                     }
                 }
+            }
+        }
+
+        stage('Save') {
+            steps {
+                sh 'echo "${AWS_ALB_ID}, ${AWS_ECS_SG}" > ${AM_DEVOPS_DIRECTORY}/temp.txt'
+                sh 'aws configure list --profile ${ECS_CONTEXT_NAME}'
             }
         }
 
@@ -57,6 +68,7 @@ pipeline {
                         $AWS_ALB_ID \
                         $DB_POOL_MIN \
                         $DB_POOL_MAX \
+                        $AWS_ECS_SG \
                         \' < docker-compose-template.yml > docker-compose.yml
                     '''
                 }
@@ -66,6 +78,7 @@ pipeline {
         stage('Configure') {
             steps {
                 echo 'Configuring ECS'
+                sh 'aws configure set region ${AWS_REGION_ID} --profile ${ECS_CONTEXT_NAME}'
                 sh 'docker context use ${ECS_CONTEXT_NAME}'
                 sh 'aws ecr get-login-password --region ${AWS_REGION_ID} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com'
             }
