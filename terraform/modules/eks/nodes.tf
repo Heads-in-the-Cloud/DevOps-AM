@@ -33,7 +33,7 @@ resource "aws_eks_node_group" "eks_nodes" {
 #############
 
 resource "aws_iam_role" "EKS_nodegroup_role" {
-  name = "AM-eks-nodegroup-role"
+  name = "${var.environment_name}-eks-nodegroup-role"
   assume_role_policy = data.aws_iam_policy_document.eks_nodegroup_policy_doc.json
 }
 

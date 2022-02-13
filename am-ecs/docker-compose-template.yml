@@ -1,11 +1,19 @@
 version: "3.9"
 x-aws-vpc: "${AWS_VPC_ID}"
 x-aws-loadbalancer: "${AWS_ALB_ID}"
+
+networks:
+  back_tier:
+    external: true
+    name: "${AWS_ECS_SG}"
+
 services:
   ###########
   # FLIGHTS #
   ###########
   flights:
+    x-aws-min_percent: 50
+    x-aws-max_percent: 100
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com/am-flights-api
     ports:
       - 8081:8081

@@ -10,3 +10,11 @@ output "AWS_RDS_ENDPOINT" {
 output "AWS_ALB_ID" {
   value = module.ecs.ALB_ID
 }
+
+output "AWS_EKS_CLUSTER_NAME" {
+  value = module.eks.eks_name
+}
+
+output "AWS_ECS_SG" {
+  value = module.security.SG_ECS
+}

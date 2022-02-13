@@ -35,10 +35,10 @@ Parameters:
     Default: Z02774322V8FI017JONWO
   EKSRecordName:
     Type: String
-    Default: am-eks.hitwc.link
+    Default: am-eks-cf.hitwc.link
   ECSRecordName:
     Type: String
-    Default: am-ecs.hitwc.link
+    Default: am-ecs-cf.hitwc.link
 
 Resources:
 
@@ -275,7 +275,7 @@ Resources:
           - |
             #!/bin/bash
             yum update -y
-            yum install -y vim mysql
+            yum install -y mysql
             aws s3 cp s3://am-utopia-items/db-create.sql .
             mysql -h "${RDS_ENDPOINT}" -u "${RDS_USERNAME}" -p"${RDS_PASSWORD}" < db-create.sql
           - RDS_ENDPOINT: !GetAtt UtopiaDB.Endpoint.Address
@@ -423,7 +423,6 @@ Resources:
       TTL: 30
       ResourceRecords:
         - !GetAtt ECSLoadBalancer.DNSName
-
 
 # end
 

@@ -42,3 +42,11 @@ variable "zone_2" {
   type = string
   default = ""
 }
+
+variable "environment_name" {
+  type = string
+}
+
+variable "deploy_mode" {
+  type = string
+}

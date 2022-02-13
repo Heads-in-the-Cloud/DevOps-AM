@@ -20,9 +20,9 @@ resource "aws_instance" "bastion" {
   associate_public_ip_address = true
   subnet_id                   = var.public_subnet_id
   key_name                    = var.bastion_ssh_keyname
-  vpc_security_group_ids      = [aws_security_group.bastion_security.id]
+  vpc_security_group_ids      = [var.bastion_sg_id]
   iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
-  tags = { Name               = "AM-bastion" }
+  tags = { Name               = "${var.environment_name}-bastion" }
 
   // startup script
   user_data                   = templatefile("${path.module}/bastion_init.sh", {
@@ -33,33 +33,5 @@ resource "aws_instance" "bastion" {
 
   lifecycle {
     ignore_changes = [ associate_public_ip_address ]
-  }
-}
-
-############
-# Security #
-############
-
-resource "aws_security_group" "bastion_security" {
-  name = "AM-bastion-security"
-  description = "Allow only SSH"
-  vpc_id = var.vpc_id
-
-  ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "AM-bastion-security"
   }
 }

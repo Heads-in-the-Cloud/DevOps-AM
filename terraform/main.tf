@@ -5,11 +5,12 @@
 
 resource "aws_key_pair" "bastion_key" {
   key_name = "bastion_key"
-  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQClX+8jDnS03TezMz3AWki1+FkOwcSdTxTtj40gbYf8ysf6Aa5VCWZBkzHEfmGo+mMBgfu3N3QDvRz+rR5RrOOsOfKPcFOY5jnHImZeoLaAMbD0Qvk9cyUG7/ndkz/puYd/DNPvP6R/jyHvNiDeK0yVSoGAPLybzI4GVmpnO/FTK8uGsJsxuXUVpt5H0MZ/Sl9eGUkzrXQIFGVS4Anj0532/5xvY4DX3B8ahOgomFCLED66ZAheWMfq0R/q06MSP2TOMV7Fna2uKchwHyNYDjh+hEVCw554LE42lQgtb70oP0fGEWAYFBeNFF2aOWw389n+zqwDgBHCnGHDQj83e//MYsomApuKK8etYrY4BhB53VXe8R5nNY3CfkXmPFwJxUojfFFgGf+XF9kbDK1lSUT/7+HynmrPG4LYTBpQvm4OmhEDABqLXctb0hasnEkZjXoJ7dSxjf2kMTZZcqGOk+5GKi+6vfmql80k3LaON1DYYxr9qniD3dMoLG77qPs0DiLXMxAcH4y5+Rz+4oE11dO5yfypRfevYMLpRVcMI4/mgh5Knu3PvSkFR2ltQXyY266LEjT6G+feZOBWdev797QQLxo2vyBk7NtnBDA7GQfuhaKhFAAavJ2Wz+aXnNLYVDP0jP5g/abbgE1saU4LhiIj8meyN9ViBEKDLdggY6UhAQ== aidan.mattson@smoothstack.com"
+  public_key = var.SSH_BASTION_KEY
 }
 
 locals {
   bastion_ami_tag   = "ami-00f7e5c52c0f43726"
+  environment_name  = "AM-Utopia-TF-${var.DEPLOY_MODE}"
 }
 
 
@@ -18,7 +19,10 @@ locals {
 ###########
 
 module "network" {
+  # general
   source                      = "./modules/network"
+  deploy_mode                 = var.DEPLOY_MODE
+  environment_name            = local.environment_name
 
   # networking
   vpc_cidr                    = "10.0.0.0/16"
@@ -31,8 +35,23 @@ module "network" {
   zone_2                      = "${var.REGION_ID}${var.AZ_2}"
 }
 
+
+module "security" {
+  # general
+  source              = "./modules/security"
+  deploy_mode         = var.DEPLOY_MODE
+  environment_name    = local.environment_name
+
+  # networking info
+  vpc_id              = module.network.utopia_vpc
+}
+
+
 module "utopia-db" {
+  # general
   source                = "./modules/rds"
+  deploy_mode           = var.DEPLOY_MODE
+  environment_name      = local.environment_name
 
   # instancing
   db_instance_class     = "db.t3.small"
@@ -44,6 +63,7 @@ module "utopia-db" {
   subnet_group_id       = module.network.subnet_group_id
   public_subnet_id      = module.network.all_subnets[2]
   vpc_id                = module.network.utopia_vpc
+  rds_sg_id             = module.security.SG_RDS
 
   # database
   db_username           = var.DB_USERNAME
@@ -53,28 +73,35 @@ module "utopia-db" {
   ami_id                = local.bastion_ami_tag
   bastion_ssh_keyname   = aws_key_pair.bastion_key.key_name
   bastion_instance_type = "t2.micro"
+  bastion_sg_id         = module.security.SG_Bastion
 }
+
 
 module "ecs" {
-  source          = "./modules/ecs"
+  # general
+  source            = "./modules/ecs"
+  deploy_mode       = var.DEPLOY_MODE
+  environment_name  = local.environment_name
 
   # networking
-  r53_zone_id     = var.HOSTED_ZONE
-  record_name     = var.ECS_RECORD
-  vpc_id          = module.network.utopia_vpc
-  service_subnets = [module.network.all_subnets[2], module.network.all_subnets[3]]
-
+  r53_zone_id       = var.HOSTED_ZONE
+  record_name       = "${var.DEPLOY_MODE}-${var.ECS_RECORD}"
+  vpc_id            = module.network.utopia_vpc
+  service_subnets   = [module.network.all_subnets[2], module.network.all_subnets[3]]
 }
 
+
 module "eks" {
+  # general
   source              = "./modules/eks"
+  deploy_mode         = var.DEPLOY_MODE
+  environment_name    = local.environment_name
 
   # networking
   eks_public_subnets  = [module.network.all_subnets[2], module.network.all_subnets[3]]
   eks_subnets         = module.network.all_subnets
   vpc_id              = module.network.utopia_vpc
-  r53_zone_id         = var.HOSTED_ZONE
-  record_name         = var.EKS_RECORD
+  eks_sg_id           = module.security.SG_EKS
 
   # instancing
   node_instance_type  = "t3.medium"
@@ -86,7 +113,7 @@ module "eks" {
 ###########
 
 resource "local_file" "ansible_eks_vars" {
-  filename = "outputs/eks_output_vars.yaml"
+  filename = "outputs/tf_output_vars_${var.DEPLOY_MODE}"
   content = <<-VARS
     tf_subnet_public_1: ${module.network.all_subnets[2]}
     tf_subnet_public_2: ${module.network.all_subnets[3]}

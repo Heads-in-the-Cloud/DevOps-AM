@@ -18,14 +18,17 @@ variable "vpc_id" {
   default = ""
 }
 
-variable "r53_zone_id" {
+variable "eks_sg_id" {
   type = string
   default = ""
 }
 
-variable "record_name" {
+variable "environment_name" {
   type = string
-  default = ""
+}
+
+variable "deploy_mode" {
+  type = string
 }
 
 ##############

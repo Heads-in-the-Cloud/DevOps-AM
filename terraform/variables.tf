@@ -1,8 +1,4 @@
 
-variable "EKS_RECORD" {
-  type = string
-}
-
 variable "ECS_RECORD" {
   type = string
 }
@@ -40,5 +36,14 @@ variable "AZ_1" {
 }
 
 variable "AZ_2" {
+  type = string
+}
+
+variable "DEPLOY_MODE" {
+  type = string
+  default = "dev"
+}
+
+variable "SSH_BASTION_KEY" {
   type = string
 }
