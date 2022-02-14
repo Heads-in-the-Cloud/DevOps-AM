@@ -20,26 +20,21 @@ pipeline {
         DB_POOL_MIN               = 2
         DB_POOL_MAX               = 4
 
-        // AWS Region Override for Secrets
-        AWS_REGION          = "${AWS_REGION_ID}"
-        AWS_DEFAULT_REGION  = "${AWS_REGION_ID}"
+        // AWS Region Override
+        AWS_PROFILE               = "${AWS_PROFILE_NAME}"
     }
 
     stages {
         stage('Load Environment') {
             steps {
-                echo 'Loading Environment'
+                sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
                 script {
-                    withCredentials([
-                        string(credentialsId: SECRET_ID,
-                        variable: 'DB_CREDS')
-                    ]) {
-                        def jsonObj = readJSON text: DB_CREDS
-                        env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
-                        env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
-                        env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
-                        env.AWS_CLUSTER_NAME    = jsonObj.AWS_EKS_CLUSTER_NAME
-                    }
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    def jsonObj = readJSON text: secret
+                    env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
+                    env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
+                    env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
+                    env.AWS_CLUSTER_NAME    = jsonObj.AWS_EKS_CLUSTER_NAME
                 }
             }
         }
