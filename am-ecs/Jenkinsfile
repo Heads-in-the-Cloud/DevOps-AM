@@ -26,20 +26,17 @@ pipeline {
     stages {
         stage('Load Environment') {
             steps {
-                echo 'Loading Environment'
+                sh 'export AWS_REGION=${AWS_REGION_ID}'
+                sh 'export AWS_DEFAULT_REGION=${AWS_REGION_ID}'
                 script {
-                    withCredentials([
-                        string(credentialsId: env.SECRET_ID,
-                        variable: 'DB_CREDS')
-                    ]) {
-                        def jsonObj = readJSON text: DB_CREDS
-                        env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
-                        env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
-                        env.AWS_VPC_ID          = jsonObj.AWS_VPC_ID
-                        env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
-                        env.AWS_ALB_ID          = jsonObj.AWS_ALB_ID
-                        env.AWS_ECS_SG          = jsonObj.AWS_ECS_SG
-                    }
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    def jsonObj = readJSON text: secret
+                    env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
+                    env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
+                    env.AWS_VPC_ID          = jsonObj.AWS_VPC_ID
+                    env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
+                    env.AWS_ALB_ID          = jsonObj.AWS_ALB_ID
+                    env.AWS_ECS_SG          = jsonObj.AWS_ECS_SG
                 }
             }
         }
