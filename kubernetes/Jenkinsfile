@@ -19,6 +19,10 @@ pipeline {
 
         DB_POOL_MIN               = 2
         DB_POOL_MAX               = 4
+
+        // AWS Region Override for Secrets
+        AWS_REGION          = "${AWS_REGION_ID}"
+        AWS_DEFAULT_REGION  = "${AWS_REGION_ID}"
     }
 
     stages {
