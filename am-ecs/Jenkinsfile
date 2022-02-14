@@ -68,6 +68,7 @@ pipeline {
         stage('Configure') {
             steps {
                 echo 'Configuring ECS'
+                sh 'aws configure set region ${AWS_REGION_ID} --profile ${ECS_CONTEXT_NAME}'
                 sh 'docker context use ${ECS_CONTEXT_NAME}'
                 sh 'aws ecr get-login-password --region ${AWS_REGION_ID} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com'
             }
