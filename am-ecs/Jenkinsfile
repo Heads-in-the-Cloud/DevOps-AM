@@ -41,6 +41,13 @@ pipeline {
             }
         }
 
+        stage('Save') {
+            steps {
+                sh 'echo "${AWS_ALB_ID}, ${AWS_ECS_SG}" > ${AM_DEVOPS_DIRECTORY}/temp.txt'
+                sh 'aws configure list --profile ${ECS_CONTEXT_NAME}'
+            }
+        }
+
         stage('Fill Template') {
             steps {
                 echo 'Inserting Environment Variables into docker-compose'
