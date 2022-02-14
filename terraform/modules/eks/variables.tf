@@ -18,16 +18,6 @@ variable "vpc_id" {
   default = ""
 }
 
-variable "r53_zone_id" {
-  type = string
-  default = ""
-}
-
-variable "record_name" {
-  type = string
-  default = ""
-}
-
 variable "eks_sg_id" {
   type = string
   default = ""
