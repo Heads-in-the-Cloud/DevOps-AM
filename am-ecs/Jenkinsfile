@@ -7,7 +7,6 @@ pipeline {
     }
 
     environment {
-        ECS_CONTEXT_NAME = "am_aws"
         SECRET_ID = "dev/AM/utopia-secrets"
 
         ECS_MEM_LIMIT   = "1024M"
@@ -26,28 +25,17 @@ pipeline {
     stages {
         stage('Load Environment') {
             steps {
-                echo 'Loading Environment'
+                sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
                 script {
-                    withCredentials([
-                        string(credentialsId: env.SECRET_ID,
-                        variable: 'DB_CREDS')
-                    ]) {
-                        def jsonObj = readJSON text: DB_CREDS
-                        env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
-                        env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
-                        env.AWS_VPC_ID          = jsonObj.AWS_VPC_ID
-                        env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
-                        env.AWS_ALB_ID          = jsonObj.AWS_ALB_ID
-                        env.AWS_ECS_SG          = jsonObj.AWS_ECS_SG
-                    }
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    def jsonObj = readJSON text: secret
+                    env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
+                    env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
+                    env.AWS_VPC_ID          = jsonObj.AWS_VPC_ID
+                    env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
+                    env.AWS_ALB_ID          = jsonObj.AWS_ALB_ID
+                    env.AWS_ECS_SG          = jsonObj.AWS_ECS_SG
                 }
-            }
-        }
-
-        stage('Save') {
-            steps {
-                sh 'echo "${AWS_ALB_ID}, ${AWS_ECS_SG}" > ${AM_DEVOPS_DIRECTORY}/temp.txt'
-                sh 'aws configure list --profile ${ECS_CONTEXT_NAME}'
             }
         }
 
@@ -78,8 +66,8 @@ pipeline {
         stage('Configure') {
             steps {
                 echo 'Configuring ECS'
-                sh 'aws configure set region ${AWS_REGION_ID} --profile ${ECS_CONTEXT_NAME}'
-                sh 'docker context use ${ECS_CONTEXT_NAME}'
+                sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
+                sh 'docker context use ${AWS_PROFILE_NAME}'
                 sh 'aws ecr get-login-password --region ${AWS_REGION_ID} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com'
             }
         }

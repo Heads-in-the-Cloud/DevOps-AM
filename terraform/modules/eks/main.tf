@@ -24,16 +24,3 @@ resource "aws_eks_cluster" "eks_cluster" {
   }
 }
 
-##############
-# Networking #
-##############
-
-// route 53
-resource "aws_route53_record" "eks_record" {
-  zone_id     = var.r53_zone_id
-  name        = var.record_name
-  type        = "CNAME"
-  ttl         = "30"
-  records     = ["placeholder.text"]
-}
-
