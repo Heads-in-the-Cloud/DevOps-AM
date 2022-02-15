@@ -3,17 +3,17 @@
 # subscript a bunch of directory changes and wait
 (
   # create basic ingress framework
-  cd init
+  cd init || exit
   kubectl apply -f ns-sa.yaml
   kubens nginx-ingress
   kubectl apply -f default-server-secret.yaml
 
   # create ingress custom configs
-  cd ../eks-custom
+  cd ../eks-custom || exit
   kubectl apply -f .
 
   # create ingress control items
-  cd ../eks-config
+  cd ../eks-config || exit
   kubectl apply -f .
 
   # wait for ingress to finish
@@ -39,8 +39,8 @@ kubectl create secret generic utopia-secret \
   --from-literal=DB_CONNECTION_POOL_MAX="${DB_POOL_MAX}"
 
 # load and update API and Ingress objects
-cd objects
-for f in $(find .); do envsubst < $f | kubectl apply -f -; done
+cd objects || exit
+for f in $(find .); do envsubst < "$f" | kubectl apply -f -; done
 
 # fetch load balancer endpoint
 LB_ADDRESS=$(kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}')

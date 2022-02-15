@@ -5,6 +5,7 @@ metadata:
   labels:
     app: api-auth-app
     group: utopia
+    api: auth
 spec:
   selector:
     matchLabels:
@@ -15,6 +16,7 @@ spec:
       labels:
         app: api-auth-app
         group: utopia
+        api: auth
     spec:
       containers:
         - name: api-auth-app
@@ -29,54 +31,23 @@ spec:
               memory: "$EKS_CONTAINER_MEM_REQUEST"
           ports:
             - containerPort: 8443
-          env:
-            - name: DB_ADDRESS
-              valueFrom:
-                secretKeyRef:
-                  key: DB_ADDRESS
-                  name: utopia-secret
-            - name: DB_NAME
-              valueFrom:
-                secretKeyRef:
-                  key: DB_NAME
-                  name: utopia-secret
-            - name: DB_TYPE
-              valueFrom:
-                secretKeyRef:
-                  key: DB_TYPE
-                  name: utopia-secret
-            - name: DB_PORT
-              valueFrom:
-                secretKeyRef:
-                  key: DB_PORT
-                  name: utopia-secret
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  key: DB_PASSWORD
-                  name: utopia-secret
-            - name: DB_USERNAME
-              valueFrom:
-                secretKeyRef:
-                  key: DB_USERNAME
-                  name: utopia-secret
-            - name: DB_CONNECTION_POOL_MIN
-              valueFrom:
-                secretKeyRef:
-                  key: DB_CONNECTION_POOL_MIN
-                  name: utopia-secret
-            - name: DB_CONNECTION_POOL_MAX
-              valueFrom:
-                secretKeyRef:
-                  key: DB_CONNECTION_POOL_MAX
-                  name: utopia-secret
+          envFrom:
+            - secretRef:
+                name: utopia-secret
+          readinessProbe:
+            httpGet:
+              path: /api/v1/login/ready
+              port: 8443
+            initialDelaySeconds: 30
+            periodSeconds: 15
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: api-auth-service
   labels:
-    app: api-auth-app
+    api: auth
+    group: utopia
 spec:
   ports:
     - protocol: TCP

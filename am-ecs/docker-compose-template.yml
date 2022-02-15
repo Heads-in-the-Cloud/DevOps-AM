@@ -1,6 +1,8 @@
 version: "3.9"
 x-aws-vpc: "${AWS_VPC_ID}"
 x-aws-loadbalancer: "${AWS_ALB_ID}"
+x-aws-min_percent: 50
+x-aws-max_percent: 100
 
 networks:
   back_tier:
