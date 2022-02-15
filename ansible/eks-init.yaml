@@ -23,7 +23,6 @@
   connection: local
   vars:
     eks_location: "{{ansible_env.AM_DEVOPS_DIRECTORY}}/kubernetes"
-    ingress_namespace: nginx-ingress
   tasks:
 
     #################
@@ -32,27 +31,14 @@
     - name: EKS-Configure Block
       block:
 
-        # Create Namespaces
+        # Create Ingress default resources
         - name: Ingress setup
-          kubernetes.core.k8s:
-            state: present
-            src: "/{{ eks_location }}/init/ns-sa.yaml"
-
-        # Apply default resources
-        - name: Apply Default
-          kubernetes.core.k8s:
-            state: present
-            namespace: "{{ ingress_namespace }}"
-            src: "/{{ eks_location }}/init/default-server-secret.yaml"
-
-#        # Create Ingress default resources
-#        - name: Ingress setup
-#          shell: |
-#            kubectl apply -f ns-sa.yaml
-#            kubens nginx-ingress
-#            kubectl apply -f default-server-secret.yaml
-#          args:
-#            chdir: "{{ eks_location }}/init"
+          shell: |
+            kubectl apply -f ns-sa.yaml
+            kubens nginx-ingress
+            kubectl apply -f default-server-secret.yaml
+          args:
+            chdir: "{{ eks_location }}/init"
 
         # Create custom Ingress configs
         - name: Configs setup
