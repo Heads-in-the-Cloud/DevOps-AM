@@ -111,9 +111,19 @@
         # Show LoadBalancer address output
         - debug: var=LB_ADDRESS.stdout
 
-        # Register LoadBalancer with Route53
         - name: Register Route53
-          shell: |
-            aws route53 change-resource-record-sets --hosted-zone-id "$AWS_HOSTED_ZONE_ID" \
-              --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$AM_EKS_RECORD_NAME"'","Type":"CNAME","TTL":60,"ResourceRecords":[{"Value":"'"{{ LB_ADDRESS.stdout }}"'"}]}}]}'
+          route53:
+            state: present
+            hosted_zone_id: "{{ ansible_env.AWS_HOSTED_ZONE_ID }}"
+            record: "{{ ansible_env.AM_EKS_RECORD_NAME }}"
+            ttl: 60
+            type: CNAME
+            value:
+              - "{{ LB_ADDRESS.stdout }}"
+
+#        # Register LoadBalancer with Route53
+#        - name: Register Route53
+#          shell: |
+#            aws route53 change-resource-record-sets --hosted-zone-id "$AWS_HOSTED_ZONE_ID" \
+#              --change-batch '{"Changes":[{"Action":"UPSERT","ResourceRecordSet":{"Name":"'"$AM_EKS_RECORD_NAME"'","Type":"CNAME","TTL":60,"ResourceRecords":[{"Value":"'"{{ LB_ADDRESS.stdout }}"'"}]}}]}'
       tags: ['never', 'eks-init', 'eks-post']
