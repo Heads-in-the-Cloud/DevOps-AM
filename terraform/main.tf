@@ -112,18 +112,14 @@ module "eks" {
 # OUTPUTS #
 ###########
 
-resource "local_file" "ansible_eks_vars" {
-  filename = "outputs/tf_output_vars_${var.DEPLOY_MODE}"
+resource "local_file" "ansible_output_vars" {
+  filename = "${var.ANSIBLE_DIRECTORY}/vars/dynamic/tf_output_vars.yaml"
   content = <<-VARS
-    tf_subnet_public_1: ${module.network.all_subnets[2]}
-    tf_subnet_public_2: ${module.network.all_subnets[3]}
-    tf_eks_iam_role_arn: ${module.eks.iam_role_arn}
+    aws_region: ${var.REGION_ID}
+    vpc_id: ${module.network.utopia_vpc}
+    subnet_private_1_id: ${module.network.all_subnets[0]}
+    subnet_private_2_id: ${module.network.all_subnets[1]}
+    subnet_public_1_id: ${module.network.all_subnets[2]}
+    subnet_public_2_id: ${module.network.all_subnets[3]}
   VARS
 }
-
-//resource "local_file" "ansible_ec2_vars" {
-//  filename = "${AM_ANSIBLE_DIRECTORY}/vars/dynamic/ec2/tf_output_vars.yaml"
-//  content = <<-VARS
-//    var: val
-//  VARS
-//}

@@ -7,22 +7,21 @@ pipeline {
     }
 
     environment {
-        COMMIT_HASH             = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
-        SECRET_ID               = "dev/AM/utopia-secrets"
-        SECRET_ID_PUSH          = "dev/AM/utopia-secrets-NE4x9z"
+        COMMIT_HASH               = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
+        SECRET_ID                 = "dev/AM/utopia-secrets"
+        SECRET_ID_PUSH            = "dev/AM/utopia-secrets-NE4x9z"
 
-        TF_VAR_DEPLOY_MODE      = "dev"
+        TF_VAR_DEPLOY_MODE        = "dev"
 
         // Terraform passthrough
-        TF_VAR_ECS_RECORD       = "${AM_ECS_RECORD_NAME}"
-        TF_VAR_HOSTED_ZONE      = "${AWS_HOSTED_ZONE_ID}"
-        TF_VAR_REGION_ID        = "${AWS_REGION_ID}"
-        TF_VAR_AWS_ACCESS_KEY   = credentials('AM_AWS_ACCESS')
-        TF_VAR_AWS_SECRET_KEY   = credentials('AM_AWS_SECRET')
-        TF_VAR_SSH_BASTION_KEY  = credentials('AM_SSH_BASTION')
-        TF_VAR_AWS_SECRET_ID    = "${AM_SECRET_ID}"
-        TF_VAR_AZ_1             = "${AWS_REGION_AZ_1}"
-        TF_VAR_AZ_2             = "${AWS_REGION_AZ_2}"
+        TF_VAR_ECS_RECORD         = "${AM_ECS_RECORD_NAME}"
+        TF_VAR_HOSTED_ZONE        = "${AWS_HOSTED_ZONE_ID}"
+        TF_VAR_REGION_ID          = "${AWS_REGION_ID}"
+        TF_VAR_SSH_BASTION_KEY    = credentials('AM_SSH_BASTION')
+        TF_VAR_AWS_SECRET_ID      = "${AM_SECRET_ID}"
+        TF_VAR_AZ_1               = "${AWS_REGION_AZ_1}"
+        TF_VAR_AZ_2               = "${AWS_REGION_AZ_2}"
+        TF_VAR_ANSIBLE_DIRECTORY  = "${AM_DEVOPS_DIRECTORY}/ansible"
     }
 
     parameters {

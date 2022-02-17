@@ -11,14 +11,6 @@ variable "REGION_ID" {
   type = string
 }
 
-variable "AWS_ACCESS_KEY" {
-  type = string
-}
-
-variable "AWS_SECRET_KEY" {
-  type = string
-}
-
 variable "AWS_SECRET_ID" {
   type = string
 }
@@ -45,5 +37,9 @@ variable "DEPLOY_MODE" {
 }
 
 variable "SSH_BASTION_KEY" {
+  type = string
+}
+
+variable "ANSIBLE_DIRECTORY" {
   type = string
 }

@@ -1,0 +1,23 @@
+---
+- name: Test pushing variables
+  hosts: localhost
+  connection: local
+  vars:
+    testvar: thing
+  tasks:
+    - name: Load Variables
+      debug:
+        msg: "Variable is {{ testvar }}"
+
+    - name: Other Variable
+      debug:
+        msg: "Passed variable is {{ testvar2 }}"
+
+    - name: Get Secret
+      debug:
+        msg: "{{ lookup('aws_secret', 'dev/AM/utopia-secrets') }}"
+      register: stored_secret
+
+    - name: Use Secret
+      debug:
+        msg: "{{ stored_secret.msg.AWS_RDS_ENDPOINT }}"
