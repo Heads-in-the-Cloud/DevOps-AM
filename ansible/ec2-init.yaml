@@ -38,7 +38,7 @@
         vpc_id: "{{ AM_ansible_VPC.vpc.id }}"
         region: "{{ aws_region }}"
         subnets:
-          - "{{ AM-ansible-subnet-public-1.subnet.id }}"
+          - "{{ AM_ansible_subnet_public_1.subnet.id }}"
         routes:
           - dest: 0.0.0.0/0
             gateway_id: "{{ AM_ansible_.gateway.id }}"
