@@ -41,7 +41,7 @@
           - "{{ AM_ansible_subnet_public_1.subnet.id }}"
         routes:
           - dest: 0.0.0.0/0
-            gateway_id: "{{ AM_ansible_IGW.gateway.id }}"
+            gateway_id: "{{ AM_ansible_IGW.gateway_id }}"
 
     - name: Create Security Group
       ec2_group:
