@@ -79,4 +79,8 @@
             key_name: "{{ ec2_ssh_keyname }}"
             image: "{{ ec2_ami_image }}"
           register: AM_ansible_ec2_instance
+
+        - name: Add Tags to EC2 Instance
+          ec2_tag:
+            resource: "{{ AM_ansible_ec2_instance.instances[0].id }}"
       tags: ['never', 'ansible-init', 'ansible-create-resources']
