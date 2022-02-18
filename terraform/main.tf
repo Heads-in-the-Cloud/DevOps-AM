@@ -113,7 +113,7 @@ module "eks" {
 ###########
 
 resource "local_file" "ansible_output_vars" {
-  filename = "${AM_ANSIBLE_DIRECTORY}/vars/dynamic/tf_output_vars.yaml"
+  filename = "${var.ANSIBLE_DIRECTORY}/vars/dynamic/tf_output_vars.yaml"
   content = <<-VARS
     aws_region: ${var.REGION_ID}
     vpc_id: ${module.network.utopia_vpc}

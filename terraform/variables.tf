@@ -47,3 +47,7 @@ variable "DEPLOY_MODE" {
 variable "SSH_BASTION_KEY" {
   type = string
 }
+
+variable "ANSIBLE_DIRECTORY" {
+  type = string
+}
