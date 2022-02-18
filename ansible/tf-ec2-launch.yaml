@@ -1,0 +1,73 @@
+---
+#################################################
+#    EC2 Deploy via Terraform Infrastructure    #
+#################################################
+
+- name: Get VPC Info
+  hosts: localhost
+  connection: local
+  vars:
+    ec2_ssh_keyname: bastion_key_cf
+    ec2_ami_image: ami-054965c6cd7c6e462
+  tasks:
+
+    #######################
+    # Get Networking Info #   // gets Networking values using Terraform outputs
+    #######################
+    - name: VPC Block
+      block:
+        - name: Get VPC Object
+          ec2_vpc_net_info:
+            region: "{{ aws_region }}"
+            filters:
+              "state": available
+              "vpc-id": "{{ vpc_id }}"
+          register: vpc_return
+
+        - name: Validate VPC Exists
+          fail:
+            msg: "Specified VPC '{{ vpc_name }}' does not exist or is not available."
+          when: vpc_return.vpcs[0] is undefined
+
+        - name: List VPC Info
+          debug:
+            msg: "Using VPC with ID: {{ vpc_return.vpcs[0].vpc_id }}"
+      tags: ['never', 'ansible-init', 'ansible-get-network']
+
+    ############
+    # Security #
+    ############
+    - name: Security Block
+      block:
+        - name: Create EC2 Security Group
+          ec2_group:
+            name: AM-ansible-SG
+            description: Ansible Security Group for EC2 access
+            vpc_id: "{{ vpc_return.vpcs[0].vpc_id }}"
+            region: "{{ aws_region }}"
+            rules:
+              - proto: tcp
+                ports:
+                  - 22
+                cidr_ip: 0.0.0.0/0
+                rule_desc: Allow all SSH
+      tags: ['never', 'ansible-init', 'ansible-security']
+
+    ####################
+    # Launch Resources #
+    ####################
+    - name: Launch Block
+      block:
+        - name: Create a Public RHEL8 EC2 instance
+          ec2:
+            region: "{{ aws_region }}"
+            vpc_subnet_id: "{{ subnet_public_1_id }}"
+            group: AM-ansible-SG
+            count: 1
+            instance_type: t2.micro
+            wait: yes
+            assign_public_ip: yes
+            key_name: "{{ ec2_ssh_keyname }}"
+            image: "{{ ec2_ami_image }}"
+          register: AM_ansible_ec2_instance
+      tags: ['never', 'ansible-init', 'ansible-create-resources']
