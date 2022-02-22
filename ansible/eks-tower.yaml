@@ -21,6 +21,7 @@
   connection: local
   vars:
     eks_location: "../kubernetes"
+    eks_api_namespace: apis-ns
   tasks:
 
     #########################
@@ -30,6 +31,13 @@
       debug:
         msg: "{{ lookup('aws_secret', 'dev/AM/utopia-secrets') }}"
       register: utopia_secret
+
+    ##################
+    # Access Cluster #
+    ##################
+    - name: Access Cluster
+      shell: |
+        aws eks --region {{AWS_REGION}} update-kubeconfig --name {{utopia_secret.msg.AWS_EKS_CLUSTER_NAME}}
 
     #################
     # EKS Configure #  // runs initially to set up environment.
@@ -71,16 +79,16 @@
         # Create secret for use by APIs
         - name: Secret create
           shell: |
-            kubens "${EKS_API_NAMESPACE}"
+            kubens "${eks_api_namespace}"
             kubectl create secret generic utopia-secret \
               --from-literal=DB_NAME=utopia \
               --from-literal=DB_PORT=3306 \
               --from-literal=DB_TYPE=mysql \
-              --from-literal=DB_ADDRESS="${AWS_RDS_ENDPOINT}" \
-              --from-literal=DB_USERNAME="${AWS_RDS_USERNAME}" \
-              --from-literal=DB_PASSWORD="${AWS_RDS_PASSWORD}" \
-              --from-literal=DB_CONNECTION_POOL_MIN="${DB_POOL_MIN}" \
-              --from-literal=DB_CONNECTION_POOL_MAX="${DB_POOL_MAX}"
+              --from-literal=DB_ADDRESS="{{utopia_secret.msg.AWS_RDS_ENDPOINT}}" \
+              --from-literal=DB_USERNAME="{{utopia_secret.msg.DB_USERNAME}}" \
+              --from-literal=DB_PASSWORD="{{utopia_secret.msg.DB_PASSWORD}}" \
+              --from-literal=DB_CONNECTION_POOL_MIN="{{CONN_MIN}}" \
+              --from-literal=DB_CONNECTION_POOL_MAX="{{CONN_MAX}}"
       tags: ['never', 'eks-init', 'eks-configure']
 
     #############
@@ -92,7 +100,7 @@
         # Move to Custom Namespace
         - name: Namespace switch
           shell: |
-            kubens "${EKS_API_NAMESPACE}"
+            kubens "${eks_api_namespace}"
 
         # Create custom API Objects from definitions
         - name: Create APIs
@@ -121,8 +129,8 @@
         - name: Register Route53
           route53:
             state: present
-            hosted_zone_id: "{{ ansible_env.AWS_HOSTED_ZONE_ID }}"
-            record: "{{ ansible_env.AM_EKS_RECORD_NAME }}"
+            hosted_zone_id: "{{ ZONE_ID }}"
+            record: "{{ EKS_RECORD_NAME }}"
             ttl: 60
             type: CNAME
             value:
