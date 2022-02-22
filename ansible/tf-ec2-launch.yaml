@@ -9,6 +9,7 @@
   vars:
     ec2_ssh_keyname: bastion_key_cf
     ec2_ami_image: ami-054965c6cd7c6e462
+    environment_name: AM-Utopia-ansible
   tasks:
 
     ##################
@@ -50,7 +51,7 @@
       block:
         - name: Create EC2 Security Group
           ec2_group:
-            name: AM-ansible-SG
+            name: "{{ environment_name }}-ec2-SG"
             description: Ansible Security Group for EC2 access
             vpc_id: "{{ vpc_return.vpcs[0].vpc_id }}"
             region: "{{ tf_vars.aws_region }}"
@@ -78,7 +79,7 @@
             assign_public_ip: yes
             key_name: "{{ ec2_ssh_keyname }}"
             image: "{{ ec2_ami_image }}"
-          register: AM_ansible_ec2_instance
+          register: "{{ environment_name }}_ec2_instance"
 
         - name: Add Tags to EC2 Instance
           ec2_tag:
