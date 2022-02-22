@@ -31,6 +31,7 @@
       debug:
         msg: "{{ lookup('aws_secret', 'dev/AM/utopia-secrets') }}"
       register: utopia_secret
+      tags: ['always', 'eks-init']
 
     ##################
     # Access Cluster #
@@ -38,6 +39,7 @@
     - name: Access Cluster
       shell: |
         aws eks --region {{AWS_REGION}} update-kubeconfig --name {{utopia_secret.msg.AWS_EKS_CLUSTER_NAME}}
+      tags: ['always', 'eks-init']
 
     #################
     # EKS Configure #  // runs initially to set up environment.
