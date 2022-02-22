@@ -26,3 +26,7 @@
       shell: |
         ls -la
         pwd
+      register: envout
+
+    - name: List results
+      debug: var=envout.stdout
