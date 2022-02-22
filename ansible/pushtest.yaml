@@ -15,4 +15,4 @@
 
     - name: Get Secret
       debug:
-        msg: "{{ lookup('amazon.aws.aws_secret', 'dev/AM/utopia-secrets') }}
+        msg: "{{ lookup('amazon.aws.aws_secret', 'dev/AM/utopia-secrets') }}"
