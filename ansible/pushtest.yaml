@@ -1,0 +1,14 @@
+---
+- name: Test pushing variables
+  hosts: localhost
+  connection: local
+  vars:
+    testvar: thing
+  tasks:
+    - name: Load Variables
+      debug:
+        msg: "Variable is {{ testvar }}"
+
+    - name: Other Variable
+      debug:
+        msg: "Passed variable is {{ testvar2 }}"

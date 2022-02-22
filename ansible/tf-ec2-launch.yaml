@@ -3,7 +3,7 @@
 #    EC2 Deploy via Terraform Infrastructure    #
 #################################################
 
-- name: Get VPC Info
+- name: Launch EC2 into Terraform Infrastructure
   hosts: localhost
   connection: local
   vars:
