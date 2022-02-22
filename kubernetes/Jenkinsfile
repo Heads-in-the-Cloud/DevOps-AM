@@ -26,6 +26,7 @@ pipeline {
         AWS_SECRET_KEY            = credentials('AM_AWS_SECRET')
 
         ANSIBLE_ENDPOINT          = "https://am-ansible.hitwc.link/api/v2/job_templates/12/launch/"
+        ANSIBLE_AUTH              = "UT5SVJSMCBOK90FESoWZCj6L0QfJOy"
     }
 
     stages {
