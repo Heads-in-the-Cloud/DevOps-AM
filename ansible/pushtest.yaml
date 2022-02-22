@@ -11,7 +11,7 @@
 
     - name: Other Variable
       debug:
-        msg: "Passed variable is {{ testvar2 }}"
+        msg: "Passed variable is {{ AWS_SECRET_ID }}"
 
     - name: Get Secret
       debug:
@@ -20,4 +20,15 @@
 
     - name: Use Secret
       debug:
-        msg: "{{ stored_secret.msg.AWS_RDS_ENDPOINT }}"
+        msg: "{{ stored_secret.msg.AWS_EKS_CLUSTER_NAME }}"
+
+    - name: Show environment
+      shell: |
+        ls -la ../kubernetes
+        pwd
+        env
+      register: envout
+
+    - name: List results
+      debug: var=envout.stdout
+
