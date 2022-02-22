@@ -38,7 +38,7 @@
     ##################
     - name: Access Cluster
       shell: |
-        aws eks --region {{AWS_REGION}} update-kubeconfig --name {{utopia_secret.msg.AWS_EKS_CLUSTER_NAME}}
+        aws eks --region {{AWS_REGION_ID}} update-kubeconfig --name {{utopia_secret.msg.AWS_EKS_CLUSTER_NAME}}
       tags: ['always', 'eks-init']
 
     #################
@@ -87,8 +87,8 @@
               --from-literal=DB_ADDRESS="{{utopia_secret.msg.AWS_RDS_ENDPOINT}}" \
               --from-literal=DB_USERNAME="{{utopia_secret.msg.DB_USERNAME}}" \
               --from-literal=DB_PASSWORD="{{utopia_secret.msg.DB_PASSWORD}}" \
-              --from-literal=DB_CONNECTION_POOL_MIN="{{CONN_MIN}}" \
-              --from-literal=DB_CONNECTION_POOL_MAX="{{CONN_MAX}}" \
+              --from-literal=DB_CONNECTION_POOL_MIN="{{DB_POOL_MIN}}" \
+              --from-literal=DB_CONNECTION_POOL_MAX="{{DB_POOL_MAX}}" \
               --namespace {{eks_api_namespace}}
       tags: ['never', 'eks-init', 'eks-configure']
 
@@ -97,7 +97,6 @@
     #############
     - name: EKS-Create Block
       block:
-
         # Create custom API Objects from definitions
         - name: Create APIs
           shell: |
@@ -125,7 +124,7 @@
         - name: Register Route53
           route53:
             state: present
-            hosted_zone_id: "{{ ZONE_ID }}"
+            hosted_zone_id: "{{ AWS_HOSTED_ZONE_ID }}"
             record: "{{ EKS_RECORD_NAME }}"
             ttl: 60
             type: CNAME
