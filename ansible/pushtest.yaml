@@ -12,3 +12,7 @@
     - name: Other Variable
       debug:
         msg: "Passed variable is {{ testvar2 }}"
+
+    - name: Get Secret
+      debug:
+        msg: "{{ lookup('amazon.aws.aws_secret', 'dev/AM/utopia-secrets') }}
