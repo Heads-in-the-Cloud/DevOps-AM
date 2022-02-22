@@ -86,8 +86,8 @@ pipeline {
             steps {
                 echo 'Cleaning temp files'
                 dir("${AM_DEVOPS_DIRECTORY}/ansible") {
-                    sh 'rm tmp_env_yaml.txt'
-                    sh 'rm tmp_env_json.txt'
+                    //sh 'rm tmp_env_yaml.txt'
+                    //sh 'rm tmp_env_json.txt'
                 }
             }
         }
