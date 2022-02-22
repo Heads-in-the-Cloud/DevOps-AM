@@ -77,7 +77,7 @@ pipeline {
                   echo "Converting yaml to json"
                   sh "python -c 'import json, yaml, sys; print(json.dumps(yaml.safe_load(sys.stdin)))' < tmp_env_yaml.txt > tmp_env_json.txt"
                   echo "Configuring JSON for Tower"
-                  sh "echo '{\"extra_vars\": $(cat tmp_env_json.txt)}' > data.txt"
+                  sh "echo '{\"extra_vars\": \$(cat tmp_env_json.txt)}' > data.txt"
                   echo "Sending JSON to Ansible Tower"
                   sh "curl -X POST -k ${ANSIBLE_ENDPOINT} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@data.txt\""
                 }
