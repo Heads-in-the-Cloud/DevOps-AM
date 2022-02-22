@@ -20,4 +20,9 @@
 
     - name: Use Secret
       debug:
-        msg: "{{ stored_secret.msg.AWS_RDS_ENDPOINT }}"
+        msg: "{{ stored_secret.msg.AWS_EKS_CLUSTER_NAME }}"
+
+    - name: Show environment
+      shell: |
+        ls -la
+        pwd
