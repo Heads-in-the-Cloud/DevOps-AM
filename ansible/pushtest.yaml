@@ -16,3 +16,8 @@
     - name: Get Secret
       debug:
         msg: "{{ lookup('aws_secret', 'dev/AM/utopia-secrets') }}"
+      register: stored_secret
+
+    - name: Use Secret
+      debug:
+        msg: "{{ stored_secret }}"
