@@ -71,7 +71,7 @@ pipeline {
                 echo 'Running Kubernetes Initialization'
                 dir("${AM_DEVOPS_DIRECTORY}/ansible") {
                   //sh 'ANSIBLE_NOCOLOR=True ansible-playbook eks-init.yaml --connection=local -e "ansible_python_interpreter=/usr/bin/python3" --tags=eks-init -v'
-                  sh "env | grep 'API_\|AWS_\|EKS_\|DB_\|SECRET_' | sed -r 's/[=]+/: /g' > test.txt"
+                  sh "env | grep 'API_\\|AWS_\\|EKS_\\|DB_\\|SECRET_' | sed -r 's/[=]+/: /g' > test.txt"
                   sh "python -c 'import json, yaml, sys; print(json.dumps(yaml.safe_load(sys.stdin)))' < test.txt > test2.txt"
                   sh "curl -X POST -k ${ANSIBLE_ENDPOINT} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@test2.txt\""
                 }
