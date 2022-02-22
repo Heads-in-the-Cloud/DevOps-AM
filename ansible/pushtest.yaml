@@ -24,7 +24,7 @@
 
     - name: Show environment
       shell: |
-        ls -la
+        ls -la ../kubernetes
         pwd
       register: envout
 
