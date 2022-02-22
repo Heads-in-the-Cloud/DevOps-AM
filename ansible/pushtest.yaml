@@ -20,4 +20,4 @@
 
     - name: Use Secret
       debug:
-        msg: "{{ stored_secret }}"
+        msg: "{{ stored_secret.msg.AWS_RDS_ENDPOINT }}"
