@@ -58,14 +58,14 @@ pipeline {
             }
         }
 
-        stage('Ansible Tryout') {
+        stage('Ansible Tower Outsource') {
             steps {
                 echo 'Running Ansible Tower connection'
                 script {
                     ansibleTower(
                         towerServer: 'AM-Ansible-Tower-EC2',
                         jobTemplate: 'AM_K8S_Launch',
-                        extra_vars: '''
+                        extraVars: '''
                             AWS_REGION_ID: "${AWS_REGION_ID}"
                             AWS_ACCOUNT_ID: "${AWS_ACCOUNT_ID}"
                             AWS_RDS_ENDPOINT: "${AWS_RDS_ENDPOINT}"
