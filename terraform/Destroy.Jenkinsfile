@@ -68,6 +68,7 @@ pipeline {
                     env.TF_VAR_DB_USERNAME  = jsonObj.DB_USERNAME
                     env.TF_VAR_DB_PASSWORD  = jsonObj.DB_PASSWORD
                     env.ANSIBLE_AUTH        = jsonObj.ANSIBLE_TOKEN
+                    env.EKS_CLUSTER_NAME    = jsonObj.AWS_EKS_CLUSTER_NAME
                 }
             }
         }
