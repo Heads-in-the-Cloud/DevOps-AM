@@ -71,15 +71,12 @@ pipeline {
             steps {
                 echo 'Running Kubernetes Initialization'
                 dir("${AM_DEVOPS_DIRECTORY}/ansible") {
-                  //sh 'ANSIBLE_NOCOLOR=True ansible-playbook eks-init.yaml --connection=local -e "ansible_python_interpreter=/usr/bin/python3" --tags=eks-init -v'
-                  echo "Saving environment as yaml"
-                  sh "env | grep 'API_\\|AWS_\\|EKS_\\|DB_\\|SECRET_' | sed -r 's/[=]+/: /g' > tmp_env_yaml.txt"
-                  echo "Converting yaml to json"
-                  sh "python -c 'import json, yaml, sys; print(json.dumps(yaml.safe_load(sys.stdin)))' < tmp_env_yaml.txt > tmp_env_json.txt"
-                  echo "Configuring JSON for Tower"
-                  sh "echo '{\"extra_vars\": \$(cat tmp_env_json.txt)}' > data.txt"
-                  echo "Sending JSON to Ansible Tower"
-                  sh "curl -X POST -k ${ANSIBLE_ENDPOINT} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@data.txt\""
+                    script {
+                        yaml = sh(returnStdout: true, script: "env | grep 'API_\\|AWS_\\|EKS_\\|DB_\\|SECRET_' | sed -r 's/[=]+/: /g' > tmp_env_yaml.txt").trim()
+                        json = sh(returnStdout: true, script: "python -c 'import json, yaml, sys; print(json.dumps(yaml.safe_load(sys.stdin)))' < tmp_env_yaml.txt > tmp_env_json.txt").trim()
+                        data = "{\"extra_vars\": ${json}}"
+                        sh(script: "curl -X POST -k ${ANSIBLE_ENDPOINT} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"${data}\"")
+                    }
                 }
             }
         }
