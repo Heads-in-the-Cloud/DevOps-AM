@@ -43,12 +43,15 @@ pipeline {
             steps {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
                 script {
+                    // Secret Values
                     secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${AWS_SECRET_ID} | jq -Mr \'.SecretString\'').trim()
                     def jsonObj = readJSON text: secret
                     env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
                     env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
                     env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
                     env.ANSIBLE_AUTH        = jsonObj.ANSIBLE_TOKEN
+
+                    // Terraform Outputs
                     env.ANSIBLE_EKS_RECORD_NAME = sh(returnStdout: true, script: "cd ${AM_DEVOPS_DIRECTORY}/terraform; terraform output | grep EKS_RECORD | sed 's/.*= //; s/\"//g'")
                 }
             }
