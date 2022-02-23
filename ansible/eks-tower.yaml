@@ -47,10 +47,15 @@
     - name: EKS-Configure Block
       block:
 
+        # Create Namespaces from file
+        - name: Namespaces
+          k8s:
+            state: present
+            src: "{{ eks_location }}/init/ns-sa.yaml"
+
         # Create Ingress default resources
         - name: Ingress setup
           shell: |
-            kubectl apply -f ns-sa.yaml
             kubectl apply -f default-server-secret.yaml --namespace nginx-ingress
           args:
             chdir: "{{ eks_location }}/init"
