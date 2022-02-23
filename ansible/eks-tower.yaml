@@ -22,6 +22,7 @@
   vars:
     eks_location: "../kubernetes"
     eks_api_namespace: apis-ns
+    eks_ingress_namespace: nginx-ingress
   tasks:
 
     #########################
@@ -47,32 +48,37 @@
     - name: EKS-Configure Block
       block:
 
+        # Create Namespaces from file
+        - name: Namespaces
+          k8s:
+            state: present
+            src: "{{ eks_location }}/init/ns-sa.yaml"
+
         # Create Ingress default resources
         - name: Ingress setup
-          shell: |
-            kubectl apply -f ns-sa.yaml
-            kubectl apply -f default-server-secret.yaml --namespace nginx-ingress
-          args:
-            chdir: "{{ eks_location }}/init"
+          k8s:
+            state: present
+            src: "{{ eks_location }}/init/default-server-secret.yaml"
+            namespace: "{{ eks_ingress_namespace }}"
 
         # Create custom Ingress configs
         - name: Configs setup
           shell: |
-            kubectl apply -f . --namespace nginx-ingress
+            kubectl apply -f . --namespace {{ eks_ingress_namespace }}
           args:
             chdir: "{{ eks_location }}/eks-custom"
 
         # Create custom Ingress resources
         - name: Ingress Control setup
           shell: |
-            kubectl apply -f . --namespace nginx-ingress
+            kubectl apply -f . --namespace {{ eks_ingress_namespace }}
           args:
             chdir: "{{ eks_location }}/eks-config"
 
         # Wait for Ingress to come online
         - name: Ingress wait
           shell: |
-            kubectl wait --namespace nginx-ingress \
+            kubectl wait --namespace {{ eks_ingress_namespace }} \
                 --for=condition=ready pod \
                 --selector=app.component=controller \
                 --timeout=180s
@@ -131,7 +137,7 @@
         # Get LoadBalancer address and store
         - name: Get LoadBalancer
           shell: |
-            kubectl get svc --namespace=nginx-ingress | awk 'NR==2{print $4}'
+            kubectl get svc --namespace={{ eks_ingress_namespace }} | awk 'NR==2{print $4}'
           register: LB_ADDRESS
 
         # Show LoadBalancer address output
@@ -145,6 +151,7 @@
             record: "{{ EKS_RECORD_NAME }}"
             ttl: 60
             type: CNAME
+            overwrite: true
             value:
               - "{{ LB_ADDRESS.stdout }}"
       tags: ['never', 'eks-init', 'eks-post']
