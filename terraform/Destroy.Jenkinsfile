@@ -21,23 +21,18 @@ pipeline {
         SECRET_ID         = "dev/AM/utopia-secrets"
 
         // Terraform passthrough
-        TF_VAR_ECS_RECORD       = "${AM_ECS_RECORD_NAME}"
-        TF_VAR_EKS_RECORD       = "${AM_EKS_RECORD_NAME}"
-        TF_VAR_HOSTED_ZONE      = "${AWS_HOSTED_ZONE_ID}"
-        TF_VAR_REGION_ID        = "${AWS_REGION_ID}"
-        TF_VAR_AWS_ACCESS_KEY   = credentials('AM_AWS_ACCESS')
-        TF_VAR_AWS_SECRET_KEY   = credentials('AM_AWS_SECRET')
-        TF_VAR_SSH_BASTION_KEY  = credentials('AM_SSH_BASTION')
-        TF_VAR_AWS_SECRET_ID    = "${AM_SECRET_ID}"
-        TF_VAR_AZ_1             = "${AWS_REGION_AZ_1}"
-        TF_VAR_AZ_2             = "${AWS_REGION_AZ_2}"
-        TF_VAR_ANSIBLE_DIRECTORY  = "${AM_DEVOPS_DIRECTORY}/ansible"
+        TF_VAR_ECS_RECORD         = "${AM_ECS_RECORD_NAME}"
+        TF_VAR_EKS_RECORD         = "${AM_EKS_RECORD_NAME}"
+        TF_VAR_HOSTED_ZONE        = "${AWS_HOSTED_ZONE_ID}"
+        TF_VAR_REGION_ID          = "${AWS_REGION_ID}"
+        TF_VAR_AWS_ACCESS_KEY     = credentials('AM_AWS_ACCESS')
+        TF_VAR_AWS_SECRET_KEY     = credentials('AM_AWS_SECRET')
+        TF_VAR_SSH_BASTION_KEY    = credentials('AM_SSH_BASTION')
+        TF_VAR_AWS_SECRET_ID      = "${AM_SECRET_ID}"
+        TF_VAR_AZ_1               = "${AWS_REGION_AZ_1}"
+        TF_VAR_AZ_2               = "${AWS_REGION_AZ_2}"
 
-        AWS_PROFILE             = "${AWS_PROFILE_NAME}"
-
-        ANSIBLE_ENDPOINT          = "https://am-ansible.hitwc.link"
-        ANSIBLE_JOBNUM            = "13"
-        ANSIBLE_WEBHOOK           = "${ANSIBLE_ENDPOINT}/api/v2/job_templates/${ANSIBLE_JOBNUM}/launch/"
+        AWS_PROFILE               = "${AWS_PROFILE_NAME}"
     }
 
     // PARAM SETUP
@@ -212,10 +207,13 @@ def EKSExists() {
 }
 
 def EKSDestroy() {
-    sh 'kubens ${SERVICE_NAMESPACE} && kubectl delete service --namespace ${SERVICE_NAMESPACE} ${SERVICE_NAME}'
-    sh 'kubens apis-ns && kubectl delete secret utopia-secret'
-    sh 'kubectl delete deploy -l group=utopia'
-    sh 'kubectl delete service -l group=utopia'
+    ansibleTower(
+        towerServer: 'AM-Ansible-Tower-EC2',
+        jobTemplate: 'AM_K8S_Destroy',
+        extraVars: '''
+            AWS_REGION_ID: "${AWS_REGION_ID}"
+        '''
+    )
 }
 
 def ECSExists() {
