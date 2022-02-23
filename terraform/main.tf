@@ -114,14 +114,14 @@ module "eks" {
 # OUTPUTS #
 ###########
 
-resource "local_file" "ansible_output_vars" {
-  filename = "${var.ANSIBLE_DIRECTORY}/vars/dynamic/tf_output_vars.yaml"
-  content = <<-VARS
-    aws_region: ${var.REGION_ID}
-    vpc_id: ${module.network.utopia_vpc}
-    subnet_private_1_id: ${module.network.all_subnets[0]}
-    subnet_private_2_id: ${module.network.all_subnets[1]}
-    subnet_public_1_id: ${module.network.all_subnets[2]}
-    subnet_public_2_id: ${module.network.all_subnets[3]}
-  VARS
-}
+//resource "local_file" "ansible_output_vars" {
+//  filename = "${var.ANSIBLE_DIRECTORY}/vars/dynamic/tf_output_vars.yaml"
+//  content = <<-VARS
+//    aws_region: ${var.REGION_ID}
+//    vpc_id: ${module.network.utopia_vpc}
+//    subnet_private_1_id: ${module.network.all_subnets[0]}
+//    subnet_private_2_id: ${module.network.all_subnets[1]}
+//    subnet_public_1_id: ${module.network.all_subnets[2]}
+//    subnet_public_2_id: ${module.network.all_subnets[3]}
+//  VARS
+//}

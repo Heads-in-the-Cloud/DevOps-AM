@@ -4,7 +4,7 @@ variable "ECS_RECORD" {
 }
 
 variable "EKS_RECORD" {
-
+  type = string
 }
 
 variable "HOSTED_ZONE" {
@@ -44,6 +44,6 @@ variable "SSH_BASTION_KEY" {
   type = string
 }
 
-variable "ANSIBLE_DIRECTORY" {
-  type = string
-}
+//variable "ANSIBLE_DIRECTORY" {
+//  type = string
+//}
