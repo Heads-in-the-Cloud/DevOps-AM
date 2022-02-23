@@ -2,15 +2,15 @@ def ECS_EXISTS = false
 def EKS_EXISTS = false
 
 pipeline {
-    
+
     // AGENT SETUP
-    agent { 
+    agent {
         node {
-            label 'aws-ready' 
+            label 'aws-ready'
             customWorkspace "${AM_DEVOPS_DIRECTORY}"
         }
     }
-    
+
     // ENVIRONMENT SETUP
     environment {
         // General use
@@ -19,7 +19,7 @@ pipeline {
         SERVICE_NAMESPACE = "nginx-ingress"
         CONTEXT_NAME      = "${AWS_PROFILE_NAME}"
         SECRET_ID         = "dev/AM/utopia-secrets"
-        
+
         // Terraform passthrough
         TF_VAR_ECS_RECORD       = "${AM_ECS_RECORD_NAME}"
         TF_VAR_EKS_RECORD       = "${AM_EKS_RECORD_NAME}"
@@ -32,29 +32,33 @@ pipeline {
         TF_VAR_AZ_1             = "${AWS_REGION_AZ_1}"
         TF_VAR_AZ_2             = "${AWS_REGION_AZ_2}"
         TF_VAR_ANSIBLE_DIRECTORY  = "${AM_DEVOPS_DIRECTORY}/ansible"
-        
+
         AWS_PROFILE             = "${AWS_PROFILE_NAME}"
+
+        ANSIBLE_ENDPOINT          = "https://am-ansible.hitwc.link"
+        ANSIBLE_JOBNUM            = "13"
+        ANSIBLE_WEBHOOK           = "${ANSIBLE_ENDPOINT}/api/v2/job_templates/${ANSIBLE_JOBNUM}/launch/"
     }
-    
+
     // PARAM SETUP
     parameters {
         choice(
-            name: 'DestroyType', 
-            choices: ['ECS', 'EKS', 'Terraform'], 
+            name: 'DestroyType',
+            choices: ['ECS', 'EKS', 'Terraform'],
             description: '''Determines which infrastructure to delete.
    - ECS: Destroys ECS resources via Docker Compose Down, and leaves Terraform infrastructure intact.
    - EKS: Destroys EKS LoadBalancer and Service resources, and leaves Terraform infrastructure intact.
    - Terraform: Performs the previous two destruction methods, and then destroys all Terraform infrastructure.'''
         )
     }
-    
+
     // STAGE DEFINITIONS
     stages {
-        
+
         ///////////
         // SETUP //
         ///////////
-        
+
         stage('Load Environment') {
             steps {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
@@ -63,15 +67,15 @@ pipeline {
                     def jsonObj = readJSON text: secret
                     env.TF_VAR_DB_USERNAME  = jsonObj.DB_USERNAME
                     env.TF_VAR_DB_PASSWORD  = jsonObj.DB_PASSWORD
-                    env.EKS_CLUSTER_NAME    = jsonObj.AWS_EKS_CLUSTER_NAME
+                    env.ANSIBLE_AUTH        = jsonObj.ANSIBLE_TOKEN
                 }
             }
         }
-        
+
         /////////
         // EKS //
         /////////
-        
+
         // Check EKS resources exist for EKS destroy. Build failed if fail.
         stage('EKS Exists (EKS Only)') {
             when { expression { params.DestroyType == 'EKS' } }
@@ -86,7 +90,7 @@ pipeline {
                 }
             }
         }
-        
+
         // Check EKS resources exist for Terraform destroy. Stage Unstable if false, Stable if true.
         stage('EKS Exists (Terraform)') {
             when { expression { params.DestroyType == 'Terraform' } }
@@ -104,16 +108,16 @@ pipeline {
                 }
             }
         }
-        
-        // Destroy EKS resources. Build Failure if fail. 
+
+        // Destroy EKS resources. Build Failure if fail.
         stage('EKS Destroy') {
-            when { 
+            when {
                 allOf {
                     anyOf {
                         expression { params.DestroyType == 'EKS' }
                         expression { params.DestroyType == 'Terraform' }
                     }
-                    expression { EKS_EXISTS == true } 
+                    expression { EKS_EXISTS == true }
                 }
             }
             steps {
@@ -121,11 +125,11 @@ pipeline {
                 EKSDestroy()
             }
         }
-        
+
         /////////
         // ECS //
         /////////
-        
+
         // Check ECS resources exist for ECS destroy. Build failed if fail.
         stage('ECS Exists (ECS Only)') {
             when { expression { params.DestroyType == 'ECS' } }
@@ -140,7 +144,7 @@ pipeline {
                 }
             }
         }
-        
+
         // Check ECS resources exist for Terraform destroy. Stage Unstable if false, Stable if true.
         stage('ECS Exists (Terraform)') {
             when { expression { params.DestroyType == 'Terraform' } }
@@ -158,16 +162,16 @@ pipeline {
                 }
             }
         }
-        
-        // Destroy ECS resources. Build Failure if fail. 
+
+        // Destroy ECS resources. Build Failure if fail.
         stage('ECS Destroy') {
-            when { 
+            when {
                 allOf {
                     anyOf {
                         expression { params.DestroyType == 'ECS' }
                         expression { params.DestroyType == 'Terraform' }
                     }
-                    expression { ECS_EXISTS == true } 
+                    expression { ECS_EXISTS == true }
                 }
             }
             steps {
@@ -175,11 +179,11 @@ pipeline {
                 ECSDestroy()
             }
         }
-        
+
         ///////////////
         // Terraform //
         ///////////////
-        
+
         // Destroy Terraform resources. Build Failure if fail.
         stage('Terraform Destroy') {
             when { expression { params.DestroyType == 'Terraform' } }
@@ -193,7 +197,7 @@ pipeline {
                 }
             }
         }
-        
+
         // end stages
     }
 }
@@ -208,10 +212,9 @@ def EKSExists() {
 }
 
 def EKSDestroy() {
-    sh 'kubens ${SERVICE_NAMESPACE} && kubectl delete service --namespace ${SERVICE_NAMESPACE} ${SERVICE_NAME}'
-    sh 'kubens apis-ns && kubectl delete secret utopia-secret'
-    sh 'kubectl delete deploy -l group=utopia'
-    sh 'kubectl delete service -l group=utopia'
+    sh "jq -n -M --arg region $AWS_REGION_ID '{extra_vars: {AWS_REGION_ID: \$region}}' > tmp_env.json"
+    sh "curl -X POST -k ${ANSIBLE_WEBHOOK} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@tmp_env.json\""
+    sh "rm tmp_env.json; sleep 20"
 }
 
 def ECSExists() {
