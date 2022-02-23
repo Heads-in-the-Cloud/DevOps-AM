@@ -31,7 +31,6 @@ pipeline {
         ANSIBLE_EKS_CONTAINER_MEM_LIMIT   = "800Mi"
         ANSIBLE_EKS_CONTAINER_MEM_REQUEST = "400Mi"
         ANSIBLE_EKS_REPLICA_COUNT         = 2
-        ANSIBLE_EKS_RECORD_NAME           = "am-eks.hitwc.link"
 
         // Ansible Tower Config
         TOWER_ENDPOINT          = "https://am-ansible.hitwc.link"
@@ -50,6 +49,7 @@ pipeline {
                     env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
                     env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
                     env.ANSIBLE_AUTH        = jsonObj.ANSIBLE_TOKEN
+                    env.ANSIBLE_EKS_RECORD_NAME = sh(returnStdout: true, script: "cd ${AM_DEVOPS_DIRECTORY}/terraform; terraform output | grep EKS_RECORD | sed 's/.*= //; s/\"//g'")
                 }
             }
         }

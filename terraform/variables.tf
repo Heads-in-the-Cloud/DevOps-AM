@@ -3,6 +3,10 @@ variable "ECS_RECORD" {
   type = string
 }
 
+variable "EKS_RECORD" {
+
+}
+
 variable "HOSTED_ZONE" {
   type = string
 }

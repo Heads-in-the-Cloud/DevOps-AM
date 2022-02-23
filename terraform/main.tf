@@ -102,6 +102,8 @@ module "eks" {
   eks_subnets         = module.network.all_subnets
   vpc_id              = module.network.utopia_vpc
   eks_sg_id           = module.security.SG_EKS
+  r53_zone_id         = var.HOSTED_ZONE
+  record_name         = "${var.DEPLOY_MODE}-${var.EKS_RECORD}"
 
   # instancing
   node_instance_type  = "t3.medium"
