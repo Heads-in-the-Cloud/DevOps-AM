@@ -100,7 +100,7 @@
         # Create custom API Objects from definitions
         - name: Create APIs
           shell: |
-            for f in $(find .); do envsubst < $f | kubectl --namespace {{eks_api_namespace}} apply -f -; done
+            for f in $(find *.yaml); do envsubst < $f | kubectl --namespace {{eks_api_namespace}} apply -f -; done
           args:
             chdir: "{{ eks_location }}/objects"
       tags: ['never', 'eks-init', 'eks-create', 'eks-update']
