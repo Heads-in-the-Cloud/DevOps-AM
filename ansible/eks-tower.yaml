@@ -145,6 +145,7 @@
             record: "{{ EKS_RECORD_NAME }}"
             ttl: 60
             type: CNAME
+            overwrite: true
             value:
               - "{{ LB_ADDRESS.stdout }}"
       tags: ['never', 'eks-init', 'eks-post']
