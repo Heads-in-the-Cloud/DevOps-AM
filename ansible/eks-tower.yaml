@@ -105,19 +105,19 @@
             chdir: "{{ eks_location }}/objects"
           environment:
             # envsubst requires linux-level environment variables
-            EKS_CONTAINER_CPU_LIMIT: {{EKS_CONTAINER_CPU_LIMIT}}
-            EKS_CONTAINER_CPU_REQUEST: {{EKS_CONTAINER_CPU_REQUEST}}
-            EKS_CONTAINER_MEM_LIMIT: {{EKS_CONTAINER_MEM_LIMIT}}
-            EKS_CONTAINER_MEM_REQUEST: {{EKS_CONTAINER_MEM_REQUEST}}
-            EKS_REPLICA_COUNT: {{EKS_REPLICA_COUNT}}
+            EKS_CONTAINER_CPU_LIMIT: "{{EKS_CONTAINER_CPU_LIMIT}}"
+            EKS_CONTAINER_CPU_REQUEST: "{{EKS_CONTAINER_CPU_REQUEST}}"
+            EKS_CONTAINER_MEM_LIMIT: "{{EKS_CONTAINER_MEM_LIMIT}}"
+            EKS_CONTAINER_MEM_REQUEST: "{{EKS_CONTAINER_MEM_REQUEST}}"
+            EKS_REPLICA_COUNT: "{{EKS_REPLICA_COUNT}}"
 
-            AWS_ACCOUNT_ID: {{AWS_ACCOUNT_ID}}
-            AWS_REGION_ID: {{AWS_REGION_ID}}
+            AWS_ACCOUNT_ID: "{{AWS_ACCOUNT_ID}}"
+            AWS_REGION_ID: "{{AWS_REGION_ID}}"
 
-            FLIGHTS_API_LATEST: {{FLIGHTS_API_LATEST}}
-            BOOKINGS_API_LATEST: {{BOOKINGS_API_LATEST}}
-            USERS_API_LATEST: {{USERS_API_LATEST}}
-            AUTH_API_LATEST: {{AUTH_API_LATEST}}
+            FLIGHTS_API_LATEST: "{{FLIGHTS_API_LATEST}}"
+            BOOKINGS_API_LATEST: "{{BOOKINGS_API_LATEST}}"
+            USERS_API_LATEST: "{{USERS_API_LATEST}}"
+            AUTH_API_LATEST: "{{AUTH_API_LATEST}}"
 
       tags: ['never', 'eks-init', 'eks-create', 'eks-update']
 
