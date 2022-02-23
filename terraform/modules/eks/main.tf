@@ -30,5 +30,5 @@ resource "aws_route53_record" "utopia_record" {
   name        = var.record_name
   type        = "CNAME"
   ttl         = "60"
-  records     = ['placeholder.text']
+  records     = ["placeholder.text"]
 }
