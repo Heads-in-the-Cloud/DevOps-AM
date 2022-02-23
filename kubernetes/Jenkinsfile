@@ -25,7 +25,7 @@ pipeline {
         AWS_ACCESS_KEY            = credentials('AM_AWS_ACCESS')
         AWS_SECRET_KEY            = credentials('AM_AWS_SECRET')
 
-        ANSIBLE_ENDPOINT          = "https://am-ansible.hitwc.link/api/v2/job_templates/12/launch/"
+        ANSIBLE_ENDPOINT          = "https://am-ansible.hitwc.link/api/v2/job_templates/11/launch/"
         ANSIBLE_AUTH              = "UT5SVJSMCBOK90FESoWZCj6L0QfJOy"
     }
 
