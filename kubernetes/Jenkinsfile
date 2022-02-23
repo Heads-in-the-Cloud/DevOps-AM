@@ -46,11 +46,11 @@ pipeline {
                     // Secret Values
                     secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${AWS_SECRET_ID} | jq -Mr \'.SecretString\'').trim()
                     def jsonObj = readJSON text: secret
-                    env.ANSIBLE_AWS_RDS_ENDPOINT  = jsonObj.AWS_RDS_ENDPOINT
-                    env.ANSIBLE_AUTH              = jsonObj.ANSIBLE_TOKEN
+                    env.ANSIBLE_AWS_RDS_ENDPOINT   = jsonObj.AWS_RDS_ENDPOINT
+                    env.TOWER_AUTH                 = jsonObj.ANSIBLE_TOKEN
 
                     // Terraform Outputs
-                    env.ANSIBLE_EKS_RECORD_NAME   = sh(returnStdout: true, script: "cd ${AM_DEVOPS_DIRECTORY}/terraform; terraform output | grep EKS_RECORD | sed 's/.*= //; s/\"//g'")
+                    env.ANSIBLE_EKS_RECORD_NAME    = sh(returnStdout: true, script: "cd ${AM_DEVOPS_DIRECTORY}/terraform; terraform output | grep EKS_RECORD | sed 's/.*= //; s/\"//g'")
                 }
             }
         }
@@ -83,7 +83,7 @@ pipeline {
                     sh "jq -n -M --argjson insert \"\$(<tmp_env.json)\" '{extra_vars: \$insert}' > tmp_env_done.json"
 
                     echo "Posting to Ansible Tower"
-                    sh "curl -X POST -k ${TOWER_WEBHOOK} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@tmp_env_done.json\""
+                    sh "curl -X POST -k ${TOWER_WEBHOOK} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${TOWER_AUTH}\" -d \"@tmp_env_done.json\""
                 }
             }
         }
