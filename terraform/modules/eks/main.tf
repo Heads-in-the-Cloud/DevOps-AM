@@ -24,3 +24,11 @@ resource "aws_eks_cluster" "eks_cluster" {
   }
 }
 
+// route 53
+resource "aws_route53_record" "utopia_record" {
+  zone_id     = var.r53_zone_id
+  name        = var.record_name
+  type        = "CNAME"
+  ttl         = "60"
+  records     = ["placeholder.text"]
+}

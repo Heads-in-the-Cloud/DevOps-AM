@@ -1,0 +1,55 @@
+---
+
+###############################################
+#    EKS Destroy Module                       #
+###############################################
+#
+# Required Variables (passed as extra_vars to Ansible Tower):
+#
+#    - AWS_REGION_ID
+#
+###############################################
+#    EKS Destroy Module                       #
+###############################################
+
+- name: Destroy EKS created resources
+  hosts: localhost
+  connection: local
+  vars:
+    eks_ingress_namespace: nginx-ingress
+    eks_api_namespace: apis-ns
+  tasks:
+
+    #########################
+    # Secrets and Variables #
+    #########################
+    - name: Get Utopia Secrets
+      debug:
+        msg: "{{ lookup('aws_secret', 'dev/AM/utopia-secrets') }}"
+      register: utopia_secret
+
+    ##################
+    # Access Cluster #
+    ##################
+    - name: Access Cluster
+      shell: |
+        aws eks --region {{AWS_REGION_ID}} update-kubeconfig --name {{utopia_secret.msg.AWS_EKS_CLUSTER_NAME}}
+
+    #####################
+    # Destroy Resources #
+    #####################
+    - name: Destroy Loadbalancer Device
+      shell: |
+        kubectl delete service --namespace {{eks_ingress_namespace}} nginx-ingress
+
+    - name: Destroy Utopia Secret
+      shell: |
+        kubectl delete secret utopia-secret --namespace {{eks_api_namespace}}
+
+    - name: Destroy API Deployments
+      shell: |
+        kubectl delete deploy -l group=utopia --namespace {{eks_api_namespace}}
+
+    - name: Destroy API Services
+      shell: |
+        kubectl delete service -l group=utopia --namespace {{eks_api_namespace}}

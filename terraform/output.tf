@@ -18,3 +18,7 @@ output "AWS_EKS_CLUSTER_NAME" {
 output "AWS_ECS_SG" {
   value = module.security.SG_ECS
 }
+
+output "AWS_EKS_RECORD" {
+  value = module.eks.route_name
+}
