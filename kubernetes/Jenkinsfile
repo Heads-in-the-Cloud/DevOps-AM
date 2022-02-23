@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        SECRET_ID                 = 'dev/AM/utopia-secrets'
+        AWS_SECRET_ID             = 'dev/AM/utopia-secrets'
         EKS_REPLICA_COUNT         = 2
 
         // for t2.medium: 1930m cpu, 3332Mi, 4 pods
@@ -34,7 +34,7 @@ pipeline {
             steps {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
                 script {
-                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${AWS_SECRET_ID} | jq -Mr \'.SecretString\'').trim()
                     def jsonObj = readJSON text: secret
                     env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
                     env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
@@ -71,12 +71,17 @@ pipeline {
             steps {
                 echo 'Running Kubernetes Initialization'
                 dir("${AM_DEVOPS_DIRECTORY}/ansible") {
-                    script {
-                        sh(script: "env | grep 'API_\\|AWS_\\|EKS_\\|DB_' | grep -v 'KEY\\|PASSWORD' | sed -r 's/[=]+/: /g' > tmp_env.yaml")
-                        sh(script: "python -c 'import json, yaml, sys; print(json.dumps(yaml.safe_load(sys.stdin)))' < tmp_env.yaml > tmp_env.json")
-                        sh(script: "jq -n -M --argjson insert \"\$(<tmp_env.json)\" '{extra_vars: \$insert}' > tmp_env_done.json")
-                        sh(script: "curl -X POST -k ${ANSIBLE_ENDPOINT} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@tmp_env_done.json\"")
-                    }
+                    echo "Getting Environment Variables as YAML"
+                    sh "env | grep 'API_\\|AWS_\\|EKS_\\|DB_' | grep -v 'KEY\\|PASSWORD' | sed -r 's/[=]+/: /g' > tmp_env.yaml"
+
+                    echo "Converting YAML to JSON"
+                    sh "python -c 'import json, yaml, sys; print(json.dumps(yaml.safe_load(sys.stdin)))' < tmp_env.yaml > tmp_env.json"
+
+                    echo "Formatting for Ansible (extra_vars: )"
+                    sh "jq -n -M --argjson insert \"\$(<tmp_env.json)\" '{extra_vars: \$insert}' > tmp_env_done.json"
+
+                    echo "Posting to Ansible Tower"
+                    sh "curl -X POST -k ${ANSIBLE_ENDPOINT} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@tmp_env_done.json\""
                 }
             }
         }
@@ -85,8 +90,7 @@ pipeline {
             steps {
                 echo 'Cleaning temp files'
                 dir("${AM_DEVOPS_DIRECTORY}/ansible") {
-                    //sh 'rm tmp_env_yaml.txt'
-                    //sh 'rm tmp_env_json.txt'
+                    sh 'rm tmp_env*'
                 }
             }
         }

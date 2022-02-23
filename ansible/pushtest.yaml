@@ -11,7 +11,7 @@
 
     - name: Other Variable
       debug:
-        msg: "Passed variable is {{ SECRET_ID }}"
+        msg: "Passed variable is {{ AWS_SECRET_ID }}"
 
     - name: Get Secret
       debug:
