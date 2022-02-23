@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        AWS_SCMG_ID               = 'dev/AM/utopia-secrets'
+        SECRET_ID                 = 'dev/AM/utopia-secrets'
         EKS_REPLICA_COUNT         = 2
 
         // for t2.medium: 1930m cpu, 3332Mi, 4 pods
