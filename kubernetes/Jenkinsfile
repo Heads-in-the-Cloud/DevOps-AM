@@ -16,6 +16,7 @@ pipeline {
         EKS_CONTAINER_MEM_LIMIT   = "800Mi"
         EKS_CONTAINER_MEM_REQUEST = "400Mi"
         EKS_API_NAMESPACE         = "apis-ns"
+        EKS_RECORD_NAME           = "am-eks.hitwc.link"
 
         DB_POOL_MIN               = 2
         DB_POOL_MAX               = 4
