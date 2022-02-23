@@ -74,7 +74,7 @@ pipeline {
                     script {
                         sh(script: "env | grep 'API_\\|AWS_\\|EKS_\\|DB_' | grep -v 'KEY\\|PASSWORD' | sed -r 's/[=]+/: /g' > tmp_env.yaml")
                         sh(script: "python -c 'import json, yaml, sys; print(json.dumps(yaml.safe_load(sys.stdin)))' < tmp_env.yaml > tmp_env.json")
-                        sh(script: "jq -n -M --argjson insert \"\$(<tmp_env.json)\" '{extra_vars: $insert}' > tmp_env_done.json")
+                        sh(script: "jq -n -M --argjson insert \"\$(<tmp_env.json)\" '{extra_vars: \$insert}' > tmp_env_done.json")
                         sh(script: "curl -X POST -k ${ANSIBLE_ENDPOINT} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@tmp_env_done.json\"")
                     }
                 }
