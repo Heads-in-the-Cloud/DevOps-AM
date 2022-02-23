@@ -7,27 +7,30 @@ pipeline {
     }
 
     environment {
+        // AWS references
         AWS_SECRET_ID             = 'dev/AM/utopia-secrets'
-        EKS_REPLICA_COUNT         = 2
-
-        // for t2.medium: 1930m cpu, 3332Mi, 4 pods
-        EKS_CONTAINER_CPU_LIMIT   = "450m"
-        EKS_CONTAINER_CPU_REQUEST = "250m"
-        EKS_CONTAINER_MEM_LIMIT   = "800Mi"
-        EKS_CONTAINER_MEM_REQUEST = "400Mi"
-        EKS_API_NAMESPACE         = "apis-ns"
-        EKS_RECORD_NAME           = "am-eks.hitwc.link"
-
-        DB_POOL_MIN               = 2
-        DB_POOL_MAX               = 4
-
-        // AWS Region Override
         AWS_PROFILE               = "${AWS_PROFILE_NAME}"
         AWS_ACCESS_KEY            = credentials('AM_AWS_ACCESS')
         AWS_SECRET_KEY            = credentials('AM_AWS_SECRET')
 
-        ANSIBLE_ENDPOINT          = "https://am-ansible.hitwc.link/api/v2/job_templates/11/launch/"
-        ANSIBLE_AUTH              = "UT5SVJSMCBOK90FESoWZCj6L0QfJOy"
+        // EKS specific
+        // for t2.medium: 1930m cpu, 3332Mi, 4 pods max
+        EKS_CONTAINER_CPU_LIMIT   = "450m"
+        EKS_CONTAINER_CPU_REQUEST = "250m"
+        EKS_CONTAINER_MEM_LIMIT   = "800Mi"
+        EKS_CONTAINER_MEM_REQUEST = "400Mi"
+        EKS_REPLICA_COUNT         = 2
+        EKS_API_NAMESPACE         = "apis-ns"
+        EKS_RECORD_NAME           = "am-eks.hitwc.link"
+
+        // API variables
+        DB_POOL_MIN               = 2
+        DB_POOL_MAX               = 4
+
+        // Ansible Tower Config
+        ANSIBLE_ENDPOINT          = "https://am-ansible.hitwc.link"
+        ANSIBLE_JOBNUM            = "11"
+        ANSIBLE_WEBHOOK           = "${ANSIBLE_ENDPOINT}/api/v2/job_templates/${ANSIBLE_JOBNUM}/launch/"
     }
 
     stages {
@@ -41,6 +44,7 @@ pipeline {
                     env.AWS_RDS_PASSWORD    = jsonObj.DB_PASSWORD
                     env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
                     env.AWS_CLUSTER_NAME    = jsonObj.AWS_EKS_CLUSTER_NAME
+                    env.ANSIBLE_AUTH        = jsonObj.ANSIBLE_TOKEN
                 }
             }
         }
@@ -82,7 +86,7 @@ pipeline {
                     sh "jq -n -M --argjson insert \"\$(<tmp_env.json)\" '{extra_vars: \$insert}' > tmp_env_done.json"
 
                     echo "Posting to Ansible Tower"
-                    sh "curl -X POST -k ${ANSIBLE_ENDPOINT} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@tmp_env_done.json\""
+                    sh "curl -X POST -k ${ANSIBLE_WEBHOOK} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@tmp_env_done.json\""
                 }
             }
         }
