@@ -35,7 +35,7 @@ pipeline {
         // Ansible Tower Config
         TOWER_ENDPOINT          = "https://am-ansible.hitwc.link"
         TOWER_JOBNUM            = "11"
-        TOWER_WEBHOOK           = "${ANSIBLE_ENDPOINT}/api/v2/job_templates/${ANSIBLE_JOBNUM}/launch/"
+        TOWER_WEBHOOK           = "${TOWER_ENDPOINT}/api/v2/job_templates/${TOWER_JOBNUM}/launch/"
     }
 
     stages {
