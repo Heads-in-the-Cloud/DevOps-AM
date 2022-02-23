@@ -7,30 +7,36 @@ pipeline {
     }
 
     environment {
+
         // AWS references
         AWS_SECRET_ID             = 'dev/AM/utopia-secrets'
         AWS_PROFILE               = "${AWS_PROFILE_NAME}"
         AWS_ACCESS_KEY            = credentials('AM_AWS_ACCESS')
         AWS_SECRET_KEY            = credentials('AM_AWS_SECRET')
 
-        // EKS specific
-        // for t2.medium: 1930m cpu, 3332Mi, 4 pods max
-        EKS_CONTAINER_CPU_LIMIT   = "450m"
-        EKS_CONTAINER_CPU_REQUEST = "250m"
-        EKS_CONTAINER_MEM_LIMIT   = "800Mi"
-        EKS_CONTAINER_MEM_REQUEST = "400Mi"
-        EKS_REPLICA_COUNT         = 2
-        EKS_API_NAMESPACE         = "apis-ns"
-        EKS_RECORD_NAME           = "am-eks.hitwc.link"
+        // Ansible AWS Info
+        ANSIBLE_AWS_REGION_ID             = ${AWS_REGION_ID}
+        ANSIBLE_AWS_ACCOUNT_ID            = ${AWS_ACCOUNT_ID}
+        ANSIBLE_AWS_HOSTED_ZONE_ID        = ${AWS_HOSTED_ZONE_ID}
+        ANSIBLE_AWS_SECRET_ID             = #{AWS_SECRET_ID}
 
-        // API variables
-        DB_POOL_MIN               = 2
-        DB_POOL_MAX               = 4
+        // Ansible API Info
+        ANSIBLE_DB_POOL_MIN               = 2
+        ANSIBLE_DB_POOL_MAX               = 4
+
+        // Ansible EKS specific
+        // for t2.medium: 1930m cpu, 3332Mi, 4 pods max
+        ANSIBLE_EKS_CONTAINER_CPU_LIMIT   = "450m"
+        ANSIBLE_EKS_CONTAINER_CPU_REQUEST = "250m"
+        ANSIBLE_EKS_CONTAINER_MEM_LIMIT   = "800Mi"
+        ANSIBLE_EKS_CONTAINER_MEM_REQUEST = "400Mi"
+        ANSIBLE_EKS_REPLICA_COUNT         = 2
+        ANSIBLE_EKS_RECORD_NAME           = "am-eks.hitwc.link"
 
         // Ansible Tower Config
-        ANSIBLE_ENDPOINT          = "https://am-ansible.hitwc.link"
-        ANSIBLE_JOBNUM            = "11"
-        ANSIBLE_WEBHOOK           = "${ANSIBLE_ENDPOINT}/api/v2/job_templates/${ANSIBLE_JOBNUM}/launch/"
+        TOWER_ENDPOINT          = "https://am-ansible.hitwc.link"
+        TOWER_JOBNUM            = "11"
+        TOWER_WEBHOOK           = "${ANSIBLE_ENDPOINT}/api/v2/job_templates/${ANSIBLE_JOBNUM}/launch/"
     }
 
     stages {
@@ -66,8 +72,8 @@ pipeline {
             steps {
                 echo 'Running Kubernetes Initialization'
                 dir("${AM_DEVOPS_DIRECTORY}/ansible") {
-                    echo "Getting Environment Variables as YAML"
-                    sh "env | grep 'API_\\|AWS_\\|EKS_\\|DB_' | grep -v 'KEY\\|PASSWORD' | sed -r 's/[=]+/: /g' > tmp_env.yaml"
+                    echo "Getting required Environment Variables as YAML"
+                    sh "env | grep 'ANSIBLE_' | sed -r 's/[ANSIBLE_]+//g' | sed -r 's/[=]+/: /g' > tmp_env.yaml"
 
                     echo "Converting YAML to JSON"
                     sh "python -c 'import json, yaml, sys; print(json.dumps(yaml.safe_load(sys.stdin)))' < tmp_env.yaml > tmp_env.json"
@@ -76,7 +82,7 @@ pipeline {
                     sh "jq -n -M --argjson insert \"\$(<tmp_env.json)\" '{extra_vars: \$insert}' > tmp_env_done.json"
 
                     echo "Posting to Ansible Tower"
-                    sh "curl -X POST -k ${ANSIBLE_WEBHOOK} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@tmp_env_done.json\""
+                    sh "curl -X POST -k ${TOWER_WEBHOOK} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${ANSIBLE_AUTH}\" -d \"@tmp_env_done.json\""
                 }
             }
         }
