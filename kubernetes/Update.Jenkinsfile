@@ -7,50 +7,38 @@ pipeline {
     }
 
     environment {
+        SECRET_ID                         = 'dev/AM/utopia-secrets'
+        AWS_PROFILE                       = "${AWS_PROFILE_NAME}"
 
-        // AWS references
-        AWS_SECRET_ID             = 'dev/AM/utopia-secrets'
-        AWS_PROFILE               = "${AWS_PROFILE_NAME}"
-        AWS_ACCESS_KEY            = credentials('AM_AWS_ACCESS')
-        AWS_SECRET_KEY            = credentials('AM_AWS_SECRET')
-
-        // Ansible AWS Info
+        ANSIBLE_AWS_SECRET_ID             = "${SECRET_ID}"
         ANSIBLE_AWS_REGION_ID             = "${AWS_REGION_ID}"
         ANSIBLE_AWS_ACCOUNT_ID            = "${AWS_ACCOUNT_ID}"
-        ANSIBLE_AWS_HOSTED_ZONE_ID        = "${AWS_HOSTED_ZONE_ID}"
-        ANSIBLE_AWS_SECRET_ID             = "${AWS_SECRET_ID}"
 
-        // Ansible API Info
-        ANSIBLE_DB_POOL_MIN               = 2
-        ANSIBLE_DB_POOL_MAX               = 4
-
-        // Ansible EKS specific
-        // for t2.medium: 1930m cpu, 3332Mi, 4 pods max
+        // for t2.medium: 1930m cpu, 3332Mi, 4 pods
         ANSIBLE_EKS_CONTAINER_CPU_LIMIT   = "450m"
         ANSIBLE_EKS_CONTAINER_CPU_REQUEST = "250m"
         ANSIBLE_EKS_CONTAINER_MEM_LIMIT   = "800Mi"
         ANSIBLE_EKS_CONTAINER_MEM_REQUEST = "400Mi"
         ANSIBLE_EKS_REPLICA_COUNT         = 2
 
-        // Ansible Tower Config
+        DB_POOL_MIN               = 2
+        DB_POOL_MAX               = 4
+
         TOWER_ENDPOINT          = "https://am-ansible.hitwc.link"
-        TOWER_JOBNUM            = "11"
+        TOWER_JOBNUM            = "14"
         TOWER_WEBHOOK           = "${TOWER_ENDPOINT}/api/v2/job_templates/${TOWER_JOBNUM}/launch/"
     }
 
     stages {
+
         stage('Load Environment') {
             steps {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
                 script {
-                    // Secret Values
-                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${AWS_SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${SECRET_ID} | jq -Mr \'.SecretString\'').trim()
                     def jsonObj = readJSON text: secret
-                    env.ANSIBLE_AWS_RDS_ENDPOINT   = jsonObj.AWS_RDS_ENDPOINT
-                    env.TOWER_AUTH                 = jsonObj.ANSIBLE_TOKEN
-
-                    // Terraform Outputs
-                    env.ANSIBLE_EKS_RECORD_NAME    = sh(returnStdout: true, script: "cd ${AM_DEVOPS_DIRECTORY}/terraform; terraform output | grep EKS_RECORD | sed 's/.*= //; s/\"//g'")
+                    env.EKS_CLUSTER_NAME    = jsonObj.AWS_EKS_CLUSTER_NAME
+                    env.TOWER_AUTH          = jsonObj.ANSIBLE_TOKEN
                 }
             }
         }
@@ -83,8 +71,7 @@ pipeline {
                     sh "jq -n -M --argjson insert \"\$(<tmp_env.json)\" '{extra_vars: \$insert}' > tmp_env_done.json"
 
                     echo "Posting to Ansible Tower"
-                    sh "curl -X POST -k ${TOWER_WEBHOOK} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${TOWER_AUTH}\" -d \"@tmp_env_done.json\""
-                }
+                    sh "curl -X POST -k ${TOWER_WEBHOOK} -H \"Content-Type: application/json\" -H \"Authorization: Bearer ${TOWER_AUTH}\" -d \"@tmp_env_done.json\""                }
             }
         }
 
