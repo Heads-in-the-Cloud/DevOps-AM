@@ -95,10 +95,10 @@
                 --timeout=180s
 
         # Create API Secret
-        - name: CREATE MONGOSECRETS SECRET
+        - name: Create Utopia Secret
           k8s:
             state: present
-            namespace: "{{ eks_ingress_namespace }}"
+            namespace: "{{ eks_api_namespace }}"
             definition:
               apiVersion: v1
               kind: Secret
@@ -109,11 +109,11 @@
                 DB_NAME: "utopia"
                 DB_PORT: "3306"
                 DB_TYPE: "mysql"
-                DB_ADDRESS: "{{utopia_secret.msg.AWS_RDS_ENDPOINT}}"
-                DB_USERNAME: "{{utopia_secret.msg.DB_USERNAME}}"
-                DB_PASSWORD: "{{utopia_secret.msg.DB_PASSWORD}}"
-                DB_CONNECTION_POOL_MIN: "{{DB_POOL_MIN}}"
-                DB_CONNECTION_POOL_MAX: "{{DB_POOL_MAX}}"
+                DB_ADDRESS: "{{utopia_secret.msg.AWS_RDS_ENDPOINT | b64encode}}"
+                DB_USERNAME: "{{utopia_secret.msg.DB_USERNAME | b64encode}}"
+                DB_PASSWORD: "{{utopia_secret.msg.DB_PASSWORD | b64encode}}"
+                DB_CONNECTION_POOL_MIN: "{{DB_POOL_MIN | b64encode}}"
+                DB_CONNECTION_POOL_MAX: "{{DB_POOL_MAX | b64encode}}"
 
       tags: ['never', 'eks-init', 'eks-configure']
 
