@@ -7,34 +7,36 @@ pipeline {
     }
 
     environment {
-        SECRET_ID                 = 'dev/AM/utopia-secrets'
+        // AWS References
         AWS_PROFILE               = "${AWS_PROFILE_NAME}"
         AWS_REGION_ID             = "${AWS_REGION_ID}"
         AWS_ACCOUNT_ID            = "${AWS_ACCOUNT_ID}"
 
+        // Ansible API info
         // for t2.medium: 1930m cpu, 3332Mi, 4 pods
         EKS_CONTAINER_CPU_LIMIT   = "450m"
         EKS_CONTAINER_CPU_REQUEST = "250m"
         EKS_CONTAINER_MEM_LIMIT   = "800Mi"
         EKS_CONTAINER_MEM_REQUEST = "400Mi"
         EKS_REPLICA_COUNT         = 2
-
         DB_POOL_MIN               = 2
         DB_POOL_MAX               = 4
     }
 
     stages {
 
-        stage('Load Images') {
+        stage('Load Environment') {
             steps {
-                echo "Loading latest image hashes"
-                dir("${AM_RESOURCES_DIRECTORY}") {
-                    script {
-                        env.USERS_API_LATEST = sh(script:'jq -Mr \'.users\' images-${AWS_REGION_ID}.json', returnStdout: true)
-                        env.BOOKINGS_API_LATEST = sh(script:'jq -Mr \'.bookings\' images-${AWS_REGION_ID}.json', returnStdout: true)
-                        env.FLIGHTS_API_LATEST = sh(script:'jq -Mr \'.flights\' images-${AWS_REGION_ID}.json', returnStdout: true)
-                        env.AUTH_API_LATEST = sh(script:'jq -Mr \'.auth\' images-${AWS_REGION_ID}.json', returnStdout: true)
-                    }
+                sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
+                script {
+                    // Load from AWS Secret
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${AM_SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    def jsonObj = readJSON text: secret
+                    env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
+                    env.FLIGHTS_API_LATEST  = jsonObj.FLIGHTS_API_LATEST
+                    env.BOOKINGS_API_LATEST = jsonObj.BOOKINGS_API_LATEST
+                    env.USERS_API_LATEST    = jsonObj.USERS_API_LATEST
+                    env.AUTH_API_LATEST     = jsonObj.AUTH_API_LATEST
                 }
             }
         }
@@ -48,8 +50,8 @@ pipeline {
                         jobTemplate: 'AM_K8S_Update',
                         extraVars: '''
                             AWS_REGION_ID: "${AWS_REGION_ID}"
-                            AWS_ACCOUNT_ID: "${}"
-                            AWS_SECRET_ID:
+                            AWS_ACCOUNT_ID: "${AWS_ACCOUNT_ID}"
+                            AWS_SECRET_ID: "${AM_SECRET_ID}"
 
                             EKS_CONTAINER_CPU_LIMIT: "${EKS_CONTAINER_CPU_LIMIT}"
                             EKS_CONTAINER_CPU_REQUEST: "${EKS_CONTAINER_CPU_REQUEST}"

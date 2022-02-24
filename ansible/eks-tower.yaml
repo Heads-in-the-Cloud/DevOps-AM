@@ -9,7 +9,7 @@
 #              Runs the below in order:
 #
 #    - eks-configure: first-time startup config, to be run once.
-#    - eks-create:    pod and API creation, run on any API update.
+#    - eks-update:    pod and API creation, run on any API update.
 #    - eks-post:      updates Route53, to be run after configure and create.
 #
 # Required Variables - eks-init (passed as extra_vars to Ansible Tower):
@@ -46,7 +46,7 @@
       debug:
         msg: "{{ lookup('aws_secret', 'dev/AM/utopia-secrets') }}"
       register: utopia_secret
-      tags: ['always', 'eks-init']
+      tags: ['always']
 
     ##################
     # Access Cluster #
@@ -54,7 +54,7 @@
     - name: Access Cluster
       shell: |
         aws eks --region {{AWS_REGION_ID}} update-kubeconfig --name {{utopia_secret.msg.AWS_EKS_CLUSTER_NAME}}
-      tags: ['always', 'eks-init']
+      tags: ['always']
 
     #################
     # EKS Configure #  // runs initially to set up environment.
@@ -117,7 +117,6 @@
                 DB_PASSWORD: "{{utopia_secret.msg.DB_PASSWORD | b64encode}}"
                 DB_CONNECTION_POOL_MIN: "{{DB_POOL_MIN | b64encode}}"
                 DB_CONNECTION_POOL_MAX: "{{DB_POOL_MAX | b64encode}}"
-
       tags: ['never', 'eks-init', 'eks-configure']
 
     #############
@@ -147,8 +146,7 @@
             BOOKINGS_API_LATEST: "{{BOOKINGS_API_LATEST}}"
             USERS_API_LATEST: "{{USERS_API_LATEST}}"
             AUTH_API_LATEST: "{{AUTH_API_LATEST}}"
-
-      tags: ['never', 'eks-init', 'eks-create', 'eks-update']
+      tags: ['never', 'eks-init', 'eks-update']
 
       ############
       # EKS Post #  // runs after initialization and first pod creation for updates.
