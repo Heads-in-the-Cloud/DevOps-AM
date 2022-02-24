@@ -60,20 +60,18 @@
       k8s:
         state: absent
         namespace: "{{eks_api_namespace}}"
+        label_selectors:
+          - group: utopia
         definition:
           apiVersion: apps/v1
           kind: Deployment
-          metadata:
-            labels:
-              group: utopia
 
     - name: Destroy API Services
       k8s:
         state: absent
         namespace: "{{eks_api_namespace}}"
+        label_selectors:
+          - group: utopia
         definition:
           apiVersion: v1
           kind: Service
-          metadata:
-            labels:
-              group: utopia
