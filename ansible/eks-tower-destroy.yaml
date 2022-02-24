@@ -42,29 +42,27 @@
     - name: Destroy LoadBalancer Service
       k8s:
         state: absent
-        namespace: "{{eks_ingress_namespace}}"
         api_version: v1
         kind: Service
+        namespace: "{{eks_ingress_namespace}}"
         name: nginx-ingress
 
     - name: Destroy Utopia Secret
       k8s:
         state: absent
-        namespace: "{{eks_api_namespace}}"
         definition:
           apiVersion: v1
           kind: Secret
           metadata:
             name: utopia-secret
+        namespace: "{{eks_api_namespace}}"
 
     - name: Destroy APIs
       k8s:
         state: absent
         namespace: "{{eks_api_namespace}}"
-        definition:
-          label_selector:
-            group: utopia
-          apiVersion: apps/v1
-          kind: Deployment
-          metadata:
-            group: utopia
+        src:
+          - path: "{{eks_location}}/objects/auth-deploy.yaml"
+          - path: "{{eks_location}}/objects/users-deploy.yaml"
+          - path: "{{eks_location}}/objects/bookings-deploy.yaml"
+          - path: "{{eks_location}}/objects/flights-deploy.yaml"
