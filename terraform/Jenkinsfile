@@ -7,9 +7,10 @@ pipeline {
     }
 
     environment {
+        // General
+        AWS_PROFILE               = "${AWS_PROFILE_NAME}"
         COMMIT_HASH               = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
-        SECRET_ID                 = "dev/AM/utopia-secrets"
-        SECRET_ID_PUSH            = "dev/AM/utopia-secrets-NE4x9z"
+        SECRET_ID_PUSH            = "${AM_SECRET_ID_PUSH}"
         DEPLOY_MODE               = "dev"
 
         // Terraform passthrough
@@ -33,16 +34,13 @@ pipeline {
 
         stage('Load Environment') {
             steps {
-                echo 'Loading Environment'
+                sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
                 script {
-                    withCredentials([
-                        string(credentialsId: SECRET_ID,
-                        variable: 'DB_CREDS')
-                    ]) {
-                        def jsonObj = readJSON text: DB_CREDS
-                        env.TF_VAR_DB_USERNAME    = jsonObj.DB_USERNAME
-                        env.TF_VAR_DB_PASSWORD    = jsonObj.DB_PASSWORD
-                    }
+                    // Load from AWS Secret
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${AM_SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    def jsonObj = readJSON text: secret
+                    env.TF_VAR_DB_USERNAME    = jsonObj.DB_USERNAME
+                    env.TF_VAR_DB_PASSWORD    = jsonObj.DB_PASSWORD
                 }
             }
         }
@@ -85,7 +83,7 @@ pipeline {
                 echo 'Writing output to Secrets'
                 script {
                     withCredentials([
-                        string (credentialsId: env.SECRET_ID,
+                        string (credentialsId: env.AM_SECRET_ID,
                         variable: 'DB_CREDS')
                     ]) {
                         // json objects
