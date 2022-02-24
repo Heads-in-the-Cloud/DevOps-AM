@@ -16,6 +16,7 @@
   hosts: localhost
   connection: local
   vars:
+    eks_location: "../kubernetes"
     eks_ingress_namespace: nginx-ingress
     eks_api_namespace: apis-ns
   tasks:
@@ -49,27 +50,13 @@
     - name: Destroy Utopia Secret
       k8s:
         state: absent
-        apiVersion: v1
-        kind: Secret
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: utopia-secret
         namespace: "{{eks_api_namespace}}"
-        name: utopia-secret
 
-    - name: Destroy APIs
-      k8s:
-        state: absent
-        apiVersion: apps/v1
-        kind: Deployment
-        namespace: "{{eks_api_namespace}}"
-        metadata:
-          labels:
-            group: utopia
-
-    - name: Destroy API Services
-      k8s:
-        state: absent
-        apiVersion: v1
-        kind: Service
-        namespace: "{{eks_api_namespace}}"
-        metadata:
-          labels:
-            group: utopia
+    - name: Destroy API Resources
+      shell: |
+        kubectl destroy all -n {{eks_api_namespace}} -l group=utopia
