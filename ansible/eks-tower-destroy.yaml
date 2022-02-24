@@ -57,12 +57,6 @@
             name: utopia-secret
         namespace: "{{eks_api_namespace}}"
 
-    - name: Destroy APIs
-      k8s:
-        state: absent
-        namespace: "{{eks_api_namespace}}"
-        src:
-          - path: "{{eks_location}}/objects/auth-deploy.yaml"
-          - path: "{{eks_location}}/objects/users-deploy.yaml"
-          - path: "{{eks_location}}/objects/bookings-deploy.yaml"
-          - path: "{{eks_location}}/objects/flights-deploy.yaml"
+    - name: Destroy API Resources
+      shell: |
+        kubectl destroy all -n {{eks_api_namespace}} -l group=utopia
