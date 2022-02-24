@@ -16,6 +16,7 @@
   hosts: localhost
   connection: local
   vars:
+    eks_location: "../kubernetes"
     eks_ingress_namespace: nginx-ingress
     eks_api_namespace: apis-ns
   tasks:
@@ -60,18 +61,8 @@
       k8s:
         state: absent
         namespace: "{{eks_api_namespace}}"
-        label_selectors:
-          - group: utopia
-        definition:
-          apiVersion: apps/v1
-          kind: Deployment
-
-    - name: Destroy API Services
-      k8s:
-        state: absent
-        namespace: "{{eks_api_namespace}}"
-        label_selectors:
-          - group: utopia
-        definition:
-          apiVersion: v1
-          kind: Service
+        template:
+          - path: "{{eks_location}}/objects/auth-deploy.yaml"
+          - path: "{{eks_location}}/objects/users-deploy.yaml"
+          - path: "{{eks_location}}/objects/bookings-deploy.yaml"
+          - path: "{{eks_location}}/objects/flights-deploy.yaml"

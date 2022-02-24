@@ -1,6 +1,0 @@
----
-collections:
-  - kubernetes.core
-
-- name: kubernetes.core
-  version: 2.2.2
