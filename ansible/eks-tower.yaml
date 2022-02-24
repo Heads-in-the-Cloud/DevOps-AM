@@ -21,6 +21,7 @@
 #
 #    - AWS_RDS_ENDPOINT, AWS_HOSTED_ZONE_ID [init]
 #    - DB_POOL_MIN, DB_POOL_MAX [init]
+#    - EKS_RECORD_NAME [init]
 #
 ###############################################################################
 #    EKS CLUSTER DEPLOY AND UPDATE MODULE                                     #
