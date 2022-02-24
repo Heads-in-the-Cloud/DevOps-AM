@@ -48,8 +48,8 @@ pipeline {
                         jobTemplate: 'AM_K8S_Update',
                         extraVars: '''
                             AWS_REGION_ID: "${AWS_REGION_ID}"
-                            AWS_ACCOUNT_ID: "${}"
-                            AWS_SECRET_ID:
+                            AWS_ACCOUNT_ID: "${AWS_ACCOUNT_ID}"
+                            AWS_SECRET_ID: "${AWS_SECRET_ID}"
 
                             EKS_CONTAINER_CPU_LIMIT: "${EKS_CONTAINER_CPU_LIMIT}"
                             EKS_CONTAINER_CPU_REQUEST: "${EKS_CONTAINER_CPU_REQUEST}"
