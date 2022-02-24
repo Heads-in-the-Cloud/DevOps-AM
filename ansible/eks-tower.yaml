@@ -115,19 +115,6 @@
                 DB_CONNECTION_POOL_MIN: "{{DB_POOL_MIN}}"
                 DB_CONNECTION_POOL_MAX: "{{DB_POOL_MAX}}"
 
-#        # Create secret for use by APIs
-#        - name: Secret create
-#          shell: |
-#            kubectl create secret generic utopia-secret \
-#              --from-literal=DB_NAME=utopia \
-#              --from-literal=DB_PORT=3306 \
-#              --from-literal=DB_TYPE=mysql \
-#              --from-literal=DB_ADDRESS="{{utopia_secret.msg.AWS_RDS_ENDPOINT}}" \
-#              --from-literal=DB_USERNAME="{{utopia_secret.msg.DB_USERNAME}}" \
-#              --from-literal=DB_PASSWORD="{{utopia_secret.msg.DB_PASSWORD}}" \
-#              --from-literal=DB_CONNECTION_POOL_MIN="{{DB_POOL_MIN}}" \
-#              --from-literal=DB_CONNECTION_POOL_MAX="{{DB_POOL_MAX}}" \
-#              --namespace {{eks_api_namespace}}
       tags: ['never', 'eks-init', 'eks-configure']
 
     #############

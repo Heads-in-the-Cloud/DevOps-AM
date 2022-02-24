@@ -38,18 +38,38 @@
     #####################
     # Destroy Resources #
     #####################
-    - name: Destroy Loadbalancer Device
-      shell: |
-        kubectl delete service --namespace {{eks_ingress_namespace}} nginx-ingress
+    - name: Destroy LoadBalancer Service
+      k8s:
+        state: absent
+        api_version: v1
+        kind: Service
+        namespace: "{{eks_ingress_namespace}}"
+        name: nginx-ingress
 
     - name: Destroy Utopia Secret
-      shell: |
-        kubectl delete secret utopia-secret --namespace {{eks_api_namespace}}
+      k8s:
+        state: absent
+        apiVersion: v1
+        kind: Secret
+        namespace: "{{eks_api_namespace}}"
+        name: utopia-secret
 
-    - name: Destroy API Deployments
-      shell: |
-        kubectl delete deploy -l group=utopia --namespace {{eks_api_namespace}}
+    - name: Destroy APIs
+      k8s:
+        state: absent
+        apiVersion: apps/v1
+        kind: Deployment
+        namespace: "{{eks_api_namespace}}"
+        metadata:
+          labels:
+            group: utopia
 
     - name: Destroy API Services
-      shell: |
-        kubectl delete service -l group=utopia --namespace {{eks_api_namespace}}
+      k8s:
+        state: absent
+        apiVersion: v1
+        kind: Service
+        namespace: "{{eks_api_namespace}}"
+        metadata:
+          labels:
+            group: utopia
