@@ -49,10 +49,12 @@
     - name: Destroy Utopia Secret
       k8s:
         state: absent
-        apiVersion: v1
-        kind: Secret
+        definition:
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: utopia-secret
         namespace: "{{eks_api_namespace}}"
-        name: utopia-secret
 
     - name: Destroy APIs
       k8s:
