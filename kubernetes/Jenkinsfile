@@ -76,6 +76,7 @@ pipeline {
                             EKS_CONTAINER_CPU_REQUEST: "${EKS_CONTAINER_CPU_REQUEST}"
                             EKS_CONTAINER_MEM_LIMIT: "${EKS_CONTAINER_MEM_LIMIT}"
                             EKS_CONTAINER_MEM_REQUEST: "${EKS_CONTAINER_MEM_REQUEST}"
+                            EKS_REPLICA_COUNT: "${EKS_REPLICA_COUNT}"
 
                             FLIGHTS_API_LATEST: "${FLIGHTS_API_LATEST}"
                             BOOKINGS_API_LATEST: "${BOOKINGS_API_LATEST}"

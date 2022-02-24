@@ -14,14 +14,13 @@
 #
 # Required Variables - eks-init (passed as extra_vars to Ansible Tower):
 #
-#    - AWS_REGION_ID, AWS_ACCOUNT_ID [init, create]
-#    - AWS_RDS_ENDPOINT, AWS_HOSTED_ZONE_ID, AWS_SECRET_ID [init]
-#    - DB_POOL_MIN, DB_POOL_MAX [init]
+#    - AWS_REGION_ID, AWS_ACCOUNT_ID, AWS_SECRET_ID [init, create]
 #    - EKS_CONTAINER_{CPU/MEM}_{LIMIT/REQUEST} [init, create]
-#    - EKS_REPLICA_COUNT, EKS_RECORD_NAME [init, create]
+#    - EKS_REPLICA_COUNT [init, create]
 #    - {FLIGHTS/BOOKINGS/USERS/AUTH}_API_LATEST [init, create]
 #
-# Required Variables - eks-create
+#    - AWS_RDS_ENDPOINT, AWS_HOSTED_ZONE_ID [init]
+#    - DB_POOL_MIN, DB_POOL_MAX [init]
 #
 ###############################################################################
 #    EKS CLUSTER DEPLOY AND UPDATE MODULE                                     #
