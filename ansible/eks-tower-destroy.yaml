@@ -59,4 +59,4 @@
 
     - name: Destroy API Resources
       shell: |
-        kubectl destroy all -n {{eks_api_namespace}} -l group=utopia
+        kubectl delete all -n {{eks_api_namespace}} -l group=utopia
