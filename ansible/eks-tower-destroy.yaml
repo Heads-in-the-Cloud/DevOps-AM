@@ -61,6 +61,8 @@
       k8s:
         state: absent
         namespace: "{{eks_api_namespace}}"
+        label_selector:
+          group: utopia
         definition:
           apiVersion: apps/v1
           kind: Deployment
