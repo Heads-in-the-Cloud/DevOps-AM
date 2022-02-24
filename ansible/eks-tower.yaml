@@ -94,6 +94,8 @@
                 --selector=app.component=controller \
                 --timeout=180s
 
+        # Create API Secret
+
         # Create secret for use by APIs
         - name: Secret create
           shell: |

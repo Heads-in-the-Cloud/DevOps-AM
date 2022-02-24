@@ -37,7 +37,7 @@ pipeline {
                     env.AWS_RDS_ENDPOINT   = jsonObj.AWS_RDS_ENDPOINT
 
                     // Load from Terraform Output
-                    env.EKS_RECORD_NAME    = sh(returnStdout: true, script: "cd ${AM_DEVOPS_DIRECTORY}/terraform; terraform output | grep EKS_RECORD | sed 's/.*= //; s/\"//g'")
+                    env.EKS_RECORD_NAME    = sh(returnStdout: true, script: "cd ${AM_DEVOPS_DIRECTORY}/terraform; terraform output | grep EKS_RECORD | sed 's/.*= //; s/\"//g'").trim()
                 }
             }
         }
@@ -47,10 +47,10 @@ pipeline {
                 echo "Loading latest image hashes"
                 dir("${AM_RESOURCES_DIRECTORY}") {
                     script {
-                        env.USERS_API_LATEST = sh(script:'jq -Mr \'.users\' images-${AWS_REGION_ID}.json', returnStdout: true)
-                        env.BOOKINGS_API_LATEST = sh(script:'jq -Mr \'.bookings\' images-${AWS_REGION_ID}.json', returnStdout: true)
-                        env.FLIGHTS_API_LATEST = sh(script:'jq -Mr \'.flights\' images-${AWS_REGION_ID}.json', returnStdout: true)
-                        env.AUTH_API_LATEST = sh(script:'jq -Mr \'.auth\' images-${AWS_REGION_ID}.json', returnStdout: true)
+                        env.USERS_API_LATEST = sh(script:'jq -Mr \'.users\' images-${AWS_REGION_ID}.json', returnStdout: true).trim()
+                        env.BOOKINGS_API_LATEST = sh(script:'jq -Mr \'.bookings\' images-${AWS_REGION_ID}.json', returnStdout: true).trim()
+                        env.FLIGHTS_API_LATEST = sh(script:'jq -Mr \'.flights\' images-${AWS_REGION_ID}.json', returnStdout: true).trim()
+                        env.AUTH_API_LATEST = sh(script:'jq -Mr \'.auth\' images-${AWS_REGION_ID}.json', returnStdout: true).trim()
                     }
                 }
             }
