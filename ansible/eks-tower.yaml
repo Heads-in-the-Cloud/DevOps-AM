@@ -34,6 +34,9 @@
     eks_location: "../kubernetes"
     eks_api_namespace: apis-ns
     eks_ingress_namespace: nginx-ingress
+    pod_db_type: mysql
+    pod_db_port: 3306
+    pod_db_name: utopia
   tasks:
 
     #########################
@@ -95,20 +98,26 @@
                 --timeout=180s
 
         # Create API Secret
+        - name: Create Utopia Secret
+          k8s:
+            state: present
+            namespace: "{{ eks_api_namespace }}"
+            definition:
+              apiVersion: v1
+              kind: Secret
+              type: Opaque
+              metadata:
+                name: utopia-secret
+              data:
+                DB_NAME: "{{pod_db_name | b64encode}}"
+                DB_PORT: "{{pod_db_port | b64encode}}"
+                DB_TYPE: "{{pod_db_type | b64encode}}"
+                DB_ADDRESS: "{{utopia_secret.msg.AWS_RDS_ENDPOINT | b64encode}}"
+                DB_USERNAME: "{{utopia_secret.msg.DB_USERNAME | b64encode}}"
+                DB_PASSWORD: "{{utopia_secret.msg.DB_PASSWORD | b64encode}}"
+                DB_CONNECTION_POOL_MIN: "{{DB_POOL_MIN | b64encode}}"
+                DB_CONNECTION_POOL_MAX: "{{DB_POOL_MAX | b64encode}}"
 
-        # Create secret for use by APIs
-        - name: Secret create
-          shell: |
-            kubectl create secret generic utopia-secret \
-              --from-literal=DB_NAME=utopia \
-              --from-literal=DB_PORT=3306 \
-              --from-literal=DB_TYPE=mysql \
-              --from-literal=DB_ADDRESS="{{utopia_secret.msg.AWS_RDS_ENDPOINT}}" \
-              --from-literal=DB_USERNAME="{{utopia_secret.msg.DB_USERNAME}}" \
-              --from-literal=DB_PASSWORD="{{utopia_secret.msg.DB_PASSWORD}}" \
-              --from-literal=DB_CONNECTION_POOL_MIN="{{DB_POOL_MIN}}" \
-              --from-literal=DB_CONNECTION_POOL_MAX="{{DB_POOL_MAX}}" \
-              --namespace {{eks_api_namespace}}
       tags: ['never', 'eks-init', 'eks-configure']
 
     #############
