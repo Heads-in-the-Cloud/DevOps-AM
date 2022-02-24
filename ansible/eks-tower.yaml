@@ -34,6 +34,9 @@
     eks_location: "../kubernetes"
     eks_api_namespace: apis-ns
     eks_ingress_namespace: nginx-ingress
+    pod_db_type: mysql
+    pod_db_port: 3306
+    pod_db_name: utopia
   tasks:
 
     #########################
@@ -106,9 +109,9 @@
               metadata:
                 name: utopia-secret
               data:
-                DB_NAME: "utopia"
-                DB_PORT: "3306"
-                DB_TYPE: "mysql"
+                DB_NAME: "{{pod_db_name | b64encode}}"
+                DB_PORT: "{{pod_db_port | b64encode}}"
+                DB_TYPE: "{{pod_db_type | b64encode}}"
                 DB_ADDRESS: "{{utopia_secret.msg.AWS_RDS_ENDPOINT | b64encode}}"
                 DB_USERNAME: "{{utopia_secret.msg.DB_USERNAME | b64encode}}"
                 DB_PASSWORD: "{{utopia_secret.msg.DB_PASSWORD | b64encode}}"
