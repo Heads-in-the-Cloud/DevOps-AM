@@ -13,7 +13,6 @@ locals {
   environment_name  = "AM-Utopia-TF-${var.DEPLOY_MODE}"
 }
 
-
 ###########
 # MODULES #
 ###########
