@@ -18,6 +18,14 @@ locals {
 # MODULES #
 ###########
 
+module "backend" {
+  # general
+  source              = "./modules/backend"
+  deploy_mode         = var.DEPLOY_MODE
+  environment_name    = local.environment_name
+  region              = var.REGION_ID
+}
+
 module "network" {
   # general
   source                      = "./modules/network"
