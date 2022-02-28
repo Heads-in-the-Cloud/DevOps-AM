@@ -35,3 +35,18 @@ provider "kubernetes" {
   token = data.aws_eks_cluster_auth.cluster-auth.token
   cluster_ca_certificate = base64encode(data.aws_eks_cluster.cluster-id.certificate_authority[0].data)
 }
+
+###########
+# BACKEND #
+###########
+
+terraform {
+  backend "s3" {
+    bucket          = "am-utopia-tf-dev-backend-store"
+    dynamodb_table  = "am-utopia-tf-dev-state-lock"
+    encrypt         = true
+    key             = "terraform.tfstate"
+    region          = "us-west-1"
+    profile         = "am_aws"
+  }
+}

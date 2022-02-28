@@ -13,35 +13,6 @@ locals {
   environment_name  = "AM-Utopia-TF-${var.DEPLOY_MODE}"
 }
 
-
-###########
-# BACKEND #
-###########
-
-//module "backend" {
-//  # general
-//  source              = "./modules/backend/dev"
-//  count               = var.DEPLOY_MODE == "dev" ? 1 : 0
-//}
-
-//module "backend" {
-//  # general
-//  source              = "./modules/backend/prod"
-//  count               = var.DEPLOY_MODE == "prod" ? 1 : 0
-//}
-
-terraform {
-  backend "s3" {
-    bucket          = "am-utopia-tf-dev-backend-store"
-    dynamodb_table  = "am-utopia-tf-dev-state-lock"
-    encrypt         = true
-    key             = "terraform.tfstate"
-    region          = "us-west-1"
-    profile         = "am_aws"
-  }
-}
-
-
 ###########
 # MODULES #
 ###########
