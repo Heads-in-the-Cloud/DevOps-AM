@@ -1,4 +1,3 @@
-
 variable "ECS_RECORD" {
   type = string
 }

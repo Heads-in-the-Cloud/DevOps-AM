@@ -56,19 +56,16 @@ pipeline {
                             AWS_RDS_ENDPOINT: "${AWS_RDS_ENDPOINT}"
                             AWS_HOSTED_ZONE_ID: "${AWS_HOSTED_ZONE_ID}"
                             AWS_SECRET_ID: "${AM_SECRET_ID}"
-
                             EKS_CONTAINER_CPU_LIMIT: "${EKS_CONTAINER_CPU_LIMIT}"
                             EKS_CONTAINER_CPU_REQUEST: "${EKS_CONTAINER_CPU_REQUEST}"
                             EKS_CONTAINER_MEM_LIMIT: "${EKS_CONTAINER_MEM_LIMIT}"
                             EKS_CONTAINER_MEM_REQUEST: "${EKS_CONTAINER_MEM_REQUEST}"
                             EKS_REPLICA_COUNT: "${EKS_REPLICA_COUNT}"
                             EKS_RECORD_NAME: "${EKS_RECORD_NAME}"
-
                             FLIGHTS_API_LATEST: "${FLIGHTS_API_LATEST}"
                             BOOKINGS_API_LATEST: "${BOOKINGS_API_LATEST}"
                             USERS_API_LATEST: "${USERS_API_LATEST}"
                             AUTH_API_LATEST: "${AUTH_API_LATEST}"
-
                             DB_POOL_MIN: "${DB_POOL_MIN}"
                             DB_POOL_MAX: "${DB_POOL_MAX}"
                         '''
