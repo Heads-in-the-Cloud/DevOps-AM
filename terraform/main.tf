@@ -39,7 +39,7 @@ terraform {
     dynamodb_table  = "am-utopia-tf-dev-state-lock"
     encrypt         = true
     key             = "terraform.tfstate"
-    region          = "us-west-2"
+    region          = "us-west-1"
     profile         = "am_aws"
   }
 }
