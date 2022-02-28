@@ -4,13 +4,13 @@
 #############
 
 resource "aws_s3_bucket" "backend-bucket" {
-  bucket  = "AM-Utopia-TF-backend-store"
+  bucket  = "am-utopia-tf-dev-backend-store"
   acl     = "private"
   versioning {
     enabled = true
   }
   tags = {
-    Name          = "AM-Utopia-TF-backend-store"
+    Name          = "am-utopia-tf-dev-backend-store"
     Environment   = "Dev"
   }
   lifecycle {
@@ -23,7 +23,7 @@ resource "aws_s3_bucket" "backend-bucket" {
 ##############
 
 resource "aws_dynamodb_table" "db_terraform_state_lock" {
-  name            = "AM-Utopia-TF-state-lock"
+  name            = "am-utopia-tf-dev-state-lock"
   hash_key        = "LockID"
   read_capacity   = 20
   write_capacity  = 20
