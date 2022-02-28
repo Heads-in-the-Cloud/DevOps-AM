@@ -43,27 +43,13 @@ resource "aws_security_group" "db_security" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port     = 0
-    to_port       = 0
-    protocol      = "-1"
-    cidr_blocks   = ["0.0.0.0/0"]
-  }
-
   tags = {
     Name = "${var.environment_name}-rds-security"
   }
 }
 
 ###############
-# EKS Cluster #
+# ECS Cluster #
 ###############
 
 resource "aws_security_group" "ecs_api_access" {
@@ -116,18 +102,14 @@ resource "aws_security_group" "ecs_api_access" {
   }
 }
 
+###############
+# EKS Cluster #
+###############
+
 resource "aws_security_group" "eks_api_access" {
   name = "${var.environment_name}-eks-allow-traffic"
-  description = "Open HTTP and HTTPS connections, plus APIs"
+  description = "Open HTTP and outgoing"
   vpc_id = var.vpc_id
-
-  # SSH
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
 
   # HTTP
   ingress {
