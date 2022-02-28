@@ -18,18 +18,15 @@ locals {
 # BACKEND #
 ###########
 
-module "backend" {
-  # general
-  source              = "./modules/backend/dev"
-  count               = var.DEPLOY_MODE == "dev" ? 1 : 0
-}
+//module "backend" {
+//  # general
+//  source              = "./modules/backend/dev"
+//  count               = var.DEPLOY_MODE == "dev" ? 1 : 0
+//}
 
 //module "backend" {
 //  # general
 //  source              = "./modules/backend/prod"
-//  deploy_mode         = var.DEPLOY_MODE
-//  environment_name    = local.environment_name
-//  region              = var.REGION_ID
 //  count               = var.DEPLOY_MODE == "prod" ? 1 : 0
 //}
 
