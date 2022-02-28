@@ -26,17 +26,6 @@ module "backend" {
   region              = var.REGION_ID
 }
 
-terraform {
-  backend "s3" {
-    bucket          = "AM-Utopia-TF-backend-store"
-    dynamodb_table  = "AM-Utopia-TF-state-lock"
-    encrypt         = true
-    key             = "terraform.tfstate"
-    region          = "us-west-2"
-    profile         = "am_aws"
-  }
-}
-
 ###########
 # MODULES #
 ###########

@@ -13,6 +13,9 @@ resource "aws_s3_bucket" "backend-bucket" {
     Name          = "AM-Utopia-TF-backend-store"
     Environment   = "Dev"
   }
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 ##############
@@ -27,5 +30,8 @@ resource "aws_dynamodb_table" "db_terraform_state_lock" {
   attribute {
     name = "LockID"
     type = "S"
+  }
+  lifecycle {
+    prevent_destroy = true
   }
 }
