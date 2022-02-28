@@ -33,6 +33,18 @@ module "backend" {
 //  count               = var.DEPLOY_MODE == "prod" ? 1 : 0
 //}
 
+terraform {
+  backend "s3" {
+    bucket          = "am-utopia-tf-dev-backend-store"
+    dynamodb_table  = "am-utopia-tf-dev-state-lock"
+    encrypt         = true
+    key             = "terraform.tfstate"
+    region          = "us-west-2"
+    profile         = "am_aws"
+  }
+}
+
+
 ###########
 # MODULES #
 ###########
