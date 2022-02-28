@@ -40,13 +40,13 @@ provider "kubernetes" {
 # BACKEND #
 ###########
 
-terraform {
-  backend "s3" {
-    bucket          = "am-utopia-tf-dev-backend-store"
-    dynamodb_table  = "am-utopia-tf-dev-state-lock"
-    encrypt         = true
-    key             = "terraform.tfstate"
-    region          = "us-west-1"
-    profile         = "am_aws"
-  }
-}
+//terraform {
+//  backend "s3" {
+//    bucket          = "am-utopia-tf-dev-backend-store"
+//    dynamodb_table  = "am-utopia-tf-dev-state-lock"
+//    encrypt         = true
+//    key             = "terraform.tfstate"
+//    region          = "us-west-1"
+//    profile         = "am_aws"
+//  }
+//}
