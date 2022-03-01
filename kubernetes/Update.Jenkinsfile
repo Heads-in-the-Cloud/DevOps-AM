@@ -41,7 +41,7 @@ pipeline {
                     env.BOOKINGS_API_LATEST = jsonObj.BOOKINGS_API_LATEST
                     env.USERS_API_LATEST    = jsonObj.USERS_API_LATEST
                     env.AUTH_API_LATEST     = jsonObj.AUTH_API_LATEST
-                    env.EKS_CLUSTER_NAME    = jsonObj.EKS_CLUSTER_NAME
+                    env.EKS_CLUSTER_NAME    = jsonObj.AWS_EKS_CLUSTER_NAME
                 }
             }
         }
@@ -49,10 +49,7 @@ pipeline {
         stage('Check EKS Exists') {
             steps {
                 script {
-                    // Mark build as unstable if EKS does not exist
-                    catchError(buildResult: 'FAILURE', stageResult: 'UNSTABLE') {
-                        EKSExists()
-                    }
+                    EKSExists()
                 }
             }
         }

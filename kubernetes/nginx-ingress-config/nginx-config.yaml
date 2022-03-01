@@ -1,0 +1,22 @@
+
+##################################
+# ConfigMap for NGINX Deployment #
+##################################
+#
+#   Config items for the nginx-ingress deployment,
+#   allows Ingress objects to call the Ingress
+#   Controller pod.
+#
+#   Value is passed to the Ingress Controller
+#   deployment in its definition.
+#
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+  namespace: nginx-ingress
+data:
+  proxy-protocol: "True"
+  real-ip-header: "proxy_protocol"
+  set-real-ip-from: "0.0.0.0/0"
