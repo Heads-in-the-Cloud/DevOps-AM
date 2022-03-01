@@ -1,0 +1,177 @@
+---
+###############################################################################
+#    EKS CLUSTER DEPLOY AND UPDATE MODULE                                     #
+###############################################################################
+#
+# Tags:
+#
+#  - eks-init: inclusive tag for a full initial setup, to be run once.
+#              Runs the below in order:
+#
+#    - eks-configure: first-time startup config, to be run once.
+#    - eks-update:    pod and API creation, run on any API update.
+#    - eks-post:      updates Route53, to be run after configure and create.
+#
+# Required Variables - eks-init (passed as extra_vars to Ansible Tower):
+#
+#    - AWS_REGION_ID, AWS_ACCOUNT_ID, AWS_SECRET_ID [init, create]
+#    - EKS_CONTAINER_{CPU/MEM}_{LIMIT/REQUEST} [init, create]
+#    - EKS_REPLICA_COUNT [init, create]
+#    - {FLIGHTS/BOOKINGS/USERS/AUTH}_API_LATEST [init, create]
+#
+#    - AWS_RDS_ENDPOINT, AWS_HOSTED_ZONE_ID [init]
+#    - DB_POOL_MIN, DB_POOL_MAX [init]
+#    - EKS_RECORD_NAME [init]
+#
+###############################################################################
+#    EKS CLUSTER DEPLOY AND UPDATE MODULE                                     #
+###############################################################################
+
+- name: Deploy to EKS Cluster
+  hosts: localhost
+  connection: local
+  vars:
+    eks_location: "../kubernetes"
+    eks_api_namespace: apis-ns
+    eks_ingress_namespace: nginx-ingress
+    pod_db_type: mysql
+    pod_db_port: 3306
+    pod_db_name: utopia
+  tasks:
+
+    #########################
+    # Secrets and Variables #
+    #########################
+    - name: Get Utopia Secrets
+      debug:
+        msg: "{{ lookup('aws_secret', 'dev/AM/utopia-secrets') }}"
+      register: utopia_secret
+      tags: ['always']
+
+    ##################
+    # Access Cluster #
+    ##################
+    - name: Access Cluster
+      shell: |
+        aws eks --region {{AWS_REGION_ID}} update-kubeconfig --name {{utopia_secret.msg.AWS_EKS_CLUSTER_NAME}}
+      tags: ['always']
+
+    #################
+    # EKS Configure #  // runs initially to set up environment.
+    #################
+    - name: EKS-Configure Block
+      block:
+
+        # Create Namespaces from file
+        - name: Namespaces
+          k8s:
+            state: present
+            src: "{{ eks_location }}/init/ns-sa.yaml"
+
+        # Create Ingress default resources
+        - name: Ingress setup
+          k8s:
+            state: present
+            src: "{{ eks_location }}/init/default-server-secret.yaml"
+            namespace: "{{ eks_ingress_namespace }}"
+
+        # Create custom Ingress configs
+        - name: Configs setup
+          shell: |
+            kubectl apply -f . --namespace {{ eks_ingress_namespace }}
+          args:
+            chdir: "{{ eks_location }}/eks-custom"
+
+        # Create custom Ingress resources
+        - name: Ingress Control setup
+          shell: |
+            kubectl apply -f . --namespace {{ eks_ingress_namespace }}
+          args:
+            chdir: "{{ eks_location }}/eks-config"
+
+        # Wait for Ingress to come online
+        - name: Ingress wait
+          shell: |
+            kubectl wait --namespace {{ eks_ingress_namespace }} \
+                --for=condition=ready pod \
+                --selector=app.component=controller \
+                --timeout=180s
+
+        # Create API Secret
+        - name: Create Utopia Secret
+          k8s:
+            state: present
+            namespace: "{{ eks_api_namespace }}"
+            definition:
+              apiVersion: v1
+              kind: Secret
+              type: Opaque
+              metadata:
+                name: utopia-secret
+              data:
+                DB_NAME: "{{pod_db_name | b64encode}}"
+                DB_PORT: "{{pod_db_port | b64encode}}"
+                DB_TYPE: "{{pod_db_type | b64encode}}"
+                DB_ADDRESS: "{{utopia_secret.msg.AWS_RDS_ENDPOINT | b64encode}}"
+                DB_USERNAME: "{{utopia_secret.msg.DB_USERNAME | b64encode}}"
+                DB_PASSWORD: "{{utopia_secret.msg.DB_PASSWORD | b64encode}}"
+                DB_CONNECTION_POOL_MIN: "{{DB_POOL_MIN | b64encode}}"
+                DB_CONNECTION_POOL_MAX: "{{DB_POOL_MAX | b64encode}}"
+      tags: ['never', 'eks-init', 'eks-configure']
+
+    #############
+    # EKS Build #  // runs on create and update to maintain pods.
+    #############
+    - name: EKS-Create Block
+      block:
+        # Create custom API Objects from definitions
+        - name: Create APIs
+          shell: |
+            for f in $(find *.yaml); do envsubst < $f | kubectl --namespace {{eks_api_namespace}} apply -f -; done
+          args:
+            chdir: "{{ eks_location }}/objects"
+          environment:
+
+            # envsubst requires linux-level environment variables
+            EKS_CONTAINER_CPU_LIMIT: "{{EKS_CONTAINER_CPU_LIMIT}}"
+            EKS_CONTAINER_CPU_REQUEST: "{{EKS_CONTAINER_CPU_REQUEST}}"
+            EKS_CONTAINER_MEM_LIMIT: "{{EKS_CONTAINER_MEM_LIMIT}}"
+            EKS_CONTAINER_MEM_REQUEST: "{{EKS_CONTAINER_MEM_REQUEST}}"
+            EKS_REPLICA_COUNT: "{{EKS_REPLICA_COUNT}}"
+
+            AWS_ACCOUNT_ID: "{{AWS_ACCOUNT_ID}}"
+            AWS_REGION_ID: "{{AWS_REGION_ID}}"
+
+            FLIGHTS_API_LATEST: "{{FLIGHTS_API_LATEST}}"
+            BOOKINGS_API_LATEST: "{{BOOKINGS_API_LATEST}}"
+            USERS_API_LATEST: "{{USERS_API_LATEST}}"
+            AUTH_API_LATEST: "{{AUTH_API_LATEST}}"
+      tags: ['never', 'eks-init', 'eks-update']
+
+      ############
+      # EKS Post #  // runs after initialization and first pod creation for updates.
+      ############
+    - name: EKS-Post Block
+      block:
+
+        # Get LoadBalancer address and store
+        - name: Get LoadBalancer
+          shell: |
+            kubectl get svc --namespace={{ eks_ingress_namespace }} | awk 'NR==2{print $4}'
+          register: LB_ADDRESS
+
+        # Show LoadBalancer address output
+        - debug: var=LB_ADDRESS.stdout
+
+        # Register Route53 change
+        - name: Register Route53
+          route53:
+            state: present
+            hosted_zone_id: "{{ AWS_HOSTED_ZONE_ID }}"
+            record: "{{ EKS_RECORD_NAME }}"
+            ttl: 60
+            type: CNAME
+            overwrite: true
+            value:
+              - "{{ LB_ADDRESS.stdout }}"
+      tags: ['never', 'eks-init', 'eks-post']

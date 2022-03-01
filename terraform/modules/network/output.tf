@@ -10,10 +10,10 @@ output "subnet_group_id" {
 
 // all subnets - choose privates as [0, 1] or publics as [2, 3]
 output "all_subnets" {
-  value = [ aws_subnet.private_subnet_1.id,
-            aws_subnet.private_subnet_2.id,
-            aws_subnet.public_subnet_1.id,
-            aws_subnet.public_subnet_2.id ]
+  value = [aws_subnet.private_subnet_1.id,
+    aws_subnet.private_subnet_2.id,
+    aws_subnet.public_subnet_1.id,
+  aws_subnet.public_subnet_2.id]
 }
 
 // vpc to use across the program

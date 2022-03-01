@@ -1,5 +1,8 @@
-
 variable "ECS_RECORD" {
+  type = string
+}
+
+variable "EKS_RECORD" {
   type = string
 }
 
@@ -8,14 +11,6 @@ variable "HOSTED_ZONE" {
 }
 
 variable "REGION_ID" {
-  type = string
-}
-
-variable "AWS_ACCESS_KEY" {
-  type = string
-}
-
-variable "AWS_SECRET_KEY" {
   type = string
 }
 
@@ -40,10 +35,14 @@ variable "AZ_2" {
 }
 
 variable "DEPLOY_MODE" {
-  type = string
+  type    = string
   default = "dev"
 }
 
 variable "SSH_BASTION_KEY" {
   type = string
 }
+
+//variable "ANSIBLE_DIRECTORY" {
+//  type = string
+//}
