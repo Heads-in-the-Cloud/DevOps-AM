@@ -5,9 +5,10 @@
 
 resource "aws_security_group" "bastion_security" {
   name        = "${var.environment_name}-bastion-security"
-  description = "Allow only SSH"
+  description = "Allow SSH globally"
   vpc_id      = var.vpc_id
 
+  # Public Bastion SSH Access
   ingress {
     from_port   = 22
     to_port     = 22
@@ -15,6 +16,7 @@ resource "aws_security_group" "bastion_security" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Bastion Internet Access
   egress {
     from_port   = 0
     to_port     = 0
@@ -33,21 +35,15 @@ resource "aws_security_group" "bastion_security" {
 
 resource "aws_security_group" "db_security" {
   name        = "${var.environment_name}-rds-security"
-  description = "Allow all SSH and SQL traffic"
+  description = "Allow SQL specific traffic from VPC subnets"
   vpc_id      = var.vpc_id
 
+  # DB Access from Subnets
   ingress {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = concat(var.public_cidrs, var.private_cidrs)
   }
 
   tags = {
@@ -61,42 +57,26 @@ resource "aws_security_group" "db_security" {
 
 resource "aws_security_group" "ecs_api_access" {
   name        = "${var.environment_name}-ecs-allow-traffic"
-  description = "Open HTTP and HTTPS connections, plus APIs"
+  description = "Open API Ports to NWB"
   vpc_id      = var.vpc_id
 
-  # SSH
+  # General API ports from LB
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # HTTP
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # General API ports
-  ingress {
-    from_port   = 8080
+    from_port   = 8081
     to_port     = 8083
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.public_cidrs
   }
 
-  # Auth API port
+  # Auth API port from LB
   ingress {
     from_port   = 8443
     to_port     = 8443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.public_cidrs
   }
 
-  # outgoing coverage
+  # API Internet Access
   egress {
     from_port   = 0
     to_port     = 0
@@ -115,26 +95,18 @@ resource "aws_security_group" "ecs_api_access" {
 
 resource "aws_security_group" "eks_api_access" {
   name        = "${var.environment_name}-eks-allow-traffic"
-  description = "Open HTTP and outgoing"
+  description = "Open HTTP to Ingress LoadBalancer and allow Egress"
   vpc_id      = var.vpc_id
 
-  # HTTP
+  # HTTP from all sources
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.public_cidrs
   }
 
-  # SSH
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # outgoing coverage
+  # API Internet Access
   egress {
     from_port   = 0
     to_port     = 0
