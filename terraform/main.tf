@@ -48,8 +48,8 @@ module "security" {
 
   # networking info
   vpc_id        = module.network.utopia_vpc
-  public_cidrs  = [local.vpc_subnet_1_public_cidr, local.vpc_subnet_2_public_cidr]
-  private_cidrs = [local.vpc_subnet_1_private_cidr, local.vpc_subnet_2_private_cidr]
+  public_cidrs  = [ local.vpc_subnet_1_public_cidr,  local.vpc_subnet_2_public_cidr  ]
+  private_cidrs = [ local.vpc_subnet_1_private_cidr, local.vpc_subnet_2_private_cidr ]
 }
 
 
@@ -67,7 +67,7 @@ module "utopia-db" {
 
   # networking
   subnet_group_id  = module.network.subnet_group_id
-  public_subnet_id = module.network.all_subnets[2]
+  public_subnet_id = module.network.public_subnets[0]
   vpc_id           = module.network.utopia_vpc
   rds_sg_id        = module.security.SG_RDS
 
@@ -93,7 +93,7 @@ module "ecs" {
   r53_zone_id     = var.HOSTED_ZONE
   record_name     = "${var.DEPLOY_MODE}-${var.ECS_RECORD}"
   vpc_id          = module.network.utopia_vpc
-  service_subnets = [module.network.all_subnets[2], module.network.all_subnets[3]]
+  service_subnets = module.network.public_subnets
 }
 
 
@@ -104,8 +104,8 @@ module "eks" {
   environment_name = local.environment_name
 
   # networking
-  eks_public_subnets = [module.network.all_subnets[2], module.network.all_subnets[3]]
-  eks_subnets        = module.network.all_subnets
+  eks_public_subnets = module.network.public_subnets
+  eks_subnets        = concat(module.network.public_subnets, module.network.private_subnets)
   vpc_id             = module.network.utopia_vpc
   eks_sg_id          = module.security.SG_EKS
   r53_zone_id        = var.HOSTED_ZONE
