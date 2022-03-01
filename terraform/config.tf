@@ -6,16 +6,15 @@
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "~> 3.0"
     }
   }
 }
 
 provider "aws" {
-  region      = var.REGION_ID
-  access_key  = var.AWS_ACCESS_KEY
-  secret_key  = var.AWS_SECRET_KEY
+  region  = var.REGION_ID
+  profile = "am_aws"
 }
 
 #######################
@@ -32,7 +31,22 @@ data "aws_eks_cluster_auth" "cluster-auth" {
 }
 
 provider "kubernetes" {
-  host = data.aws_eks_cluster.cluster-id.endpoint
-  token = data.aws_eks_cluster_auth.cluster-auth.token
+  host                   = data.aws_eks_cluster.cluster-id.endpoint
+  token                  = data.aws_eks_cluster_auth.cluster-auth.token
   cluster_ca_certificate = base64encode(data.aws_eks_cluster.cluster-id.certificate_authority[0].data)
 }
+
+###########
+# BACKEND #
+###########
+
+//terraform {
+//  backend "s3" {
+//    bucket          = "am-utopia-tf-dev-backend-store"
+//    dynamodb_table  = "am-utopia-tf-dev-state-lock"
+//    encrypt         = true
+//    key             = "terraform.tfstate"
+//    region          = "us-west-1"
+//    profile         = "am_aws"
+//  }
+//}

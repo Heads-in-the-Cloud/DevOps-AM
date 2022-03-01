@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        SECRET_ID = "dev/AM/utopia-secrets"
+        SECRET_ID = "${AM_SECRET_ID}"
 
         ECS_MEM_LIMIT   = "1024M"
         ECS_MEM_REQUEST = "256M"
@@ -41,7 +41,7 @@ pipeline {
 
         stage('Fill Template') {
             steps {
-                echo 'Inserting Environment Variables into docker-compose'
+                echo 'Inserting certain Environment Variables into docker-compose'
                 dir("am-ecs") {
                     sh '''
                         envsubst \' \

@@ -10,3 +10,7 @@ output "eks_id" {
 output "eks_name" {
   value = aws_eks_cluster.eks_cluster.name
 }
+
+output "route_name" {
+  value = aws_route53_record.utopia_record.name
+}

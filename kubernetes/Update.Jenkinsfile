@@ -7,13 +7,13 @@ pipeline {
     }
 
     environment {
-        // AWS references
+        // AWS References
         AWS_PROFILE               = "${AWS_PROFILE_NAME}"
-        AWS_ACCESS_KEY            = credentials('AM_AWS_ACCESS')
-        AWS_SECRET_KEY            = credentials('AM_AWS_SECRET')
+        AWS_REGION_ID             = "${AWS_REGION_ID}"
+        AWS_ACCOUNT_ID            = "${AWS_ACCOUNT_ID}"
 
-        // Ansible API Info
-        // for t2.medium: 1930m cpu, 3332Mi, 4 pods max
+        // Ansible API info
+        // for t2.medium: 1930m cpu, 3332Mi, 4 pods
         EKS_CONTAINER_CPU_LIMIT   = "450m"
         EKS_CONTAINER_CPU_REQUEST = "250m"
         EKS_CONTAINER_MEM_LIMIT   = "800Mi"
@@ -24,6 +24,7 @@ pipeline {
     }
 
     stages {
+
         stage('Load Environment') {
             steps {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
@@ -36,38 +37,32 @@ pipeline {
                     env.BOOKINGS_API_LATEST = jsonObj.BOOKINGS_API_LATEST
                     env.USERS_API_LATEST    = jsonObj.USERS_API_LATEST
                     env.AUTH_API_LATEST     = jsonObj.AUTH_API_LATEST
-
-                    // Load from Terraform Output
-                    env.EKS_RECORD_NAME     = sh(returnStdout: true, script: "cd ${AM_DEVOPS_DIRECTORY}/terraform; terraform output | grep EKS_RECORD | sed 's/.*= //; s/\"//g'").trim()
                 }
             }
         }
 
-        stage('Ansible Tower Outsource') {
+        stage('Push EKS') {
             steps {
-                echo 'Running Ansible Tower connection'
+                echo 'Running Kubernetes Initialization'
                 script {
-                    ansibleTower(
+                  ansibleTower(
                         towerServer: 'AM-Ansible-Tower-EC2',
-                        jobTemplate: 'AM_K8S_Launch',
+                        jobTemplate: 'AM_K8S_Update',
                         extraVars: '''
                             AWS_REGION_ID: "${AWS_REGION_ID}"
                             AWS_ACCOUNT_ID: "${AWS_ACCOUNT_ID}"
-                            AWS_RDS_ENDPOINT: "${AWS_RDS_ENDPOINT}"
-                            AWS_HOSTED_ZONE_ID: "${AWS_HOSTED_ZONE_ID}"
                             AWS_SECRET_ID: "${AM_SECRET_ID}"
+
                             EKS_CONTAINER_CPU_LIMIT: "${EKS_CONTAINER_CPU_LIMIT}"
                             EKS_CONTAINER_CPU_REQUEST: "${EKS_CONTAINER_CPU_REQUEST}"
                             EKS_CONTAINER_MEM_LIMIT: "${EKS_CONTAINER_MEM_LIMIT}"
                             EKS_CONTAINER_MEM_REQUEST: "${EKS_CONTAINER_MEM_REQUEST}"
                             EKS_REPLICA_COUNT: "${EKS_REPLICA_COUNT}"
-                            EKS_RECORD_NAME: "${EKS_RECORD_NAME}"
+
                             FLIGHTS_API_LATEST: "${FLIGHTS_API_LATEST}"
                             BOOKINGS_API_LATEST: "${BOOKINGS_API_LATEST}"
                             USERS_API_LATEST: "${USERS_API_LATEST}"
                             AUTH_API_LATEST: "${AUTH_API_LATEST}"
-                            DB_POOL_MIN: "${DB_POOL_MIN}"
-                            DB_POOL_MAX: "${DB_POOL_MAX}"
                         '''
                     )
                 }

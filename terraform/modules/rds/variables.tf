@@ -16,22 +16,22 @@ variable "deploy_mode" {
 #######################
 
 variable "db_engine" {
-  type = string
+  type    = string
   default = "mysql"
 }
 
 variable "db_engine_version" {
-  type = string
+  type    = string
   default = "8.0.23"
 }
 
 variable "db_instance_class" {
-  type = string
+  type    = string
   default = "db.t3.small"
 }
 
 variable "db_name" {
-  type = string
+  type    = string
   default = "utopia"
 }
 
@@ -40,12 +40,12 @@ variable "db_name" {
 #####################
 
 variable "db_username" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "db_password" {
-  type = string
+  type    = string
   default = ""
 }
 
@@ -54,27 +54,27 @@ variable "db_password" {
 ###################
 
 variable "subnet_group_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "public_subnet_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "vpc_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "rds_sg_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "bastion_sg_id" {
-  type = string
+  type    = string
   default = ""
 }
 
@@ -83,16 +83,16 @@ variable "bastion_sg_id" {
 ################
 
 variable "ami_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "bastion_instance_type" {
-  type = string
+  type    = string
   default = "t2.micro"
 }
 
 variable "bastion_ssh_keyname" {
-  type = string
+  type    = string
   default = ""
 }
