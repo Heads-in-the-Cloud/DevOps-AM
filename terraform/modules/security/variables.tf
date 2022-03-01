@@ -1,15 +1,15 @@
 
 variable "vpc_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "deploy_mode" {
-  type = string
+  type    = string
   default = "dev"
 }
 
 variable "environment_name" {
-  type = string
+  type    = string
   default = ""
 }

@@ -4,11 +4,11 @@
 ############
 
 data "aws_ami" "linux" {
-  owners = ["amazon"]
+  owners      = ["amazon"]
   most_recent = true
 
   filter {
-    name = "name"
+    name   = "name"
     values = ["amzn2-ami-hvm*"]
   }
 }
@@ -22,16 +22,16 @@ resource "aws_instance" "bastion" {
   key_name                    = var.bastion_ssh_keyname
   vpc_security_group_ids      = [var.bastion_sg_id]
   iam_instance_profile        = aws_iam_instance_profile.bastion_profile.name
-  tags = { Name               = "${var.environment_name}-bastion" }
+  tags                        = { Name = "${var.environment_name}-bastion" }
 
   // startup script
-  user_data                   = templatefile("${path.module}/bastion_init.sh", {
-    DB_ENDPOINT   = aws_db_instance.rds.address
-    DB_USERNAME   = var.db_username
-    DB_PASSWORD   = var.db_password
+  user_data = templatefile("${path.module}/bastion_init.sh", {
+    DB_ENDPOINT = aws_db_instance.rds.address
+    DB_USERNAME = var.db_username
+    DB_PASSWORD = var.db_password
   })
 
   lifecycle {
-    ignore_changes = [ associate_public_ip_address ]
+    ignore_changes = [associate_public_ip_address]
   }
 }

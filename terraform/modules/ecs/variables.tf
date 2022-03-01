@@ -4,22 +4,22 @@
 #####################
 
 variable "vpc_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "service_subnets" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 
 variable "r53_zone_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "record_name" {
-  type = string
+  type    = string
   default = ""
 }
 

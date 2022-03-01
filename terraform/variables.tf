@@ -35,7 +35,7 @@ variable "AZ_2" {
 }
 
 variable "DEPLOY_MODE" {
-  type = string
+  type    = string
   default = "dev"
 }
 

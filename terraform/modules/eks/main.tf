@@ -4,8 +4,8 @@
 ######################
 
 resource "aws_eks_cluster" "eks_cluster" {
-  name      = "${var.environment_name}-eks-cluster"
-  role_arn  = aws_iam_role.eks_cluster_role.arn
+  name     = "${var.environment_name}-eks-cluster"
+  role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
     subnet_ids              = var.eks_subnets
@@ -26,9 +26,9 @@ resource "aws_eks_cluster" "eks_cluster" {
 
 // route 53
 resource "aws_route53_record" "utopia_record" {
-  zone_id     = var.r53_zone_id
-  name        = var.record_name
-  type        = "CNAME"
-  ttl         = "60"
-  records     = ["placeholder.text"]
+  zone_id = var.r53_zone_id
+  name    = var.record_name
+  type    = "CNAME"
+  ttl     = "60"
+  records = ["placeholder.text"]
 }

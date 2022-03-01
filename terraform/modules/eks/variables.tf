@@ -15,32 +15,32 @@ variable "deploy_mode" {
 ##############
 
 variable "eks_subnets" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 
 variable "eks_public_subnets" {
-  type = list(string)
+  type    = list(string)
   default = []
 }
 
 variable "vpc_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "eks_sg_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "r53_zone_id" {
-  type = string
+  type    = string
   default = ""
 }
 
 variable "record_name" {
-  type = string
+  type    = string
   default = ""
 }
 
@@ -49,6 +49,6 @@ variable "record_name" {
 ##############
 
 variable "node_instance_type" {
-  type = string
+  type    = string
   default = "t3.medium"
 }

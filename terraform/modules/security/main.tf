@@ -4,21 +4,21 @@
 ################
 
 resource "aws_security_group" "bastion_security" {
-  name = "${var.environment_name}-bastion-security"
+  name        = "${var.environment_name}-bastion-security"
   description = "Allow only SSH"
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
 
   ingress {
-    from_port = 22
-    to_port = 22
-    protocol = "tcp"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
-    from_port = 0
-    to_port = 0
-    protocol = "-1"
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -32,14 +32,21 @@ resource "aws_security_group" "bastion_security" {
 ################
 
 resource "aws_security_group" "db_security" {
-  name          = "${var.environment_name}-rds-security"
-  description   = "Allow all SSH and SQL traffic"
-  vpc_id        = var.vpc_id
+  name        = "${var.environment_name}-rds-security"
+  description = "Allow all SSH and SQL traffic"
+  vpc_id      = var.vpc_id
 
   ingress {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
 
@@ -53,9 +60,9 @@ resource "aws_security_group" "db_security" {
 ###############
 
 resource "aws_security_group" "ecs_api_access" {
-  name = "${var.environment_name}-ecs-allow-traffic"
+  name        = "${var.environment_name}-ecs-allow-traffic"
   description = "Open HTTP and HTTPS connections, plus APIs"
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
 
   # SSH
   ingress {
@@ -91,10 +98,10 @@ resource "aws_security_group" "ecs_api_access" {
 
   # outgoing coverage
   egress {
-    from_port     = 0
-    to_port       = 0
-    protocol      = "-1"
-    cidr_blocks   = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
@@ -107,9 +114,9 @@ resource "aws_security_group" "ecs_api_access" {
 ###############
 
 resource "aws_security_group" "eks_api_access" {
-  name = "${var.environment_name}-eks-allow-traffic"
+  name        = "${var.environment_name}-eks-allow-traffic"
   description = "Open HTTP and outgoing"
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
 
   # HTTP
   ingress {
@@ -119,12 +126,20 @@ resource "aws_security_group" "eks_api_access" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # SSH
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # outgoing coverage
   egress {
-    from_port     = 0
-    to_port       = 0
-    protocol      = "-1"
-    cidr_blocks   = ["0.0.0.0/0"]
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   tags = {
