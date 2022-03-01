@@ -8,6 +8,7 @@ resource "aws_security_group" "bastion_security" {
   description = "Allow only SSH"
   vpc_id      = var.vpc_id
 
+  # Public Bastion SSH Access
   ingress {
     from_port   = 22
     to_port     = 22
@@ -15,6 +16,7 @@ resource "aws_security_group" "bastion_security" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
+  # Bastion Internet Access
   egress {
     from_port   = 0
     to_port     = 0
@@ -36,11 +38,12 @@ resource "aws_security_group" "db_security" {
   description = "Allow all SSH and SQL traffic"
   vpc_id      = var.vpc_id
 
+  # DB Access from Subnets
   ingress {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = concat(var.public_cidrs, var.private_cidrs)
   }
 
   tags = {
@@ -57,39 +60,23 @@ resource "aws_security_group" "ecs_api_access" {
   description = "Open HTTP and HTTPS connections, plus APIs"
   vpc_id      = var.vpc_id
 
-  # SSH
+  # General API ports from LB
   ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # HTTP
-  ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  # General API ports
-  ingress {
-    from_port   = 8080
+    from_port   = 8081
     to_port     = 8083
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.public_cidrs
   }
 
-  # Auth API port
+  # Auth API port from LB
   ingress {
     from_port   = 8443
     to_port     = 8443
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.public_cidrs
   }
 
-  # outgoing coverage
+  # API Internet Access
   egress {
     from_port   = 0
     to_port     = 0
@@ -111,7 +98,7 @@ resource "aws_security_group" "eks_api_access" {
   description = "Open HTTP and outgoing"
   vpc_id      = var.vpc_id
 
-  # HTTP
+  # HTTP from all sources
   ingress {
     from_port   = 80
     to_port     = 80
@@ -119,7 +106,7 @@ resource "aws_security_group" "eks_api_access" {
     cidr_blocks = ["0.0.0.0/0"]
   }
 
-  # outgoing coverage
+  # API Internet Access
   egress {
     from_port   = 0
     to_port     = 0

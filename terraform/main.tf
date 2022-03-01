@@ -10,6 +10,12 @@ resource "aws_key_pair" "bastion_key" {
 locals {
   bastion_ami_tag  = "ami-00f7e5c52c0f43726"
   environment_name = "AM-Utopia-TF-${var.DEPLOY_MODE}"
+
+  vpc_cidr                  = "10.0.0.0/16"
+  vpc_subnet_1_private_cidr = "10.0.1.0/24"
+  vpc_subnet_2_private_cidr = "10.0.2.0/24"
+  vpc_subnet_1_public_cidr  = "10.0.3.0/24"
+  vpc_subnet_2_public_cidr  = "10.0.4.0/24"
 }
 
 ###########
@@ -23,11 +29,11 @@ module "network" {
   environment_name = local.environment_name
 
   # networking
-  vpc_cidr                  = "10.0.0.0/16"
-  vpc_subnet_1_private_cidr = "10.0.1.0/24"
-  vpc_subnet_2_private_cidr = "10.0.2.0/24"
-  vpc_subnet_1_public_cidr  = "10.0.3.0/24"
-  vpc_subnet_2_public_cidr  = "10.0.4.0/24"
+  vpc_cidr                  = local.vpc_cidr
+  vpc_subnet_1_private_cidr = local.vpc_subnet_1_private_cidr
+  vpc_subnet_2_private_cidr = local.vpc_subnet_2_private_cidr
+  vpc_subnet_1_public_cidr  = local.vpc_subnet_1_public_cidr
+  vpc_subnet_2_public_cidr  = local.vpc_subnet_2_public_cidr
   route_cidr                = "0.0.0.0/0"
   zone_1                    = "${var.REGION_ID}${var.AZ_1}"
   zone_2                    = "${var.REGION_ID}${var.AZ_2}"
@@ -41,7 +47,9 @@ module "security" {
   environment_name = local.environment_name
 
   # networking info
-  vpc_id = module.network.utopia_vpc
+  vpc_id        = module.network.utopia_vpc
+  public_cidrs  = [local.vpc_subnet_1_public_cidr, local.vpc_subnet_2_public_cidr]
+  private_cidrs = [local.vpc_subnet_1_private_cidr, local.vpc_subnet_2_private_cidr]
 }
 
 
