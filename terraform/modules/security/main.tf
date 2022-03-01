@@ -5,7 +5,7 @@
 
 resource "aws_security_group" "bastion_security" {
   name        = "${var.environment_name}-bastion-security"
-  description = "Allow only SSH"
+  description = "Allow SSH globally"
   vpc_id      = var.vpc_id
 
   # Public Bastion SSH Access
@@ -35,7 +35,7 @@ resource "aws_security_group" "bastion_security" {
 
 resource "aws_security_group" "db_security" {
   name        = "${var.environment_name}-rds-security"
-  description = "Allow all SSH and SQL traffic"
+  description = "Allow SQL specific traffic from VPC subnets"
   vpc_id      = var.vpc_id
 
   # DB Access from Subnets
@@ -57,7 +57,7 @@ resource "aws_security_group" "db_security" {
 
 resource "aws_security_group" "ecs_api_access" {
   name        = "${var.environment_name}-ecs-allow-traffic"
-  description = "Open HTTP and HTTPS connections, plus APIs"
+  description = "Open API Ports to NWB"
   vpc_id      = var.vpc_id
 
   # General API ports from LB
@@ -95,7 +95,7 @@ resource "aws_security_group" "ecs_api_access" {
 
 resource "aws_security_group" "eks_api_access" {
   name        = "${var.environment_name}-eks-allow-traffic"
-  description = "Open HTTP and outgoing"
+  description = "Open HTTP to Ingress LoadBalancer and allow Egress"
   vpc_id      = var.vpc_id
 
   # HTTP from all sources
@@ -103,7 +103,7 @@ resource "aws_security_group" "eks_api_access" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = var.public_cidrs
   }
 
   # API Internet Access
