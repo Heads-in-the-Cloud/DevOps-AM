@@ -142,10 +142,10 @@
             AWS_ACCOUNT_ID: "{{AWS_ACCOUNT_ID}}"
             AWS_REGION_ID: "{{AWS_REGION_ID}}"
 
-            FLIGHTS_API_LATEST: "{{FLIGHTS_API_LATEST}}"
-            BOOKINGS_API_LATEST: "{{BOOKINGS_API_LATEST}}"
-            USERS_API_LATEST: "{{USERS_API_LATEST}}"
-            AUTH_API_LATEST: "{{AUTH_API_LATEST}}"
+            FLIGHTS_API_LATEST: "{{utopia_secret.msg.FLIGHTS_API_LATEST}}"
+            BOOKINGS_API_LATEST: "{{utopia_secret.msg.BOOKINGS_API_LATEST}}"
+            USERS_API_LATEST: "{{utopia_secret.msg.USERS_API_LATEST}}"
+            AUTH_API_LATEST: "{{utopia_secret.msg.AUTH_API_LATEST}}"
       tags: ['never', 'eks-init', 'eks-update']
 
       ############
