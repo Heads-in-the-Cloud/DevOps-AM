@@ -75,13 +75,6 @@
             src: "{{ eks_location }}/eks-setup/default-server-secret.yaml"
             namespace: "{{ eks_ingress_namespace }}"
 
-        # Create resources watched by nginx
-        - name: Configs setup
-          shell: |
-            kubectl apply -f . --namespace {{ eks_ingress_namespace }}
-          args:
-            chdir: "{{ eks_location }}/nginx-custom-resource-definitions"
-
         # Create custom Ingress resources
         - name: Ingress Control setup
           shell: |
