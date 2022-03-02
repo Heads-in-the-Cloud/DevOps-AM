@@ -1,3 +1,16 @@
+
+##################################
+# ConfigMap for NGINX Deployment #
+##################################
+#
+#   Config items for the nginx-ingress deployment,
+#   allows Ingress objects to call the Ingress
+#   Controller pod.
+#
+#   Value is passed to the Ingress Controller
+#   deployment in its definition.
+#
+
 kind: ConfigMap
 apiVersion: v1
 metadata:

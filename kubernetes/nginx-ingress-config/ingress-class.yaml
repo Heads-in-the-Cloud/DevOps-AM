@@ -1,3 +1,14 @@
+
+############################
+# Ingress Class definition #
+############################
+#
+#   Required in k8s 1.18+; class definition of Ingress
+#   Class, to be used by Ingress Controller.
+#
+#   Attached via?
+#
+
 apiVersion: networking.k8s.io/v1
 kind: IngressClass
 metadata:

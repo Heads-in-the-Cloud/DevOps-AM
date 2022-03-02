@@ -1,3 +1,13 @@
+
+#######################################
+# NGINX Ingress Controller Deployment #
+#######################################
+#
+#   Controls all Ingress actions. Requires a
+#   ConfigMap with additional parameters, and
+#   a TLS keypair provided as a Secret.
+#
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -54,6 +64,7 @@ spec:
           - -enable-custom-resources=false
           - -nginx-configmaps=$(POD_NAMESPACE)/nginx-config
           - -default-server-tls-secret=$(POD_NAMESPACE)/default-server-secret
+
          #- -v=3 # Enables extensive logging. Useful for troubleshooting.
          #- -report-ingress-status
          #- -external-service=nginx-ingress
