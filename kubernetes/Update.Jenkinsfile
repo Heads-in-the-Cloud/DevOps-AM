@@ -49,10 +49,7 @@ pipeline {
         stage('Check EKS Exists') {
             steps {
                 script {
-                    // Mark build as unstable if EKS does not exist
-                    catchError(buildResult: 'FAILURE', stageResult: 'UNSTABLE') {
-                        EKSExists()
-                    }
+                    EKSExists()
                 }
             }
         }
