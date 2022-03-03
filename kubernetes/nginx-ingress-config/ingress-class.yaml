@@ -6,7 +6,9 @@
 #   Required in k8s 1.18+; class definition of Ingress
 #   Class, to be used by Ingress Controller.
 #
-#   Attached via?
+#   Attached to any Ingress Controller by specifying
+#   IngressClassName. This is also the default Ingress
+#   Class.
 #
 
 apiVersion: networking.k8s.io/v1
