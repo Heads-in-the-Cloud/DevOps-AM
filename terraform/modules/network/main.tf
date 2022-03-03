@@ -77,8 +77,29 @@ resource "aws_internet_gateway" "vpc_gateway" {
 }
 
 ###############
-# Route Table #
+# Elastic IPs #
 ###############
+resource "aws_eip" "nat_ip_1" {
+  vpc = true
+}
+resource "aws_eip" "nat_ip_2" {
+  vpc = true
+}
+
+################
+# NAT Gateways #
+################
+resource "aws_nat_gateway" "nat_gateway_1" {
+  allocation_id = aws_eip.nat_ip_1.id
+  subnet_id = aws_subnet.private_subnet_1.id
+  tags = {
+    Name = "${var.environment_name}-nat-gateway-1"
+  }
+}
+
+########################
+# Route Table (Public) #
+########################
 resource "aws_route_table" "vpc_routetable" {
   vpc_id = aws_vpc.am-vpc-db.id
   route {
@@ -96,4 +117,25 @@ resource "aws_route_table_association" "route-subnet1" {
 resource "aws_route_table_association" "route-subnet2" {
   subnet_id      = aws_subnet.public_subnet_2.id
   route_table_id = aws_route_table.vpc_routetable.id
+}
+
+#########################
+# Route Table (Private) #
+#########################
+resource "aws_route_table" "vpc_routetable_private" {
+  vpc_id = aws_vpc.am-vpc-db.id
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.nat_gateway_1.id
+  }
+}
+
+resource "aws_route_table_association" "nat_private_1" {
+  subnet_id = aws_subnet.private_subnet_1.id
+  route_table_id = aws_route_table.vpc_routetable_private.id
+}
+
+resource "aws_route_table_association" "nat_private_2" {
+  subnet_id = aws_subnet.private_subnet_2.id
+  route_table_id = aws_route_table.vpc_routetable_private.id
 }
