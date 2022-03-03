@@ -5,6 +5,7 @@
 resource "aws_vpc" "am-vpc-db" {
   cidr_block           = var.vpc_cidr
   enable_dns_hostnames = true
+  enable_dns_support   = true
   tags = {
     Name = "${var.environment_name}-vpc"
   }
@@ -91,7 +92,7 @@ resource "aws_eip" "nat_ip_2" {
 ################
 resource "aws_nat_gateway" "nat_gateway_1" {
   allocation_id = aws_eip.nat_ip_1.id
-  subnet_id = aws_subnet.private_subnet_1.id
+  subnet_id = aws_subnet.public_subnet_1.id
   tags = {
     Name = "${var.environment_name}-nat-gateway-1"
   }
