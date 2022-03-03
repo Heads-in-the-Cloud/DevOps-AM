@@ -41,9 +41,7 @@
     #####################
     - name: Destroy API Resources
       shell: |
-        kubectl delete -f . -n {{eks_api_namespace}}
-      args:
-        chdir: "{{ eks_location }}/api-deployments"
+        kubectl delete all -n {{eks_api_namespace}} -l group=utopia
 
     - name: Destroy Utopia Secret
       k8s:
