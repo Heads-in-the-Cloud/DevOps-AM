@@ -104,7 +104,7 @@ module "eks" {
   environment_name = local.environment_name
 
   # networking
-  eks_public_subnets = module.network.public_subnets
+  eks_node_subnets = module.network.private_subnets
   eks_subnets        = concat(module.network.public_subnets, module.network.private_subnets)
   vpc_id             = module.network.utopia_vpc
   eks_sg_id          = module.security.SG_EKS
