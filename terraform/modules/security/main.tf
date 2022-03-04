@@ -118,3 +118,33 @@ resource "aws_security_group" "eks_api_access" {
     Name = "${var.environment_name}-eks-allow-traffic"
   }
 }
+
+####################
+# ECS LoadBalancer #
+####################
+
+resource "aws_security_group" "ecs_loadbalancer_access" {
+  name        = "${var.environment_name}-ecs-lb-all-traffic"
+  description = "Allow Global HTTP Access"
+  vpc_id      = var.vpc_id
+
+  # HTTP from all sources
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # API Internet Access
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "${var.environment_name}-ecs-lb-all-traffic"
+  }
+}

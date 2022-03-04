@@ -16,7 +16,8 @@ services:
     x-aws-max_percent: 100
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com/am-flights-api
     ports:
-      - 8081:8081
+      - target: 8081
+        x-aws-protocol: http
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
@@ -35,6 +36,7 @@ services:
         reservations:
           cpus: "$ECS_CPU_REQUEST"
           memory: "$ECS_MEM_REQUEST"
+
 
   #########
   # USERS #
@@ -42,7 +44,8 @@ services:
   users:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com/am-users-api
     ports:
-      - 8083:8083
+      - target: 8083
+        x-aws-protocol: http
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
@@ -62,13 +65,15 @@ services:
           cpus: "$ECS_CPU_REQUEST"
           memory: "$ECS_MEM_REQUEST"
 
+
   ############
   # BOOKINGS #
   ############
   bookings:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com/am-bookings-api
     ports:
-      - 8082:8082
+      - target: 8082
+        x-aws-protocol: http
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
@@ -88,13 +93,15 @@ services:
           cpus: "$ECS_CPU_REQUEST"
           memory: "$ECS_MEM_REQUEST"
 
+
   ########
   # AUTH #
   ########
   auth:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com/am-auth-api
     ports:
-      - 8443:8443
+      - target: 8443
+        x-aws-protocol: http
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
@@ -114,39 +121,195 @@ services:
           cpus: "$ECS_CPU_REQUEST"
           memory: "$ECS_MEM_REQUEST"
 
-# Subnet Override
+
+
+# Cloudformation Override
 x-aws-cloudformation:
   Resources:
-    flights:
+
+    # Services should use Private Subnets
+    FlightsService:
       Properties:
         NetworkConfiguration:
           AwsvpcConfiguration:
             Subnets:
               - ${PRIVATE_SUBNET_1}
               - ${PRIVATE_SUBNET_2}
-    users:
+    UsersService:
       Properties:
         NetworkConfiguration:
           AwsvpcConfiguration:
             Subnets:
               - ${PRIVATE_SUBNET_1}
               - ${PRIVATE_SUBNET_2}
-    bookings:
+    BookingsService:
       Properties:
         NetworkConfiguration:
           AwsvpcConfiguration:
             Subnets:
               - ${PRIVATE_SUBNET_1}
               - ${PRIVATE_SUBNET_2}
-    auth:
+    AuthService:
       Properties:
         NetworkConfiguration:
           AwsvpcConfiguration:
             Subnets:
               - ${PRIVATE_SUBNET_1}
               - ${PRIVATE_SUBNET_2}
-    LoadBalancer:
+
+
+    # Target Groups should use adapted healthcheck paths
+    Flights8081TargetGroup:
       Properties:
-        Subnets:
-          - ${PUBLIC_SUBNET_1}
-          - ${PUBLIC_SUBNET_2}
+        HealthCheckPath: /api/v1/flights/ready
+    Bookings8082TargetGroup:
+      Properties:
+        HealthCheckPath: /api/v1/bookings/ready
+    Users8083TargetGroup:
+      Properties:
+        HealthCheckPath: /api/v1/users/ready
+    Auth8443TargetGroup:
+      Properties:
+        HealthCheckPath: /api/v1/login/ready
+
+
+    # Custom Listener for HTTP on port 80
+    UtopiaListener:
+      Type: AWS::ElasticLoadBalancingV2::Listener
+      Properties:
+        DefaultActions:
+          - Type: forward
+            ForwardConfig:
+              TargetGroups:
+                - TargetGroupArn:
+                    Ref: Auth8443TargetGroup
+        Port: 80
+        Protocol: HTTP
+        LoadBalancerArn: ${AWS_ALB_ID}
+
+
+    # Listeners need custom rules for paths
+    Flights8081ListenerRule1:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      DependsOn:
+        - UtopiaListener
+        - Flights8081TargetGroup
+      Properties:
+        Actions:
+          - Type: forward
+            TargetGroupArn:
+              Ref: Flights8081TargetGroup
+        Conditions:
+          - Field: path-pattern
+            PathPatternConfig:
+              Values:
+                - "/api/v1/flights"
+                - "/api/v1/flights/*"
+                - "/api/v1/airports"
+                - "/api/v1/airports/*"
+                - "/api/v1/routes"
+        ListenerArn:
+          Ref: UtopiaListener
+        Priority: 11
+    Flights8081ListenerRule2:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      DependsOn:
+        - UtopiaListener
+        - Flights8081TargetGroup
+      Properties:
+        Actions:
+          - Type: forward
+            TargetGroupArn:
+              Ref: Flights8081TargetGroup
+        Conditions:
+          - Field: path-pattern
+            PathPatternConfig:
+              Values:
+                - "/api/v1/routes/*"
+                - "/api/v1/airplanes"
+                - "/api/v1/airplanes/*"
+                - "/api/v1/airplaneTypes"
+                - "/api/v1/airplaneTypes/*"
+        ListenerArn:
+          Ref: UtopiaListener
+        Priority: 10
+    Bookings8082ListenerRule1:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      DependsOn:
+        - UtopiaListener
+        - Bookings8082TargetGroup
+      Properties:
+        Actions:
+          - Type: forward
+            TargetGroupArn:
+              Ref: Bookings8082TargetGroup
+        Conditions:
+          - Field: path-pattern
+            PathPatternConfig:
+              Values:
+                - "/api/v1/bookings"
+                - "/api/v1/bookings/*"
+        ListenerArn:
+          Ref: UtopiaListener
+        Priority: 12
+    Bookings8082ListenerRule2:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      DependsOn:
+        - UtopiaListener
+        - Bookings8082TargetGroup
+      Properties:
+        Actions:
+          - Type: forward
+            TargetGroupArn:
+              Ref: Bookings8082TargetGroup
+        Conditions:
+          - Field: path-pattern
+            PathPatternConfig:
+              Values:
+                - "/api/v1/payments"
+                - "/api/v1/payments/*"
+                - "/api/v1/passengers"
+                - "/api/v1/passengers/*"
+        ListenerArn:
+          Ref: UtopiaListener
+        Priority: 13
+    Users8083ListenerRule:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      DependsOn:
+        - UtopiaListener
+        - Users8083TargetGroup
+      Properties:
+        Actions:
+          - Type: forward
+            TargetGroupArn:
+              Ref: Users8083TargetGroup
+        Conditions:
+          - Field: path-pattern
+            PathPatternConfig:
+              Values:
+                - "/api/v1/users"
+                - "/api/v1/users/*"
+                - "/api/v1/roles"
+                - "/api/v1/roles/*"
+        ListenerArn:
+          Ref: UtopiaListener
+        Priority: 7
+    Auth8443ListenerRule:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      DependsOn:
+        - UtopiaListener
+        - Auth8443TargetGroup
+      Properties:
+        Actions:
+          - Type: forward
+            TargetGroupArn:
+              Ref: Auth8443TargetGroup
+        Conditions:
+          - Field: path-pattern
+            PathPatternConfig:
+              Values:
+                - "/api/v1/login/ready"
+                - "/login"
+        ListenerArn:
+          Ref: UtopiaListener
+        Priority: 6
