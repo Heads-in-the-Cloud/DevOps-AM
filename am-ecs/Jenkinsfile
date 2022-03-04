@@ -27,6 +27,7 @@ pipeline {
             steps {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
                 script {
+                    // Get env from Secrets
                     secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${SECRET_ID} | jq -Mr \'.SecretString\'').trim()
                     def jsonObj = readJSON text: secret
                     env.AWS_RDS_USERNAME    = jsonObj.DB_USERNAME
@@ -35,6 +36,22 @@ pipeline {
                     env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
                     env.AWS_ALB_ID          = jsonObj.AWS_ALB_ID
                     env.AWS_ECS_SG          = jsonObj.AWS_ECS_SG
+
+                    // Get env from aws-cli
+                    def subnets_private = sh(returnStdout: true, script: """
+                        aws ec2 describe-subnets --filters Name=vpc-id,Values=${AWS_VPC_ID} \
+                        --query 'Subnets[?MapPublicIpOnLaunch==`false`].SubnetId' \
+                        | grep subnet | sed 's/[," ]//g'
+                    """)
+                    def subnets_public = sh(returnStdout: true, script: """
+                        aws ec2 describe-subnets --filters Name=vpc-id,Values=${AWS_VPC_ID} \
+                        --query 'Subnets[?MapPublicIpOnLaunch==`true`].SubnetId' \
+                        | grep subnet | sed 's/[," ]//g'
+                    """)
+                    env.PRIVATE_SUBNET_1 = subnets_private[0]
+                    env.PRIVATE_SUBNET_2 = subnets_private[1]
+                    env.PUBLIC_SUBNET_1 = subnets_public[0]
+                    env.PUBLIC_SUBNET_2 = subnets_public[1]
                 }
             }
         }
@@ -43,8 +60,8 @@ pipeline {
             steps {
                 echo 'Inserting certain Environment Variables into docker-compose'
                 dir("am-ecs") {
-                    sh '''
-                        envsubst \' \
+                    sh """
+                        envsubst ' \
                         $ECS_MEM_LIMIT \
                         $ECS_MEM_REQUEST \
                         $ECS_CPU_LIMIT \
@@ -57,8 +74,12 @@ pipeline {
                         $DB_POOL_MIN \
                         $DB_POOL_MAX \
                         $AWS_ECS_SG \
-                        \' < docker-compose-template.yml > docker-compose.yml
-                    '''
+                        $PUBLIC_SUBNET_1 \
+                        $PUBLIC_SUBNET_2 \
+                        $PRIVATE_SUBNET_1 \
+                        $PRIVATE_SUBNET_2 \
+                        ' < docker-compose-template.yml > docker-compose.yml
+                    """
                 }
             }
         }
