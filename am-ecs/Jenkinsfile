@@ -42,12 +42,12 @@ pipeline {
                         aws ec2 describe-subnets --filters Name=vpc-id,Values=${AWS_VPC_ID} \
                         --query 'Subnets[?MapPublicIpOnLaunch==`false`].SubnetId' \
                         | grep subnet | sed 's/[," ]//g'
-                    """)
+                    """).readLines()
                     def subnets_public = sh(returnStdout: true, script: """
                         aws ec2 describe-subnets --filters Name=vpc-id,Values=${AWS_VPC_ID} \
                         --query 'Subnets[?MapPublicIpOnLaunch==`true`].SubnetId' \
                         | grep subnet | sed 's/[," ]//g'
-                    """)
+                    """).readLines()
                     env.PRIVATE_SUBNET_1 = subnets_private[0]
                     env.PRIVATE_SUBNET_2 = subnets_private[1]
                     env.PUBLIC_SUBNET_1 = subnets_public[0]
