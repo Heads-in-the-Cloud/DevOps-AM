@@ -60,8 +60,8 @@ pipeline {
             steps {
                 echo 'Inserting certain Environment Variables into docker-compose'
                 dir("am-ecs") {
-                    sh """
-                        envsubst ' \
+                    sh '''
+                        envsubst \' \
                         $ECS_MEM_LIMIT \
                         $ECS_MEM_REQUEST \
                         $ECS_CPU_LIMIT \
@@ -78,8 +78,8 @@ pipeline {
                         $PUBLIC_SUBNET_2 \
                         $PRIVATE_SUBNET_1 \
                         $PRIVATE_SUBNET_2 \
-                        ' < docker-compose-template.yml > docker-compose.yml
-                    """
+                        \' < docker-compose-template.yml > docker-compose.yml
+                    '''
                 }
             }
         }
