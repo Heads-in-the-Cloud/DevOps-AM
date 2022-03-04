@@ -116,28 +116,28 @@ services:
 # Subnet Override
 x-aws-cloudformation:
   Resources:
-    flights:
+    FlightsService:
       Properties:
         NetworkConfiguration:
           AwsvpcConfiguration:
             Subnets:
               - ${PRIVATE_SUBNET_1}
               - ${PRIVATE_SUBNET_2}
-    users:
+    UsersService:
       Properties:
         NetworkConfiguration:
           AwsvpcConfiguration:
             Subnets:
               - ${PRIVATE_SUBNET_1}
               - ${PRIVATE_SUBNET_2}
-    bookings:
+    BookingsService:
       Properties:
         NetworkConfiguration:
           AwsvpcConfiguration:
             Subnets:
               - ${PRIVATE_SUBNET_1}
               - ${PRIVATE_SUBNET_2}
-    auth:
+    AuthService:
       Properties:
         NetworkConfiguration:
           AwsvpcConfiguration:
