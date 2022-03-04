@@ -1,4 +1,6 @@
 version: "3.9"
+x-aws-vpc: "${$AWS_VPC_ID}"
+x-aws-loadbalancer: "${AWS_ALB_ID}"
 
 networks:
   back_tier:
