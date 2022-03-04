@@ -113,3 +113,40 @@ services:
         reservations:
           cpus: "$ECS_CPU_REQUEST"
           memory: "$ECS_MEM_REQUEST"
+
+# Subnet Override
+x-aws-cloudformation:
+  Resources:
+    flights:
+      Properties:
+        NetworkConfiguration:
+          AwsvpcConfiguration:
+            Subnets:
+              - ${PRIVATE_SUBNET_1}
+              - ${PRIVATE_SUBNET_2}
+    users:
+      Properties:
+        NetworkConfiguration:
+          AwsvpcConfiguration:
+            Subnets:
+              - ${PRIVATE_SUBNET_1}
+              - ${PRIVATE_SUBNET_2}
+    bookings:
+      Properties:
+        NetworkConfiguration:
+          AwsvpcConfiguration:
+            Subnets:
+              - ${PRIVATE_SUBNET_1}
+              - ${PRIVATE_SUBNET_2}
+    auth:
+      Properties:
+        NetworkConfiguration:
+          AwsvpcConfiguration:
+            Subnets:
+              - ${PRIVATE_SUBNET_1}
+              - ${PRIVATE_SUBNET_2}
+    LoadBalancer:
+      Properties:
+        Subnets:
+          - ${PUBLIC_SUBNET_1}
+          - ${PUBLIC_SUBNET_2}
