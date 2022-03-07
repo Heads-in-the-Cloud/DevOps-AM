@@ -5,9 +5,9 @@
 
 // load balancing
 resource "aws_lb" "utopia_nwb" {
-  name               = "${var.environment_name}-alb-utopia"
+  name               = "${var.environment_name}-nwb-utopia"
   internal           = false
-  load_balancer_type = "application"
+  load_balancer_type = "network"
   subnets            = var.service_subnets
 }
 
