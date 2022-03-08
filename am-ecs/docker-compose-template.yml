@@ -37,6 +37,7 @@ services:
           cpus: "$ECS_CPU_REQUEST"
           memory: "$ECS_MEM_REQUEST"
 
+
   #########
   # USERS #
   #########
@@ -63,6 +64,7 @@ services:
         reservations:
           cpus: "$ECS_CPU_REQUEST"
           memory: "$ECS_MEM_REQUEST"
+
 
   ############
   # BOOKINGS #
@@ -91,6 +93,7 @@ services:
           cpus: "$ECS_CPU_REQUEST"
           memory: "$ECS_MEM_REQUEST"
 
+
   ########
   # AUTH #
   ########
@@ -118,11 +121,13 @@ services:
           cpus: "$ECS_CPU_REQUEST"
           memory: "$ECS_MEM_REQUEST"
 
+
+
 # Cloudformation Override
 x-aws-cloudformation:
   Resources:
 
-    # Services use Private Subnets
+    # Services should use Private Subnets
     FlightsService:
       Properties:
         NetworkConfiguration:
@@ -152,7 +157,7 @@ x-aws-cloudformation:
               - ${PRIVATE_SUBNET_1}
               - ${PRIVATE_SUBNET_2}
 
-    # Target Groups use adapted healthcheck paths
+    # Target Groups should use adapted healthcheck paths
     Flights8081TargetGroup:
       Properties:
         HealthCheckPath: /api/v1/flights/ready
@@ -165,3 +170,75 @@ x-aws-cloudformation:
     Auth8443TargetGroup:
       Properties:
         HealthCheckPath: /api/v1/login/ready
+
+    # Listeners need custom rules for paths
+    Flights8081ListenerRule:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      Properties:
+        Actions:
+          - forward
+        Conditions:
+          - Field: path-pattern
+            Values:
+              - /api/v1/flights/*
+        ListenerArn: !Ref Flights8081Listener
+        Priority: 10
+    Bookings8082ListenerRule:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      Properties:
+        Actions:
+          - forward
+        Conditions:
+          - Field: path-pattern
+            Values:
+              - /api/v1/bookings/*
+        ListenerArn: !Ref Bookings8082Listener
+        Priority: 10
+    Users8083ListenerRule:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      Properties:
+        Actions:
+          - forward
+        Conditions:
+          - Field: path-pattern
+            Values:
+              - /api/v1/users/*
+        ListenerArn: !Ref Users8083Listener
+        Priority: 10
+    Auth8443ListenerRule:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      Properties:
+        Actions:
+          - forward
+        Conditions:
+          - Field: path-pattern
+            Values:
+              - /api/v1/login/*
+        ListenerArn: !Ref Auth8443Listener
+        Priority: 11
+    Login8443ListenerRule:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      Properties:
+        Actions:
+          - forward
+        Conditions:
+          - Field: path-pattern
+            Values:
+              - /login
+        ListenerArn: !Ref Auth8443Listener
+        Priority: 10
+
+
+    # Listeners should route based only on paths to HTTP port 80
+    Flights8081Listener:
+      Properties:
+        Port: 80
+    Bookings8082Listener:
+      Properties:
+        Port: 80
+    Users8083Listener:
+      Properties:
+        Port: 80
+    Auth8443Listener:
+      Properties:
+        Port: 80
