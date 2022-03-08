@@ -207,6 +207,12 @@ x-aws-cloudformation:
                 - "/api/v1/flights/*"
                 - "/api/v1/airports"
                 - "/api/v1/airports/*"
+                - "/api/v1/routes"
+                - "/api/v1/routes/*"
+                - "/api/v1/airplanes"
+                - "/api/v1/airplanes/*"
+                - "/api/v1/airplaneTypes"
+                - "/api/v1/airplaneTypes/*"
         ListenerArn:
           Ref: UtopiaListener
         Priority: 9
