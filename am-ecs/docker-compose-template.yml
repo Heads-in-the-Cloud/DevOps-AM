@@ -118,9 +118,11 @@ services:
           cpus: "$ECS_CPU_REQUEST"
           memory: "$ECS_MEM_REQUEST"
 
-# Subnet Override
+# Cloudformation Override
 x-aws-cloudformation:
   Resources:
+
+    # Services use Private Subnets
     FlightsService:
       Properties:
         NetworkConfiguration:
@@ -149,3 +151,17 @@ x-aws-cloudformation:
             Subnets:
               - ${PRIVATE_SUBNET_1}
               - ${PRIVATE_SUBNET_2}
+
+    # Target Groups use adapted healthcheck paths
+    Flights8081TargetGroup:
+      Properties:
+        HealthCheckPath: /api/v1/flights/ready
+    Bookings8082TargetGroup:
+      Properties:
+        HealthCheckPath: /api/v1/bookings/ready
+    Users8083TargetGroup:
+      Properties:
+        HealthCheckPath: /api/v1/users/ready
+    Auth8443TargetGroup:
+      Properties:
+        HealthCheckPath: /api/v1/login/ready
