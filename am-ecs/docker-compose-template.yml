@@ -183,7 +183,7 @@ x-aws-cloudformation:
                     Ref: Auth8443TargetGroup
         Port: 80
         Protocol: HTTP
-        LoadBalancerArn: !Ref ${AWS_ALB_ID}
+        LoadBalancerArn: ${AWS_ALB_ID}
 
     # Listeners need custom rules for paths
     Flights8081ListenerRule:
