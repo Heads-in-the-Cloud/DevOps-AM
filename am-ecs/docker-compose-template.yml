@@ -171,6 +171,20 @@ x-aws-cloudformation:
       Properties:
         HealthCheckPath: /api/v1/login/ready
 
+    # Custom Listener for HTTP on port 80
+    UtopiaListener:
+      Type: AWS::ElasticLoadBalancingV2::Listener
+      Properties:
+        DefaultActions:
+          - Type: forward
+            ForwardConfig:
+              TargetGroups:
+                - TargetGroupArn:
+                    Ref: Auth8443TargetGroup
+        Port: 80
+        Protocol: HTTP
+        LoadBalancerArn: !Ref ${AWS_ALB_ID}
+
     # Listeners need custom rules for paths
     Flights8081ListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
@@ -252,18 +266,3 @@ x-aws-cloudformation:
                 - "/login"
         ListenerArn: !Ref UtopiaListener
         Priority: 5
-
-
-    # Custom Listener for HTTP on port 80
-    UtopiaListener:
-      Type: AWS::ElasticLoadBalancingV2::Listener
-      Properties:
-        DefaultActions:
-        - Type: forward
-          ForwardConfig:
-            TargetGroups:
-            - TargetGroupArn:
-                Ref: Auth8443TargetGroup
-        Port: 80
-        Protocol: HTTP
-        LoadBalancerArn: !Ref ${AWS_ALB_ID}
