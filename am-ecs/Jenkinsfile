@@ -85,7 +85,7 @@ pipeline {
             }
         }
 
-        stage('Leave conversion file') {
+        stage('Conversion Log') {
             steps {
                 dir("am-ecs") {
                     sh 'mkdir -p cloudformation-templates'

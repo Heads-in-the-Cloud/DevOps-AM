@@ -1,5 +1,4 @@
 version: "3.9"
-x-aws-protocol: "http"
 x-aws-vpc: "${AWS_VPC_ID}"
 x-aws-loadbalancer: "${AWS_ALB_ID}"
 
@@ -17,7 +16,8 @@ services:
     x-aws-max_percent: 100
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com/am-flights-api
     ports:
-      - 8081:8081
+      - target: 8081
+        x-aws-protocol: http
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
@@ -43,7 +43,8 @@ services:
   users:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com/am-users-api
     ports:
-      - 8083:8083
+      - target: 8083
+        x-aws-protocol: http
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
@@ -69,7 +70,8 @@ services:
   bookings:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com/am-bookings-api
     ports:
-      - 8082:8082
+      - target: 8082
+        x-aws-protocol: http
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
@@ -95,7 +97,8 @@ services:
   auth:
     image: ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com/am-auth-api
     ports:
-      - 8443:8443
+      - target: 8443
+        x-aws-protocol: http
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
