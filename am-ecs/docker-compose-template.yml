@@ -212,8 +212,7 @@ x-aws-cloudformation:
       Properties:
         Actions:
           - Type: forward
-            TargetGroupArn:
-              Ref: Users8083TargetGroup
+            TargetGroupArn: !Ref Users8083TargetGroup
         Conditions:
           - Field: path-pattern
             PathPatternConfig:
