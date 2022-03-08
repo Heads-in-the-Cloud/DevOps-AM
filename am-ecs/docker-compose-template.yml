@@ -234,6 +234,8 @@ x-aws-cloudformation:
                 - "/api/v1/bookings/*"
                 - "/api/v1/payments"
                 - "/api/v1/payments/*"
+                - "/api/v1/passengers"
+                - "/api/v1/passengers/*"
         ListenerArn:
           Ref: UtopiaListener
         Priority: 8
