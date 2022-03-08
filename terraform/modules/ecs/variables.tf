@@ -30,3 +30,7 @@ variable "environment_name" {
 variable "deploy_mode" {
   type = string
 }
+
+variable "loadbalancer_sg" {
+  type = string
+}

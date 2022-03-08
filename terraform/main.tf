@@ -94,6 +94,7 @@ module "ecs" {
   record_name     = "${var.DEPLOY_MODE}-${var.ECS_RECORD}"
   vpc_id          = module.network.utopia_vpc
   service_subnets = module.network.public_subnets
+  loadbalancer_sg = module.security.SG_ECS_LB
 }
 
 
