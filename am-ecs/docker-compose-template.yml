@@ -175,7 +175,7 @@ x-aws-cloudformation:
     Flights8081ListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
-        - Flights8081Listener
+        - UtopiaListener
         - Flights8081TargetGroup
       Properties:
         Actions:
@@ -186,12 +186,12 @@ x-aws-cloudformation:
             PathPatternConfig:
               Values:
                 - "/api/v1/flights/*"
-        ListenerArn: !Ref Flights8081Listener
-        Priority: 10
+        ListenerArn: !Ref UtopiaListener
+        Priority: 9
     Bookings8082ListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
-        - Bookings8082Listener
+        - UtopiaListener
         - Bookings8082TargetGroup
       Properties:
         Actions:
@@ -202,12 +202,12 @@ x-aws-cloudformation:
             PathPatternConfig:
               Values:
                 - "/api/v1/bookings/*"
-        ListenerArn: !Ref Bookings8082Listener
-        Priority: 10
+        ListenerArn: !Ref UtopiaListener
+        Priority: 8
     Users8083ListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
-        - Users8083Listener
+        - UtopiaListener
         - Users8083TargetGroup
       Properties:
         Actions:
@@ -218,12 +218,12 @@ x-aws-cloudformation:
             PathPatternConfig:
               Values:
                 - "/api/v1/users/*"
-        ListenerArn: !Ref Users8083Listener
-        Priority: 10
+        ListenerArn: !Ref UtopiaListener
+        Priority: 7
     Auth8443ListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
-        - Auth8443Listener
+        - UtopiaListener
         - Auth8443TargetGroup
       Properties:
         Actions:
@@ -234,12 +234,12 @@ x-aws-cloudformation:
             PathPatternConfig:
               Values:
                 - "/api/v1/login/*"
-        ListenerArn: !Ref Auth8443Listener
-        Priority: 11
+        ListenerArn: !Ref UtopiaListener
+        Priority: 6
     Login8443ListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
-        - Auth8443Listener
+        - UtopiaListener
         - Auth8443TargetGroup
       Properties:
         Actions:
@@ -250,20 +250,20 @@ x-aws-cloudformation:
             PathPatternConfig:
               Values:
                 - "/login"
-        ListenerArn: !Ref Auth8443Listener
-        Priority: 10
+        ListenerArn: !Ref UtopiaListener
+        Priority: 5
 
 
-    # Listeners should route based only on paths to HTTP port 80
-    Flights8081Listener:
+    # Custom Listener for HTTP on port 80
+    UtopiaListener:
+      Type: AWS::ElasticLoadBalancingV2::Listener
       Properties:
+        DefaultActions:
+        - Type: forward
+          ForwardConfig:
+            TargetGroups:
+            - TargetGroupArn:
+                Ref: Auth8443TargetGroup
         Port: 80
-    Bookings8082Listener:
-      Properties:
-        Port: 80
-    Users8083Listener:
-      Properties:
-        Port: 80
-    Auth8443Listener:
-      Properties:
-        Port: 80
+        Protocol: HTTP
+        LoadBalancerArn: !Ref ${AWS_ALB_ID}
