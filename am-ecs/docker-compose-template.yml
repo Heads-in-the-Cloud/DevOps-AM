@@ -176,7 +176,8 @@ x-aws-cloudformation:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       Properties:
         Actions:
-          - forward
+          - Type: forward
+            TargetGroupArn: !Ref Flights8081TargetGroup
         Conditions:
           - Field: path-pattern
             Values:
@@ -187,7 +188,8 @@ x-aws-cloudformation:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       Properties:
         Actions:
-          - forward
+          - Type: forward
+            TargetGroupArn: !Ref Bookings8082TargetGroup
         Conditions:
           - Field: path-pattern
             Values:
@@ -198,7 +200,8 @@ x-aws-cloudformation:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       Properties:
         Actions:
-          - forward
+          - Type: forward
+            TargetGroupArn: !Ref Users8083TargetGroup
         Conditions:
           - Field: path-pattern
             Values:
@@ -209,7 +212,8 @@ x-aws-cloudformation:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       Properties:
         Actions:
-          - forward
+          - Type: forward
+            TargetGroupArn: !Ref Auth8443TargetGroup
         Conditions:
           - Field: path-pattern
             Values:
@@ -220,7 +224,8 @@ x-aws-cloudformation:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       Properties:
         Actions:
-          - forward
+          - Type: forward
+            TargetGroupArn: !Ref Auth8443TargetGroup
         Conditions:
           - Field: path-pattern
             Values:
