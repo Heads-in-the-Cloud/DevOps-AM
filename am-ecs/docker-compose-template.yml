@@ -180,8 +180,9 @@ x-aws-cloudformation:
             TargetGroupArn: !Ref Flights8081TargetGroup
         Conditions:
           - Field: path-pattern
-            Values:
-              - /api/v1/flights/*
+            PathPatternConfig:
+              Values:
+                - "/api/v1/flights/*"
         ListenerArn: !Ref Flights8081Listener
         Priority: 10
     Bookings8082ListenerRule:
@@ -192,8 +193,9 @@ x-aws-cloudformation:
             TargetGroupArn: !Ref Bookings8082TargetGroup
         Conditions:
           - Field: path-pattern
-            Values:
-              - /api/v1/bookings/*
+            PathPatternConfig:
+              Values:
+                - "/api/v1/bookings/*"
         ListenerArn: !Ref Bookings8082Listener
         Priority: 10
     Users8083ListenerRule:
@@ -204,8 +206,9 @@ x-aws-cloudformation:
             TargetGroupArn: !Ref Users8083TargetGroup
         Conditions:
           - Field: path-pattern
-            Values:
-              - /api/v1/users/*
+            PathPatternConfig:
+              Values:
+                - "/api/v1/users/*"
         ListenerArn: !Ref Users8083Listener
         Priority: 10
     Auth8443ListenerRule:
@@ -216,8 +219,9 @@ x-aws-cloudformation:
             TargetGroupArn: !Ref Auth8443TargetGroup
         Conditions:
           - Field: path-pattern
-            Values:
-              - /api/v1/login/*
+            PathPatternConfig:
+              Values:
+                - "/api/v1/login/*"
         ListenerArn: !Ref Auth8443Listener
         Priority: 11
     Login8443ListenerRule:
@@ -228,8 +232,9 @@ x-aws-cloudformation:
             TargetGroupArn: !Ref Auth8443TargetGroup
         Conditions:
           - Field: path-pattern
-            Values:
-              - /login
+            PathPatternConfig:
+              Values:
+                - "/login"
         ListenerArn: !Ref Auth8443Listener
         Priority: 10
 
