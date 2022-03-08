@@ -189,7 +189,7 @@ x-aws-cloudformation:
 
 
     # Listeners need custom rules for paths
-    Flights8081ListenerRule:
+    Flights8081ListenerRule1:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
         - UtopiaListener
@@ -208,6 +208,23 @@ x-aws-cloudformation:
                 - "/api/v1/airports"
                 - "/api/v1/airports/*"
                 - "/api/v1/routes"
+        ListenerArn:
+          Ref: UtopiaListener
+        Priority: 13
+    Flights8081ListenerRule2:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      DependsOn:
+        - UtopiaListener
+        - Flights8081TargetGroup
+      Properties:
+        Actions:
+          - Type: forward
+            TargetGroupArn:
+              Ref: Flights8081TargetGroup
+        Conditions:
+          - Field: path-pattern
+            PathPatternConfig:
+              Values:
                 - "/api/v1/routes/*"
                 - "/api/v1/airplanes"
                 - "/api/v1/airplanes/*"
@@ -215,8 +232,8 @@ x-aws-cloudformation:
                 - "/api/v1/airplaneTypes/*"
         ListenerArn:
           Ref: UtopiaListener
-        Priority: 9
-    Bookings8082ListenerRule:
+        Priority: 12
+    Bookings8082ListenerRule1:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
         - UtopiaListener
@@ -232,13 +249,30 @@ x-aws-cloudformation:
               Values:
                 - "/api/v1/bookings"
                 - "/api/v1/bookings/*"
+        ListenerArn:
+          Ref: UtopiaListener
+        Priority: 11
+    Bookings8082ListenerRule2:
+      Type: AWS::ElasticLoadBalancingV2::ListenerRule
+      DependsOn:
+        - UtopiaListener
+        - Bookings8082TargetGroup
+      Properties:
+        Actions:
+          - Type: forward
+            TargetGroupArn:
+              Ref: Bookings8082TargetGroup
+        Conditions:
+          - Field: path-pattern
+            PathPatternConfig:
+              Values:
                 - "/api/v1/payments"
                 - "/api/v1/payments/*"
                 - "/api/v1/passengers"
                 - "/api/v1/passengers/*"
         ListenerArn:
           Ref: UtopiaListener
-        Priority: 8
+        Priority: 10
     Users8083ListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
@@ -259,7 +293,7 @@ x-aws-cloudformation:
                 - "/api/v1/roles/*"
         ListenerArn:
           Ref: UtopiaListener
-        Priority: 7
+        Priority: 9
     Auth8443ListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
@@ -278,4 +312,4 @@ x-aws-cloudformation:
                 - "/login"
         ListenerArn:
           Ref: UtopiaListener
-        Priority: 6
+        Priority: 8
