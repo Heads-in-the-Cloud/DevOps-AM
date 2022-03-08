@@ -210,7 +210,7 @@ x-aws-cloudformation:
                 - "/api/v1/routes"
         ListenerArn:
           Ref: UtopiaListener
-        Priority: 13
+        Priority: 11
     Flights8081ListenerRule2:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
@@ -232,7 +232,7 @@ x-aws-cloudformation:
                 - "/api/v1/airplaneTypes/*"
         ListenerArn:
           Ref: UtopiaListener
-        Priority: 12
+        Priority: 10
     Bookings8082ListenerRule1:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
@@ -251,7 +251,7 @@ x-aws-cloudformation:
                 - "/api/v1/bookings/*"
         ListenerArn:
           Ref: UtopiaListener
-        Priority: 11
+        Priority: 12
     Bookings8082ListenerRule2:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
@@ -272,7 +272,7 @@ x-aws-cloudformation:
                 - "/api/v1/passengers/*"
         ListenerArn:
           Ref: UtopiaListener
-        Priority: 10
+        Priority: 13
     Users8083ListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
@@ -293,7 +293,7 @@ x-aws-cloudformation:
                 - "/api/v1/roles/*"
         ListenerArn:
           Ref: UtopiaListener
-        Priority: 9
+        Priority: 7
     Auth8443ListenerRule:
       Type: AWS::ElasticLoadBalancingV2::ListenerRule
       DependsOn:
@@ -312,4 +312,4 @@ x-aws-cloudformation:
                 - "/login"
         ListenerArn:
           Ref: UtopiaListener
-        Priority: 8
+        Priority: 6
