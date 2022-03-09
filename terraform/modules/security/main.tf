@@ -125,7 +125,7 @@ resource "aws_security_group" "eks_api_access" {
 
 resource "aws_security_group" "ecs_loadbalancer_access" {
   name        = "${var.environment_name}-ecs-lb-all-traffic"
-  description = "Open HTTP Listeners to Global"
+  description = "Allow Global HTTP Access"
   vpc_id      = var.vpc_id
 
   # HTTP from all sources
@@ -133,7 +133,7 @@ resource "aws_security_group" "ecs_loadbalancer_access" {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = var.public_cidrs
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   # API Internet Access
