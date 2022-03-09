@@ -31,4 +31,11 @@ resource "aws_route53_record" "utopia_record" {
   type    = "CNAME"
   ttl     = "60"
   records = ["placeholder.text"]
+
+  # Don't recreate route53 record if record target changes
+  lifecycle {
+    ignore_changes = [
+        records
+    ]
+  }
 }

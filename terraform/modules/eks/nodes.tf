@@ -7,7 +7,7 @@ resource "aws_eks_node_group" "eks_nodes" {
   node_group_name = "AM-eks-nodegroup"
   cluster_name    = aws_eks_cluster.eks_cluster.name
   node_role_arn   = aws_iam_role.EKS_nodegroup_role.arn
-  subnet_ids      = var.eks_public_subnets
+  subnet_ids      = var.eks_node_subnets
 
   instance_types = [var.node_instance_type]
 
@@ -20,7 +20,8 @@ resource "aws_eks_node_group" "eks_nodes" {
   depends_on = [
     aws_iam_role_policy_attachment.EKS_EC2_policy,
     aws_iam_role_policy_attachment.EKS_CNI_policy,
-    aws_iam_role_policy_attachment.EKS_worker_policy
+    aws_iam_role_policy_attachment.EKS_worker_policy,
+    aws_eks_cluster.eks_cluster
   ]
 
   tags = {
