@@ -19,7 +19,7 @@ variable "eks_subnets" {
   default = []
 }
 
-variable "eks_public_subnets" {
+variable "eks_node_subnets" {
   type    = list(string)
   default = []
 }

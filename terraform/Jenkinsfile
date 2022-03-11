@@ -27,7 +27,7 @@ pipeline {
     }
 
     parameters {
-        booleanParam(name: "APPLY", defaultValue: false)
+        booleanParam(name: "APPLY", defaultValue: true)
     }
 
     stages {
@@ -82,25 +82,21 @@ pipeline {
             steps {
                 echo 'Writing output to Secrets'
                 script {
-                    withCredentials([
-                        string (credentialsId: env.AM_SECRET_ID,
-                        variable: 'DB_CREDS')
-                    ]) {
-                        // json objects
-                        def creds = readJSON text: DB_CREDS
-                        def outputs = readProperties file: 'terraform/env.txt'
+                    // json objects
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${AM_SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    def creds = readJSON text: secret
+                    def outputs = readProperties file: 'terraform/env.txt'
 
-                        // secret keys
-                        creds.AWS_VPC_ID            = outputs.AWS_VPC_ID
-                        creds.AWS_RDS_ENDPOINT      = outputs.AWS_RDS_ENDPOINT
-                        creds.AWS_ALB_ID            = outputs.AWS_ALB_ID
-                        creds.AWS_EKS_CLUSTER_NAME  = outputs.AWS_EKS_CLUSTER_NAME
-                        creds.AWS_ECS_SG            = outputs.AWS_ECS_SG
+                    // secret keys
+                    creds.AWS_VPC_ID            = outputs.AWS_VPC_ID
+                    creds.AWS_RDS_ENDPOINT      = outputs.AWS_RDS_ENDPOINT
+                    creds.AWS_ALB_ID            = outputs.AWS_ALB_ID
+                    creds.AWS_EKS_CLUSTER_NAME  = outputs.AWS_EKS_CLUSTER_NAME
+                    creds.AWS_ECS_SG            = outputs.AWS_ECS_SG
 
-                        // rewrite secret
-                        String jsonOut = writeJSON returnText: true, json: creds
-                        sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:${AWS_REGION_ID}:${AWS_ACCOUNT_ID}:secret:${SECRET_ID_PUSH}' --region ${AWS_REGION_ID} --secret-string '${jsonOut}'"
-                    }
+                    // rewrite secret
+                    String jsonOut = writeJSON returnText: true, json: creds
+                    sh "aws secretsmanager update-secret --secret-id 'arn:aws:secretsmanager:${AWS_REGION_ID}:${AWS_ACCOUNT_ID}:secret:${SECRET_ID_PUSH}' --region ${AWS_REGION_ID} --secret-string '${jsonOut}'"
                 }
             }
         }

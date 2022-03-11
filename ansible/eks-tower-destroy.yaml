@@ -53,10 +53,8 @@
             name: utopia-secret
         namespace: "{{eks_api_namespace}}"
 
-    - name: Destroy LoadBalancer Service
-      k8s:
-        state: absent
-        api_version: v1
-        kind: Service
-        namespace: "{{eks_ingress_namespace}}"
-        name: nginx-ingress
+    - name: Destroy Ingress Resources
+      shell: |
+        kubectl delete -f . -n {{eks_ingress_namespace}}
+      args:
+        chdir: "{{ eks_location }}/nginx-ingress-config"

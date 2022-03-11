@@ -1,3 +1,13 @@
+
+#######################################
+# NGINX Ingress Controller Deployment #
+#######################################
+#
+#   Controls all Ingress actions. Requires a
+#   ConfigMap with additional parameters, and
+#   a TLS keypair provided as a Secret.
+#
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -15,10 +25,6 @@ spec:
       labels:
         app: nginx-ingress
         app.component: controller
-     #annotations:
-       #prometheus.io/scrape: "true"
-       #prometheus.io/port: "9113"
-       #prometheus.io/scheme: http
     spec:
       serviceAccountName: nginx-ingress
       containers:
@@ -32,8 +38,6 @@ spec:
           containerPort: 443
         - name: readiness-port
           containerPort: 8081
-        - name: prometheus
-          containerPort: 9113
         readinessProbe:
           httpGet:
             path: /nginx-ready
@@ -57,10 +61,11 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         args:
+          - -enable-custom-resources=false
           - -nginx-configmaps=$(POD_NAMESPACE)/nginx-config
           - -default-server-tls-secret=$(POD_NAMESPACE)/default-server-secret
+
          #- -v=3 # Enables extensive logging. Useful for troubleshooting.
          #- -report-ingress-status
          #- -external-service=nginx-ingress
-         #- -enable-prometheus-metrics
          #- -global-configuration=$(POD_NAMESPACE)/nginx-configuration

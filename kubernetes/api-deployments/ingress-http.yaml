@@ -6,7 +6,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
 spec:
   rules:
-    - host: "am-eks.hitwc.link"
+    - host: "dev-am-eks.hitwc.link"
       http:
         paths:
           ####################

@@ -5,10 +5,11 @@
 
 // load balancing
 resource "aws_lb" "utopia_nwb" {
-  name               = "${var.environment_name}-nwb-utopia"
+  name               = "${var.environment_name}-alb-utopia"
   internal           = false
-  load_balancer_type = "network"
+  load_balancer_type = "application"
   subnets            = var.service_subnets
+  security_groups    = [var.loadbalancer_sg]
 }
 
 // route 53

@@ -21,6 +21,10 @@ pipeline {
         EKS_REPLICA_COUNT         = 2
         DB_POOL_MIN               = 2
         DB_POOL_MAX               = 4
+
+        // Exists Information
+        EKS_SERVICE_NAME  = "nginx-ingress"
+        EKS_INGRESS_NS    = "nginx-ingress"
     }
 
     stages {
@@ -37,6 +41,15 @@ pipeline {
                     env.BOOKINGS_API_LATEST = jsonObj.BOOKINGS_API_LATEST
                     env.USERS_API_LATEST    = jsonObj.USERS_API_LATEST
                     env.AUTH_API_LATEST     = jsonObj.AUTH_API_LATEST
+                    env.EKS_CLUSTER_NAME    = jsonObj.AWS_EKS_CLUSTER_NAME
+                }
+            }
+        }
+
+        stage('Check EKS Exists') {
+            steps {
+                script {
+                    EKSExists()
                 }
             }
         }
@@ -71,4 +84,9 @@ pipeline {
 
         // end stages
     }
+}
+
+def EKSExists() {
+    sh 'aws eks --region ${AWS_REGION_ID} update-kubeconfig --name ${EKS_CLUSTER_NAME}'
+    sh 'kubectl get service --namespace ${EKS_INGRESS_NS} ${EKS_SERVICE_NAME}'
 }
