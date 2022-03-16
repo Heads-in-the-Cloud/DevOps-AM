@@ -58,7 +58,7 @@
         REPO_PASSWORD: "{{REPO_PASSWORD}}"
         REPO_NAME: "{{REPO_NAME}}"
         REPO_USERNAME: "{{REPO_USERNAME}}"
-      when: {{ REPO_TYPE }} == "ART"
+      when: "{{ REPO_TYPE }}" == "ART"
       tags: ['always']
 
     ##################
