@@ -7,8 +7,15 @@ pipeline {
     }
 
     environment {
-        SECRET_ID       = "${AM_SECRET_ID}"
         COMMIT_HASH     = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
+
+        // AWS Region Override
+        AWS_PROFILE     = "am_aws"
+        DEPLOY_MODE     = "${AM_DEPLOYMENT_ENVIRONMENT}"
+
+        // Secrets Manager
+        SECRET_BASE     = credentials("AM_SECRET_ID_BASE")
+        SECRET_ID       = "${DEPLOY_MODE}/${SECRET_BASE}"
 
         ECS_MEM_LIMIT   = "1024M"
         ECS_MEM_REQUEST = "256M"
@@ -18,10 +25,6 @@ pipeline {
 
         DB_POOL_MIN     = 2
         DB_POOL_MAX     = 4
-
-        // AWS Region Override
-        AWS_PROFILE     = "am_aws"
-        DEPLOY_MODE     = "${AM_DEPLOYMENT_ENVIRONMENT}"
     }
 
     stages {

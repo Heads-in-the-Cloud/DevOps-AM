@@ -18,7 +18,11 @@ pipeline {
         SERVICE_NAME      = "nginx-ingress"
         SERVICE_NAMESPACE = "nginx-ingress"
         CONTEXT_NAME      = "${AWS_PROFILE_NAME}"
-        SECRET_ID         = "dev/AM/utopia-secrets"
+
+        // Secrets Manager
+        DEPLOY_MODE     = "${AM_DEPLOYMENT_ENVIRONMENT}"
+        SECRET_BASE     = credentials("AM_SECRET_ID_BASE")
+        SECRET_ID       = "${DEPLOY_MODE}/${SECRET_BASE}"
 
         // Terraform passthrough
         TF_VAR_ECS_RECORD         = "${AM_ECS_RECORD_NAME}"

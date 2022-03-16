@@ -10,6 +10,9 @@ pipeline {
         // General
         AWS_PROFILE               = "${AWS_PROFILE_NAME}"
         COMMIT_HASH               = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
+
+        // Secrets Manager
+        DEPLOY_MODE               = "${AM_DEPLOYMENT_ENVIRONMENT}"
         SECRET_PUSHES             = credentials("AM_SECRETS_PUSH_JSON")
         SECRET_PULL               = sh(returnStdout: true, script: "echo '${SECRET_PUSHES}' | jq '.DEV' | tr -d '\\n\"'")
         SECRET_BASE               = credentials("AM_SECRET_ID_BASE")

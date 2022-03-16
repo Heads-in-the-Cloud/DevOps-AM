@@ -13,6 +13,7 @@ pipeline {
         AWS_ACCOUNT_ID            = "${AWS_ACCOUNT_ID}"
 
         // Secrets Manager
+        DEPLOY_MODE     = "${AM_DEPLOYMENT_ENVIRONMENT}"
         SECRET_BASE     = credentials("AM_SECRET_ID_BASE")
         SECRET_ID       = "${DEPLOY_MODE}/${SECRET_BASE}"
 
