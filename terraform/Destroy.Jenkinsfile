@@ -31,6 +31,7 @@ pipeline {
         TF_VAR_AWS_SECRET_ID      = "${AM_SECRET_ID}"
         TF_VAR_AZ_1               = "${AWS_REGION_AZ_1}"
         TF_VAR_AZ_2               = "${AWS_REGION_AZ_2}"
+        TF_VAR_DEPLOY_MODE        = "${AM_DEPLOYMENT_ENVIRONMENT}"
 
         AWS_PROFILE               = "${AWS_PROFILE_NAME}"
     }

@@ -21,6 +21,7 @@ pipeline {
 
         // AWS Region Override
         AWS_PROFILE     = "am_aws"
+        DEPLOY_MODE     = "${AM_DEPLOYMENT_ENVIRONMENT}"
     }
 
     stages {

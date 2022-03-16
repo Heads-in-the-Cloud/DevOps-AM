@@ -10,8 +10,11 @@ pipeline {
         // General
         AWS_PROFILE               = "${AWS_PROFILE_NAME}"
         COMMIT_HASH               = sh(returnStdout: true, script: "git rev-parse --short=8 HEAD").trim()
-        SECRET_ID_PUSH            = "${AM_SECRET_ID_PUSH}"
-        DEPLOY_MODE               = "dev"
+        SECRET_PUSHES             = credentials("AM_SECRETS_PUSH_JSON")
+        SECRET_PULL               = sh(returnStdout: true, script: "echo '${SECRET_PUSHES}' | jq '.DEV' | tr -d '\\n\"'")
+        SECRET_BASE               = credentials("AM_SECRET_ID_BASE")
+        SECRET_ID                 = "${DEPLOY_MODE}/${SECRET_BASE}"
+        SECRET_ID_PUSH            = "${SECRET_ID}-${SECRET_PULL}"
 
         // Terraform passthrough
         TF_VAR_ECS_RECORD         = "${AM_ECS_RECORD_NAME}"
@@ -23,7 +26,7 @@ pipeline {
         TF_VAR_AZ_1               = "${AWS_REGION_AZ_1}"
         TF_VAR_AZ_2               = "${AWS_REGION_AZ_2}"
         TF_VAR_ANSIBLE_DIRECTORY  = "${AM_DEVOPS_DIRECTORY}/ansible"
-        TF_VAR_DEPLOY_MODE        = "${DEPLOY_MODE}"
+        TF_VAR_DEPLOY_MODE        = "${AM_DEPLOY_ENVIRONMENT}"
     }
 
     parameters {
@@ -31,13 +34,12 @@ pipeline {
     }
 
     stages {
-
         stage('Load Environment') {
             steps {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
                 script {
                     // Load from AWS Secret
-                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${AM_SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${SECRET_ID} | jq -Mr \'.SecretString\'').trim()
                     def jsonObj = readJSON text: secret
                     env.TF_VAR_DB_USERNAME    = jsonObj.DB_USERNAME
                     env.TF_VAR_DB_PASSWORD    = jsonObj.DB_PASSWORD
@@ -83,7 +85,7 @@ pipeline {
                 echo 'Writing output to Secrets'
                 script {
                     // json objects
-                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${AM_SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --region ${AWS_REGION_ID} --secret-id ${SECRET_ID} | jq -Mr \'.SecretString\'').trim()
                     def creds = readJSON text: secret
                     def outputs = readProperties file: 'terraform/env.txt'
 
