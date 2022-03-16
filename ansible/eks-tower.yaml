@@ -139,6 +139,8 @@
             BOOKINGS_API_LATEST: "{{utopia_secret.msg.BOOKINGS_API_LATEST}}"
             USERS_API_LATEST: "{{utopia_secret.msg.USERS_API_LATEST}}"
             AUTH_API_LATEST: "{{utopia_secret.msg.AUTH_API_LATEST}}"
+
+            REPO_LOCATION: "{{REPO_LOCATION}}"
       tags: ['never', 'eks-init', 'eks-update']
 
       ############
