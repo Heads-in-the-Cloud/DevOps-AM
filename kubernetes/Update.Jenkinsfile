@@ -30,6 +30,15 @@ pipeline {
         // Exists Information
         EKS_SERVICE_NAME  = "nginx-ingress"
         EKS_INGRESS_NS    = "nginx-ingress"
+
+        // Artifact Information
+        CUR_REPO_TYPE   = "${AM_CURRENT_REPO_TYPE}"
+        ART_REPO_NAME   = credentials("AM_ARTIFACTORY_ENDPOINT")
+
+        // Repositories
+        ECR_REPO_LOC    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com"
+        ART_REPO_LOC    = "${ART_REPO_NAME}/am-utopia"
+        CUR_REPO_LOC    = getRepoLoc(CUR_REPO_TYPE, ECR_REPO_LOC, ART_REPO_LOC)
     }
 
     stages {
@@ -81,6 +90,8 @@ pipeline {
                             BOOKINGS_API_LATEST: "${BOOKINGS_API_LATEST}"
                             USERS_API_LATEST: "${USERS_API_LATEST}"
                             AUTH_API_LATEST: "${AUTH_API_LATEST}"
+
+                            REPO_LOCATION: "${CUR_REPO_LOC}"
                         '''
                     )
                 }
