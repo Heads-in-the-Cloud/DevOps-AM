@@ -11,7 +11,7 @@ pipeline {
 
         // AWS Region Override
         AWS_PROFILE     = "am_aws"
-        DEPLOY_MODE     = "${AM_DEPLOYMENT_ENVIRONMENT}"
+        DEPLOY_MODE     = "${AM_DEPLOY_ENVIRONMENT}"
 
         // Secrets Manager
         SECRET_BASE     = credentials("AM_SECRET_ID_BASE")

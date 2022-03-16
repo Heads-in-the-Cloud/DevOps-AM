@@ -20,7 +20,7 @@ pipeline {
         CONTEXT_NAME      = "${AWS_PROFILE_NAME}"
 
         // Secrets Manager
-        DEPLOY_MODE     = "${AM_DEPLOYMENT_ENVIRONMENT}"
+        DEPLOY_MODE     = "${AM_DEPLOY_ENVIRONMENT}"
         SECRET_BASE     = credentials("AM_SECRET_ID_BASE")
         SECRET_ID       = "${DEPLOY_MODE}/${SECRET_BASE}"
 
