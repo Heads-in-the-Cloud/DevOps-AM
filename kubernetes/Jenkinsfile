@@ -30,7 +30,6 @@ pipeline {
         // Artifact Information
         CUR_REPO_TYPE   = "${AM_CURRENT_REPO_TYPE}"
         ART_REPO_NAME   = credentials("AM_ARTIFACTORY_ENDPOINT")
-        ART_REPO_LOGIN  = credentials("AM_ARTIFACTORY_LOGIN")
 
         // Repositories
         ECR_REPO_LOC    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com"
@@ -87,11 +86,7 @@ pipeline {
                             DB_POOL_MIN: "${DB_POOL_MIN}"
                             DB_POOL_MAX: "${DB_POOL_MAX}"
 
-                            REPO_TYPE: "${CUR_REPO_TYPE}"
                             REPO_LOCATION: "${CUR_REPO_LOC}"
-                            REPO_PASSWORD: "${ART_REPO_LOGIN_PSW}"
-                            REPO_USERNAME: "${ART_REPO_LOGIN_USR}"
-                            REPO_NAME: "${ART_REPO_NAME}"
                         '''
                     )
                 }
