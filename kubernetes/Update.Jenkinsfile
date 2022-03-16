@@ -12,6 +12,10 @@ pipeline {
         AWS_REGION_ID             = "${AWS_REGION_ID}"
         AWS_ACCOUNT_ID            = "${AWS_ACCOUNT_ID}"
 
+        // Secrets Manager
+        SECRET_BASE     = credentials("AM_SECRET_ID_BASE")
+        SECRET_ID       = "${DEPLOY_MODE}/${SECRET_BASE}"
+
         // Ansible API info
         // for t2.medium: 1930m cpu, 3332Mi, 4 pods
         EKS_CONTAINER_CPU_LIMIT   = "450m"
@@ -34,7 +38,7 @@ pipeline {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
                 script {
                     // Load from AWS Secret
-                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${AM_SECRET_ID} | jq -Mr \'.SecretString\'').trim()
+                    secret = sh(returnStdout: true, script: 'aws secretsmanager get-secret-value --secret-id ${SECRET_ID} | jq -Mr \'.SecretString\'').trim()
                     def jsonObj = readJSON text: secret
                     env.AWS_RDS_ENDPOINT    = jsonObj.AWS_RDS_ENDPOINT
                     env.FLIGHTS_API_LATEST  = jsonObj.FLIGHTS_API_LATEST
@@ -64,7 +68,7 @@ pipeline {
                         extraVars: '''
                             AWS_REGION_ID: "${AWS_REGION_ID}"
                             AWS_ACCOUNT_ID: "${AWS_ACCOUNT_ID}"
-                            AWS_SECRET_ID: "${AM_SECRET_ID}"
+                            AWS_SECRET_ID: "${SECRET_ID}"
 
                             EKS_CONTAINER_CPU_LIMIT: "${EKS_CONTAINER_CPU_LIMIT}"
                             EKS_CONTAINER_CPU_REQUEST: "${EKS_CONTAINER_CPU_REQUEST}"
