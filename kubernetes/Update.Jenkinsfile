@@ -71,7 +71,7 @@ pipeline {
             steps {
                 echo 'Running Kubernetes Initialization'
                 script {
-                  ansibleTower(
+                    ansibleTower(
                         towerServer: 'AM-Ansible-Tower-EC2',
                         jobTemplate: 'AM_K8S_Update',
                         extraVars: '''
@@ -90,7 +90,11 @@ pipeline {
                             USERS_API_LATEST: "${USERS_API_LATEST}"
                             AUTH_API_LATEST: "${AUTH_API_LATEST}"
 
+                            REPO_TYPE: "${CUR_REPO_TYPE}"
                             REPO_LOCATION: "${CUR_REPO_LOC}"
+                            REPO_PASSWORD: "${ART_REPO_LOGIN_PSW}"
+                            REPO_USERNAME: "${ART_REPO_LOGIN_USR}"
+                            REPO_NAME: "${ART_REPO_NAME}"
                         '''
                     )
                 }
