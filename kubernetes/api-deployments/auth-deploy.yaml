@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: api-auth-app
-          image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-auth-api:$AUTH_API_LATEST
+          image: $REPO_LOCATION/am-auth-api:$AUTH_API_LATEST
           imagePullPolicy: Always
           resources:
             limits:

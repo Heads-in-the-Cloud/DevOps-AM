@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: api-users-app
-          image: $AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION_ID.amazonaws.com/am-users-api:$USERS_API_LATEST
+          image: $REPO_LOCATION/am-users-api:$USERS_API_LATEST
           imagePullPolicy: Always
           resources:
             limits:
