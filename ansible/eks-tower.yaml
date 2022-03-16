@@ -52,14 +52,21 @@
     # Artifactory Login #
     #####################
     - name: Artifactory Login
-      shell: |
-        echo ${REPO_PASSWORD} | docker login ${REPO_NAME} --username ${REPO_USERNAME} --password-stdin
-      environment:
-        REPO_PASSWORD: "{{REPO_PASSWORD}}"
-        REPO_NAME: "{{REPO_NAME}}"
-        REPO_USERNAME: "{{REPO_USERNAME}}"
+      docker_login:
+        registry: "{{REPO_NAME}}"
+        username: "{{REPO_USERNAME}}"
+        password: "{{REPO_PASSWORD}}"
       when: REPO_TYPE == "ART"
       tags: ['always']
+#    - name: Artifactory Login
+#      shell: |
+#        echo ${REPO_PASSWORD} | docker login ${REPO_NAME} --username ${REPO_USERNAME} --password-stdin
+#      environment:
+#        REPO_PASSWORD: "{{REPO_PASSWORD}}"
+#        REPO_NAME: "{{REPO_NAME}}"
+#        REPO_USERNAME: "{{REPO_USERNAME}}"
+#      when: REPO_TYPE == "ART"
+#      tags: ['always']
 
     ##################
     # Access Cluster #
