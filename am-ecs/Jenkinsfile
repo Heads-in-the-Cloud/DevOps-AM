@@ -25,9 +25,35 @@ pipeline {
 
         DB_POOL_MIN     = 2
         DB_POOL_MAX     = 4
+
+        // Repo Information
+        CUR_REPO_TYPE   = "${AM_CURRENT_REPO_TYPE}"
+        ART_REPO_NAME   = credentials("AM_ARTIFACTORY_ENDPOINT")
+        ART_REPO_LOGIN  = credentials("AM_ARTIFACTORY_LOGIN")
+
+        // Repositories
+        ECR_REPO_LOC    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com"
+        ART_REPO_LOC    = "${ART_REPO_NAME}/am-utopia"
+        CUR_REPO_LOC    = getRepoLoc(CUR_REPO_TYPE, ECR_REPO_LOC, ART_REPO_LOC)
     }
 
     stages {
+        stage('ECR Login') {
+            when { expression { CUR_REPO_TYPE == 'ECR' } }
+            steps {
+                echo 'logging in via AWS client'
+                sh 'aws ecr get-login-password --region ${AWS_REGION_ID} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com'
+            }
+        }
+
+        stage('Artifactory Login') {
+            when { expression { CUR_REPO_TYPE == 'ART' } }
+            steps {
+                echo 'logging in via docker login'
+                sh 'echo ${ART_REPO_LOGIN_PSW} | docker login ${ART_REPO_NAME} --username ${ART_REPO_LOGIN_USR} --password-stdin'
+            }
+        }
+
         stage('Load Environment') {
             steps {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
@@ -74,6 +100,7 @@ pipeline {
                         $AWS_ECS_SG \
                         $PRIVATE_SUBNET_1 \
                         $PRIVATE_SUBNET_2 \
+                        $CUR_REPO_LOC \
                         \' < docker-compose-template.yml > docker-compose.yml
                     '''
                 }
@@ -108,5 +135,14 @@ pipeline {
         }
 
         // end stages
+    }
+}
+
+// Decide which repo to use based on current type; default to ECR
+def getRepoLoc(repoType, ecrLoc, artLoc) {
+    if(repoType == "ART") {
+        return artLoc
+    } else {
+        return ecrLoc
     }
 }

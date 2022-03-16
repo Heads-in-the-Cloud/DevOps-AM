@@ -34,6 +34,7 @@ pipeline {
         // Artifact Information
         CUR_REPO_TYPE   = "${AM_CURRENT_REPO_TYPE}"
         ART_REPO_NAME   = credentials("AM_ARTIFACTORY_ENDPOINT")
+        ART_REPO_LOGIN  = credentials("AM_ARTIFACTORY_LOGIN")
 
         // Repositories
         ECR_REPO_LOC    = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com"
@@ -42,6 +43,21 @@ pipeline {
     }
 
     stages {
+        stage('ECR Login') {
+            when { expression { CUR_REPO_TYPE == 'ECR' } }
+            steps {
+                echo 'logging in via AWS client'
+                sh 'aws ecr get-login-password --region ${AWS_REGION_ID} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION_ID}.amazonaws.com'
+            }
+        }
+
+        stage('Artifactory Login') {
+            when { expression { CUR_REPO_TYPE == 'ART' } }
+            steps {
+                echo 'logging in via docker login'
+                sh 'echo ${ART_REPO_LOGIN_PSW} | docker login ${ART_REPO_NAME} --username ${ART_REPO_LOGIN_USR} --password-stdin'
+            }
+        }
 
         stage('Load Environment') {
             steps {
@@ -105,4 +121,13 @@ pipeline {
 def EKSExists() {
     sh 'aws eks --region ${AWS_REGION_ID} update-kubeconfig --name ${EKS_CLUSTER_NAME}'
     sh 'kubectl get service --namespace ${EKS_INGRESS_NS} ${EKS_SERVICE_NAME}'
+}
+
+// Decide which repo to use based on current type; default to ECR
+def getRepoLoc(repoType, ecrLoc, artLoc) {
+    if(repoType == "ART") {
+        return artLoc
+    } else {
+        return ecrLoc
+    }
 }
