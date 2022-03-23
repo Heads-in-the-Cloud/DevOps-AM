@@ -44,7 +44,7 @@
     #########################
     - name: Get Utopia Secrets
       debug:
-        msg: "{{ lookup('aws_secret', 'dev/AM/utopia-secrets') }}"
+        msg: "{{ lookup('aws_secret', '{{DEPLOY_MODE}}/AM/utopia-secrets') }}"
       register: utopia_secret
       tags: ['always']
 

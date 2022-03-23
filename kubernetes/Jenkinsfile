@@ -87,6 +87,7 @@ pipeline {
                             DB_POOL_MAX: "${DB_POOL_MAX}"
 
                             REPO_LOCATION: "${CUR_REPO_LOC}"
+                            DEPLOY_MODE: "${DEPLOY_MODE}"
                         '''
                     )
                 }

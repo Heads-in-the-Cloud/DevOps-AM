@@ -91,6 +91,7 @@ pipeline {
                             AUTH_API_LATEST: "${AUTH_API_LATEST}"
 
                             REPO_LOCATION: "${CUR_REPO_LOC}"
+                            DEPLOY_MODE: "${DEPLOY_MODE}"
                         '''
                     )
                 }

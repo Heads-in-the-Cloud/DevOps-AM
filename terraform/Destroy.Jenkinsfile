@@ -217,6 +217,7 @@ def EKSDestroy() {
         jobTemplate: 'AM_K8S_Destroy',
         extraVars: '''
             AWS_REGION_ID: "${AWS_REGION_ID}"
+            DEPLOY_MODE: "${DEPLOY_MODE}"
         '''
     )
 }
