@@ -141,6 +141,7 @@
             AUTH_API_LATEST: "{{utopia_secret.msg.AUTH_API_LATEST}}"
 
             REPO_LOCATION: "{{REPO_LOCATION}}"
+            DEPLOY_MODE: "{{DEPLOY_MODE}}"
       tags: ['never', 'eks-init', 'eks-update']
 
       ############
