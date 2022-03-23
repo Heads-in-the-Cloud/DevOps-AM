@@ -18,11 +18,12 @@ pipeline {
         SERVICE_NAME      = "nginx-ingress"
         SERVICE_NAMESPACE = "nginx-ingress"
         CONTEXT_NAME      = "${AWS_PROFILE_NAME}"
+        ECS_DIR           = "${AM_DEVOPS_DIRECTORY}/AM-${DEPLOY_MODE}-ecs-utopia"
 
         // Secrets Manager
-        DEPLOY_MODE     = "${AM_DEPLOY_ENVIRONMENT}"
-        SECRET_BASE     = credentials("AM_SECRET_ID_BASE")
-        SECRET_ID       = "${DEPLOY_MODE}/${SECRET_BASE}"
+        DEPLOY_MODE       = "${AM_DEPLOY_ENVIRONMENT}"
+        SECRET_BASE       = credentials("AM_SECRET_ID_BASE")
+        SECRET_ID         = "${DEPLOY_MODE}/${SECRET_BASE}"
 
         // Terraform passthrough
         TF_VAR_ECS_RECORD         = "${AM_ECS_RECORD_NAME}"
@@ -223,14 +224,14 @@ def EKSDestroy() {
 }
 
 def ECSExists() {
-    dir("am-ecs") {
+    dir("${ECS_DIR}") {
         sh 'docker context use ${AWS_PROFILE_NAME}'
         sh 'docker compose ps'
     }
 }
 
 def ECSDestroy() {
-    dir("am-ecs") {
+    dir("${ECS_DIR}") {
         sh 'docker compose down'
     }
 }
