@@ -12,6 +12,7 @@ pipeline {
         // AWS Region Override
         AWS_PROFILE     = "am_aws"
         DEPLOY_MODE     = "${AM_DEPLOY_ENVIRONMENT}"
+        ECS_DIR         = "${AM_DEVOPS_DIRECTORY}/AM-${DEPLOY_MODE}-ecs-utopia"
 
         // Secrets Manager
         SECRET_BASE     = credentials("AM_SECRET_ID_BASE")
@@ -37,6 +38,13 @@ pipeline {
     }
 
     stages {
+        stage('Setup Working Directory') {
+            steps {
+                sh "mkdir -p ${ECS_DIR}"
+                sh "cp am-ecs/docker-compose-template.yml ${ECS_DIR}"
+            }
+        }
+
         stage('Load Environment') {
             steps {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
@@ -66,7 +74,7 @@ pipeline {
         stage('Fill Template') {
             steps {
                 echo 'Inserting certain Environment Variables into docker-compose'
-                dir("am-ecs") {
+                dir("${ECS_DIR}") {
                     sh '''
                         envsubst \' \
                         $ECS_MEM_LIMIT \
@@ -101,9 +109,9 @@ pipeline {
 
         stage('Conversion Log') {
             steps {
-                dir("am-ecs") {
-                    sh 'mkdir -p cloudformation-templates'
-                    sh 'docker compose convert > cloudformation-templates/template-${COMMIT_HASH}.yaml'
+                dir("${ECS_DIR}") {
+                    sh 'mkdir -p ${AM_DEVOPS_DIRECTORY}/ecs-cloudformation-templates'
+                    sh 'docker compose convert > ${AM_DEVOPS_DIRECTORY}/ecs-cloudformation-templates/template-${COMMIT_HASH}.yaml'
                 }
             }
         }
@@ -111,7 +119,7 @@ pipeline {
         stage('Push ECS') {
             steps {
                 echo 'Pushing Up to ECS'
-                dir("am-ecs") {
+                dir("${ECS_DIR}") {
                     sh 'docker compose up'
                 }
             }
