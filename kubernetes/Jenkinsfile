@@ -97,7 +97,7 @@ pipeline {
     }
 }
 
-// Decide which repo to use based on current type; default to ECR
+// Decide which repo to use based on current type; default to ECR if not ART
 def getRepoLoc(repoType, ecrLoc, artLoc) {
     if(repoType == "ART") {
         return artLoc
