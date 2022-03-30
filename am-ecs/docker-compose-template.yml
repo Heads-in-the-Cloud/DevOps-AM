@@ -18,6 +18,12 @@ services:
     ports:
       - target: 8081
         x-aws-protocol: http
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: ${DEPLOY_MODE}/AM/ECS-logs
+        awslogs-region: ${AWS_REGION_ID}
+        awslogs-stream-prefix: flights
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
@@ -46,6 +52,12 @@ services:
     ports:
       - target: 8083
         x-aws-protocol: http
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: ${DEPLOY_MODE}/AM/ECS-logs
+        awslogs-region: ${AWS_REGION_ID}
+        awslogs-stream-prefix: flights
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
@@ -74,6 +86,12 @@ services:
     ports:
       - target: 8082
         x-aws-protocol: http
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: ${DEPLOY_MODE}/AM/ECS-logs
+        awslogs-region: ${AWS_REGION_ID}
+        awslogs-stream-prefix: flights
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}
@@ -102,6 +120,12 @@ services:
     ports:
       - target: 8443
         x-aws-protocol: http
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: ${DEPLOY_MODE}/AM/ECS-logs
+        awslogs-region: ${AWS_REGION_ID}
+        awslogs-stream-prefix: flights
     environment:
       - DB_USERNAME=${AWS_RDS_USERNAME}
       - DB_PASSWORD=${AWS_RDS_PASSWORD}

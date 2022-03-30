@@ -2,7 +2,7 @@ pipeline {
     agent {
         node {
             label 'aws-ready'
-            customWorkspace "${AM_DEVOPS_DIRECTORY}"
+            customWorkspace "${AM_DEVOPS_DIRECTORY}/environments/${AM_DEPLOY_ENVIRONMENT}"
         }
     }
 
@@ -12,7 +12,7 @@ pipeline {
         // AWS Region Override
         AWS_PROFILE     = "am_aws"
         DEPLOY_MODE     = "${AM_DEPLOY_ENVIRONMENT}"
-        ECS_DIR         = "${AM_DEVOPS_DIRECTORY}/AM-${DEPLOY_MODE}-ecs-utopia"
+        OUTPUT_DIR      = "${WORKSPACE}"
 
         // Secrets Manager
         SECRET_BASE     = credentials("AM_SECRET_ID_BASE")
@@ -92,6 +92,7 @@ pipeline {
                         $PRIVATE_SUBNET_1 \
                         $PRIVATE_SUBNET_2 \
                         $CUR_REPO_LOC \
+                        $DEPLOY_MODE \
                         \' < docker-compose-template.yml > docker-compose.yml
                     '''
                 }

@@ -2,7 +2,7 @@ pipeline {
     agent {
         node {
             label 'aws-ready'
-            customWorkspace "${AM_DEVOPS_DIRECTORY}"
+            customWorkspace "${AM_DEVOPS_DIRECTORY}/environments/${AM_DEPLOY_ENVIRONMENT}"
         }
     }
 
