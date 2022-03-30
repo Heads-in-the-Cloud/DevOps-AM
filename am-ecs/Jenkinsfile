@@ -2,7 +2,7 @@ pipeline {
     agent {
         node {
             label 'aws-ready'
-            customWorkspace "${AM_DEVOPS_DIRECTORY}/environments/${AM_DEPLOY_ENVIRONMENT}"
+            customWorkspace "${AM_DEVOPS_DIRECTORY}"
         }
     }
 
@@ -12,7 +12,7 @@ pipeline {
         // AWS Region Override
         AWS_PROFILE     = "am_aws"
         DEPLOY_MODE     = "${AM_DEPLOY_ENVIRONMENT}"
-        OUTPUT_DIR      = "${WORKSPACE}"
+        ECS_DIR         = "AM-${DEPLOY_MODE}-ecs"
 
         // Secrets Manager
         SECRET_BASE     = credentials("AM_SECRET_ID_BASE")
@@ -111,8 +111,8 @@ pipeline {
         stage('Conversion Log') {
             steps {
                 dir("${ECS_DIR}") {
-                    sh 'mkdir -p ${AM_DEVOPS_DIRECTORY}/ecs-cloudformation-templates'
-                    sh 'docker compose convert > ${AM_DEVOPS_DIRECTORY}/ecs-cloudformation-templates/template-${COMMIT_HASH}.yaml'
+                    sh 'mkdir -p cloudformation-templates'
+                    sh 'docker compose convert > cloudformation-templates/template-${COMMIT_HASH}.yaml'
                 }
             }
         }
