@@ -45,7 +45,7 @@ pipeline {
             }
         }
 
-        stage('Load Environment') {
+        stage('Load Environment and Secrets') {
             steps {
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
                 script {
@@ -71,7 +71,7 @@ pipeline {
             }
         }
 
-        stage('Fill Template') {
+        stage('Fill Compose Template') {
             steps {
                 echo 'Inserting certain Environment Variables into docker-compose'
                 dir("${ECS_DIR}") {
@@ -99,7 +99,7 @@ pipeline {
             }
         }
 
-        stage('Configure') {
+        stage('Configure ECS Environment') {
             steps {
                 echo 'Configuring ECS'
                 sh 'aws configure set region ${AWS_REGION_ID} --profile ${AWS_PROFILE_NAME}'
@@ -108,7 +108,7 @@ pipeline {
             }
         }
 
-        stage('Conversion Log') {
+        stage('Convert to Cloudformation') {
             steps {
                 dir("${ECS_DIR}") {
                     sh 'mkdir -p cloudformation-templates'
@@ -117,7 +117,7 @@ pipeline {
             }
         }
 
-        stage('Push ECS') {
+        stage('Push ECS Cluster') {
             steps {
                 echo 'Pushing Up to ECS'
                 dir("${ECS_DIR}") {
